@@ -32,6 +32,7 @@ class Chart(FigureCanvas):
     fig = None #rysowany wykres (tzn. obiekt klasy Figure)
     mainPlot = None #główny wykres (punktowy, liniowy, świecowy)    
     mainType = None #typ głównego wykresu
+    volumeBars = None #wykres wolumenu
     #secPlots = None tablica przechowująca (max 3, choć to do ustelenia) wykresy wskaźników
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
@@ -62,7 +63,8 @@ class Chart(FigureCanvas):
         """Ustawiamy model danych, który ma reprezentować wykres. Zakładam, że
             będzie istnieć jedna klasa, z której będę mógł pobrać dane podstawowe
             oraz wszystkie wskaźniki dla tych danych"""
-        self.data=data                            
+        self.data=data
+        self.updatePlot()
         
     def setMainType(self, type):
         """Ustawiamy typ głównego wykresu ('point','line','candle','none')"""
@@ -120,8 +122,7 @@ class Chart(FigureCanvas):
         self.volumeBars.set_visible(False)
         bounds=getBoundsAsRect(self.mainPlot)
         self.mainPlot.set_position([bounds[0],bounds[1]-self.volHeight,
-                                    bounds[2],bounds[3]+self.volHeight])
-        self.updateMainPlot()
+                                    bounds[2],bounds[3]+self.volHeight])        
         
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""
