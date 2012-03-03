@@ -13,8 +13,8 @@ class ApplicationWindow(QtGui.QMainWindow):
         l = QtGui.QVBoxLayout(self.main_widget)
         chart = Chart(self.main_widget)        
         l.addWidget(chart)
-        chart.drawPlot()
-
+        chart.rmVolumeBars()
+        chart.addVolumeBars()
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)        
 
