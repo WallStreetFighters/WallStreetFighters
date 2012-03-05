@@ -53,7 +53,6 @@ def CCI(closeTable,lowTable,highTable,duration):
 		tempTypical = typicalPricesTable[i-duration+1:i+1]
 		average = simpleArthmeticAverage(tempTypical)
 		deviation = meanDeviation(tempTypical)
-		print deviation
 		values[j] = (typicalPricesTable[i] - average)/(0.015*deviation)
 		j += 1
 	return values
@@ -65,3 +64,50 @@ def test():
 	close = array([23.89,23.95,23.67,23.78,23.5,23.32,23.75,23.79,24.14,23.81,23.78,23.86,23.7,24.96,24.88,24.96,25.18,25.07,25.27,25.0,24.46,24.28,24.62,24.58,24.53,24.35,24.34,24.23,23.76,24.2])
 	result = CCI(close,low,high,20)
 	return result
+
+# Korzysta z niej RSI, sumuje elementy tablicy i w zaleznosci od mode, zmienia znak lub nie :)
+def sumUnderCondition(array,mode):
+        result = 0
+        size = array.size
+        if mode == 1:
+                for i in range(0,size):
+                        if array[i] >= 0:
+                                result += array[i]
+        if mode == 2:
+                for i in range(0,size):
+                        if array[i] <= 0:
+                                result += array[i]
+                result *= -1
+        return result
+
+# Liczy wskaznik RSI, przekazujemy wartosci najlepiej zamkniec sesji, otrzymujemy tablice
+# wielkosci array-duration ze wartosciami RSI dla indeksow tablicy [duration,size]
+def RSI(array, duration):
+        size = array.size
+        values = zeros(size-duration)
+        gainLossTable = zeros(size)
+        for i in range(1,size):
+                gainLossTable[i-1] = array[i]-array[i-1]
+        k = 0
+        averageGain = (sumUnderCondition(gainLossTable[0:duration-1],1))/duration
+        averageLoss = (sumUnderCondition(gainLossTable[0:duration-1],2))/duration
+        for j in range(duration,size):    
+                RS = averageGain/averageLoss
+                RSI = 100.0 - (100.0/(1+RS))
+                values[k] = RSI
+                k += 1
+                if j < size:
+                        if gainLossTable[j] > 0:
+                                averageGain = (averageGain*13 + gainLossTable[j])/14.0
+                                averageLoss = (averageLoss*13 + 0)/14.0
+                        if gainLossTable[j] <= 0:
+                                averageGain = (averageGain*13 + 0)/14.0
+                                averageLoss = (averageLoss*13 + (-1)*gainLossTable[j])/14.0
+        return values
+# Funkcja do testowania poprawnych wynikow wskaznika RSI, wartosci pobrane z http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
+def testRSI():
+        a = array([44.34,44.09,44.15,43.61,44.33,44.83,45.10,45.42,45.84,46.08,45.89,46.03,45.61,46.28,46.28,46.0,46.03,46.41,46.22,45.64,46.21,46.25,45.71,46.45,45.78,45.35,44.03,44.18,44.22,44.57,43.42,42.66,43.13])
+        result = RSI(a,14)
+        return result
+
+
