@@ -47,16 +47,16 @@ def CCI(closeTable,lowTable,highTable,duration):
 	typicalPricesTable = zeros(size)
 	for i in range(0,size):
 		typicalPricesTable[i] = (closeTable[i]+lowTable[i]+highTable[i])/3
-	values = zeros(size-duration+1)
+	values = zeros(size-duration)
 	j = 0
-	for i in range(duration-1,size):
-		tempTypical = typicalPricesTable[i-duration+1:i+1]
+	for i in range(duration,size):
+		tempTypical = typicalPricesTable[i-duration:i+1]
 		average = simpleArthmeticAverage(tempTypical)
 		deviation = meanDeviation(tempTypical)
 		print deviation
 		values[j] = (typicalPricesTable[i] - average)/(0.015*deviation)
 		j += 1
-	return values
+	return typicalPricesTable
 
 # funkcja testujaca CCI, wartosci wziete stad http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:commodity_channel_index_cci		
 def test():
