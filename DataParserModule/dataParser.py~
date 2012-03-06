@@ -41,6 +41,8 @@ class FinancialObject:
 			self.valuesMonthly = self.valuesMonthly + tmpObj.valuesMonthly
 	
 			
+
+
 #koniec definicji klasy
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
