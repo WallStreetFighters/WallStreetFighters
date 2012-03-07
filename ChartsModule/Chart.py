@@ -26,19 +26,26 @@ class Data:
             date+=step                
 
 class Chart(FigureCanvas):
-    """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu"""
+    """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
+    Paweł, na jednym wykresie wyświetlam jeden wskaźnik i jeden oscylator, a jak ktoś
+    będzie chciał więcej, to kliknie sobie jakiś guzik, który mu pootwiera kilka wykresów
+    w nowym oknie."""
     
     data = None  #obiekt przechowujący dane
+    
     fig = None #rysowany wykres (tzn. obiekt klasy Figure)
-    mainPlot = None #główny wykres (punktowy, liniowy, świecowy)    
-    mainType = None #typ głównego wykresu
+    mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
     volumeBars = None #wykres wolumenu
-    #secPlots = None tablica przechowująca (max 3, choć to do ustelenia) wykresy wskaźników
+    oscPlot = None #wykres oscylatora
+    
+    mainType = None #typ głównego wykresu
+    oscType = None #typ oscylatora (RSI, momentum, ...)
+    mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.05, 0.9     
-    #wysokość wolumenu i wykresów dolnych
-    volHeight, secHeight = 0.1, 0.15    
+    #wysokość wolumenu i wykresu oscylatora
+    volHeight, oscHeight = 0.1, 0.15    
     
     def __init__(self, parent=None, data=Data(), width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
@@ -75,14 +82,13 @@ class Chart(FigureCanvas):
         """Odświeża wszystkie wykresy"""
         self.updateMainPlot()
         self.updateVolumeBars()
-        #tu będzie jeszcze odświeżenie wskaźników
+        self.updateOscPlot()
         pass
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
-        self.mainPlot=self.fig.add_axes(bounds)                
-        self.formatDateAxis(self.mainPlot)        
+        self.mainPlot=self.fig.add_axes(bounds)                        
         self.updateMainPlot()
     
     def updateMainPlot(self):
@@ -95,50 +101,61 @@ class Chart(FigureCanvas):
             self.drawCandlePlot()
         else:
             ax.clear()
+        self.formatDateAxis(self.mainPlot)
     
     def addVolumeBars(self):
-        """Rysowanie wykresu wolumenu"""
-        #najpierw kurczymy główny wykres
-        bounds=getBoundsAsRect(self.mainPlot)
-        self.mainPlot.set_position([bounds[0],bounds[1]+self.volHeight,
-                                    bounds[2],bounds[3]-self.volHeight])
-        volBounds=[self.margin, self.margin , 
-                    self.maxSize , self.volHeight]
-        self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                    
-        #usuwamy etykiety y dla wolumenu (zakomentujcie, to zobaczycie czemu)
-        for label in self.volumeBars.get_yticklabels():
-            label.set_visible(False)                    
-        #usuwamy etykiety pod głównym wykresem (żeby były tylko pod wolumenem)
-        for label in self.mainPlot.get_xticklabels():
-            label.set_visible(False)
-        self.formatDateAxis(self.volumeBars)           
+        """Dodaje do wykresu wyświetlanie wolumenu."""        
+        #tworzymy nowy wykres tylko za pierwszym razem, potem tylko pokazujemy i odświeżamy                
+        if(self.volumeBars==None):
+            volBounds=[self.margin, self.margin, self.maxSize, self.volHeight]
+            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                    
+            #usuwamy etykiety y dla wolumenu (zakomentujcie, to zobaczycie czemu)
+            for label in self.volumeBars.get_yticklabels():
+                label.set_visible(False)                                               
         self.updateVolumeBars()
         self.volumeBars.set_visible(True)
+        self.fixPositions()
+        self.fixLabels()
     
     def rmVolumeBars(self):
-        """Usuwa wykres wolumenu"""
+        """Ukrywa wykres wolumenu"""
         if self.volumeBars==None:
             return
-        self.volumeBars.set_visible(False)
-        bounds=getBoundsAsRect(self.mainPlot)
-        self.mainPlot.set_position([bounds[0],bounds[1]-self.volHeight,
-                                    bounds[2],bounds[3]+self.volHeight])        
+        self.volumeBars.set_visible(False)        
+        self.fixPositions()                            
+        self.fixLabels()                        
         
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""
         self.volumeBars.vlines(self.data.date,0,self.data.volume)
+        self.formatDateAxis(self.volumeBars)
         
     def drawCandlePlot(self):
         """To będzie wyświetlać (wkrótce) główny wykres jako świecowy"""
         pass
     
-    def setSecPlot(self, i, type):
-        """Wyświetla na i-tej pozycji pod głównym wykresem wykres poboczny danego typu"""
-        pass
+    def setOscPlot(self, type):
+        """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
+        self.oscType=type        
+        if self.oscPlot==None:
+            oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
+            self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
+        self.updateOscPlot()
+        self.oscPlot.set_visible(True)
+        self.fixPositions()
+        self.fixLabels()
     
-    def rmSecPlot(self, i):
-        """Usuwa i-ty z wykresów pobocznych"""
-        pass
+    def rmOscPlot(self):
+        """Ukrywa wykres oscylatora"""
+        if self.oscPlot==None:
+            return
+        self.oscPlot.set_visible(False)        
+        self.fixPositions()                            
+        self.fixLabels()
+                                    
+    def updateOscPlot(self):
+        self.formatDateAxis(self.oscPlot)
+        
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu"""
@@ -154,6 +171,49 @@ class Chart(FigureCanvas):
             label.set_size(8)
             #label.set_rotation(30)
             label.set_horizontalalignment('center')            
+    
+    def fixLabels(self):
+        """Włącza wyświetlanie etykiet osi czasu pod odpowiednim (tzn. najniższym)
+        wykresem, a usuwa w pozostałych"""
+        #oscylator jest zawsze na samym dole
+        if self.oscPlot!=None and self.oscPlot.get_visible():
+            for label in self.mainPlot.get_xticklabels():
+                label.set_visible(False)
+            for label in self.volumeBars.get_xticklabels():
+                label.set_visible(False)
+            for label in self.oscPlot.get_xticklabels():
+                label.set_visible(True)
+        #jeśli nie ma oscylatora to pod wolumenem
+        elif self.volumeBars.get_visible():
+            for label in self.mainPlot.get_xticklabels():
+                label.set_visible(False)
+            for label in self.volumeBars.get_xticklabels():
+                label.set_visible(True)         
+        #a jak jest tylko duży wykres to pod nim
+        else:
+            for label in self.mainPlot.get_xticklabels():
+                label.set_visible(True)                        
+    
+    def fixPositions(self):
+        """Dopasowuje wymiary i pozycje wykresów tak żeby zawsze wypełniały całą
+        przestrzeń. Główny wykres puchnie albo się kurczy, a wolumen i oscylator 
+        przesuwają się w górę lub dół."""
+        #na początek wszystko spychamy na sam dół
+        mainBounds=[self.margin, self.margin, self.maxSize, self.maxSize]
+        volBounds=[self.margin, self.margin, self.maxSize, self.volHeight]
+        oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
+        #oscylator wypycha wolumen w górę i kurczy maina
+        if self.oscPlot!=None and self.oscPlot.get_visible():
+            mainBounds[1]+=self.oscHeight
+            mainBounds[3]-=self.oscHeight
+            volBounds[1]+=self.oscHeight
+            self.oscPlot.set_position(oscBounds)
+        #wolumen kolejny raz kurczy maina
+        if self.volumeBars.get_visible():                    
+            mainBounds[1]+=self.volHeight
+            mainBounds[3]-=self.volHeight
+            self.volumeBars.set_position(volBounds)
+        self.mainPlot.set_position(mainBounds)                
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
