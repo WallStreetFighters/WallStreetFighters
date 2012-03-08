@@ -5,6 +5,7 @@ __date__ ="$2012-02-23 19:00:48$"
 import datetime
 import random
 import matplotlib.dates as mdates
+import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt4 import QtGui
@@ -16,13 +17,17 @@ class Data:
         self.close=[]
         self.date=[]
         self.volume=[]        
+        self.indicTest=[]        
+        self.oscTest=np.sin(0.25*np.arange(100))       
+        self.ticker="XYZ"
         date = datetime.datetime(2010, 12, 01)        
         step = datetime.timedelta(days=1)
         #step = datetime.timedelta(hours=1)
         for i in range(100):
             self.date.append(date)
             self.close.append(random.random())
-            self.volume.append(random.random())
+            self.volume.append(random.random())            
+            self.indicTest.append(random.random())
             date+=step                
 
 class Chart(FigureCanvas):
@@ -52,9 +57,7 @@ class Chart(FigureCanvas):
         dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
         
         self.data=data
-        self.mainType='line'
-        self.withVolume=True
-        self.secPlots=[]
+        self.mainType='line'                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -63,14 +66,14 @@ class Chart(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         self.addMainPlot()
-        self.addVolumeBars()
-                
+        self.addVolumeBars()                
            
     def setData(self, data):
         """Ustawiamy model danych, który ma reprezentować wykres. Zakładam, że
             będzie istnieć jedna klasa, z której będę mógł pobrać dane podstawowe
             oraz wszystkie wskaźniki dla tych danych"""
         self.data=data
+        #w zaleznosci od horyzontu czasoweg formatujemy osie czasu        
         self.updatePlot()
         
     def setMainType(self, type):
@@ -92,15 +95,21 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
     
     def updateMainPlot(self):
-        ax=self.mainPlot
+        ax=self.mainPlot                
+        ax.clear()
         if self.mainType=='line' :
-            ax.plot(self.data.date,self.data.close,'b-')
+            ax.plot(self.data.date,self.data.close,'b-',label=self.data.ticker)
         elif self.mainType=='point':
-            ax.plot(self.data.date,self.data.close,'b.')
+            ax.plot(self.data.date,self.data.close,'b.',label=self.data.ticker)
         elif self.mainType=='candle':
             self.drawCandlePlot()
-        else:
-            ax.clear()
+        else:            
+            return
+        if self.mainIndicator != None:
+            self.updateMainIndicator()       
+        #legenda
+        leg = ax.legend(loc='best', fancybox=True)
+        leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)
     
     def addVolumeBars(self):
@@ -134,6 +143,27 @@ class Chart(FigureCanvas):
         """To będzie wyświetlać (wkrótce) główny wykres jako świecowy"""
         pass
     
+    def setMainIndicator(self, type):
+        """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
+        self.mainIndicator=type        
+        self.updateMainPlot()
+    
+    def updateMainIndicator(self):
+        """Odrysowuje wskaźnik na głównym wykresie"""
+        ax=self.mainPlot
+        type=self.mainIndicator
+        ax.hold(True) #hold on
+        if type=='Test':
+            indicValues=self.data.indicTest
+        elif type=='SMA':
+            pass        
+        # ....  
+        else:
+            ax.hold(False)
+            return
+        ax.plot(self.data.date,indicValues,'r-',label=type)
+        ax.hold(False) #hold off        
+    
     def setOscPlot(self, type):
         """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
         self.oscType=type        
@@ -154,6 +184,24 @@ class Chart(FigureCanvas):
         self.fixLabels()
                                     
     def updateOscPlot(self):
+        """Odrysowuje wykres oscylatora"""
+        if self.oscPlot==None:
+            return
+        ax=self.oscPlot        
+        type=self.oscType
+        ax.clear()
+        if type == 'Test':
+            oscData=self.data.oscTest
+        elif type == 'RSI':
+            pass        
+        # ..... 
+        else:
+            ax.hold(False)
+            return
+        ax.plot(self.data.date,oscData,'g-',label=type)
+        #legenda
+        leg = ax.legend(loc='best', fancybox=True)
+        leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.oscPlot)
         
 
@@ -168,8 +216,7 @@ class Chart(FigureCanvas):
         else:
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         for label in ax.get_xticklabels():
-            label.set_size(8)
-            #label.set_rotation(30)
+            label.set_size(8)            
             label.set_horizontalalignment('center')            
     
     def fixLabels(self):

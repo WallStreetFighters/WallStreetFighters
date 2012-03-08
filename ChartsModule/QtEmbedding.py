@@ -18,11 +18,11 @@ class ApplicationWindow(QtGui.QMainWindow):
         """można też kilka wykresów w jednym oknie - ich poukładanie (pionowo/poziomo)
         to już kwestia ustawień layoutu Qt, czyli działka Dawida"""
         #chart2 = Chart(self.main_widget)
-        #l.addWidget(chart)        
+        #l.addWidget(chart)                        
+        chart.setOscPlot("Test")
         chart.rmVolumeBars()
-        chart.addVolumeBars()        
-        chart.setOscPlot("rsi")
-        #chart.rmVolumeBars()
+        chart.setMainIndicator("Test")                
+        chart.setOscPlot("Test")
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)        
 
