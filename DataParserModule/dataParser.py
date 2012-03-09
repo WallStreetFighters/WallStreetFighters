@@ -7,6 +7,7 @@ import re
 import csv
 import datetime
 import urllib2
+import urllib
 import cStringIO
 
 #Lista indeksów US
@@ -27,6 +28,7 @@ class FinancialObject:
 		self.currentValue = [] #para wartość i data pobrania
 		self.previousValues = []  #lista w wartości z tego samego dnia ale pobranych wczesniej postac [datetime, value]
 		self.valuesDaily = [] #lista list w przypadku yahoo postaci [[date,open,high,low,close,volume,adj close], [date, ...], ...] 
+					# w przypadku Stooq bez adj close.
 		self.valuesWeekly = [] # jak wyżej tylko dla danych tygodniowych
 		self.valuesMonthly = [] # jak wyżej tylko dla danych miesięcznych
 
@@ -80,14 +82,13 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, sinceDate = d
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
 		return
+
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
-	
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
-
 	for row in dataCsv:
-		dataRow = [[parserDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
+		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
 		finObj.valuesDaily = finObj.valuesDaily + dataRow
 
 	#WEEKLY
@@ -98,39 +99,99 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, sinceDate = d
 	
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
-	#i = 0
 	for row in dataCsv:
-		dataRow = [[parserDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
-		finObj.valuesWeekly = finObj.valuesDaily + dataRow
+		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
+		finObj.valuesWeekly = finObj.valuesWeekly + dataRow
 
 	#MONTHLY
-	url = url.replace('&g=d', '&g=w')
+	url = url.replace('&g=w', '&g=m')
 	site = urllib2.urlopen(url)
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
 	
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
-	#i = 0
 	for row in dataCsv:
-		dataRow = [[parserDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
-		finObj.valuesMonthly = finObj.valuesDaily + dataRow
+		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
+		finObj.valuesMonthly = finObj.valuesMonthly + dataRow
 
 	return finObj
 
+def createWithArchivesFromStooq(name, abbreviation, financialType, sinceDate = datetime.date(1971,1,1)):
+	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony stooq.pl"""
+
+	finObj = FinancialObject(name,abbreviation, financialType, "Stooq")
+	currentDate = datetime.date.today()
+
+	try:
+		url= 'http://stooq.pl/q/d/?s='+abbreviation.lower()
+		opener = urllib2.build_opener()
+		opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+		site = opener.open(url)
+		x = site.info()['Set-Cookie']
+		opener = urllib2.build_opener()
+		opener.addheaders = [('User-agent', 'Mozilla/5.0'), ('Referer','http://stooq.pl/q/d/?s=08n'),('Host','stooq.p')]
+		opener.addheaders = [('Cookie', x)]
+		url2 = 'http://stooq.pl/q/d/l/?s='+abbreviation.lower()+'&d1='+parserDateToString(sinceDate)+'&d2='
+		url2 = url2 + parserDateToString(currentDate)+'&i=d'
+		print url2
+		site = opener.open(url2)
+
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+		return
+	csvString = site.read()
+	csvString = cStringIO.StringIO(csvString)
+	dataCsv = csv.reader(csvString)
+	dataCsv.next()
+	for row in dataCsv:
+		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+		finObj.valuesDaily = finObj.valuesDaily + dataRow
+
+	#WEEKLY
+	url2 = url2.replace('&i=d', '&i=w')
+	site = opener.open(url2)
+	csvString = site.read()
+	print csvString
+	csvString = cStringIO.StringIO(csvString)
+	dataCsv = csv.reader(csvString)
+	dataCsv.next()
+	for row in dataCsv:
+		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+		finObj.valuesWeekly = finObj.valuesWeekly + dataRow
+
+	#MONTHLY
+	url2 = url2.replace('&i=w', '&i=m')
+	print url2
+	site = opener.open(url2)
+	csvString = site.read()
+	csvString = cStringIO.StringIO(csvString)
+	dataCsv = csv.reader(csvString)
+	dataCsv.next()
+	for row in dataCsv:
+		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+		finObj.valuesMonthly = finObj.valuesMonthly + dataRow
+	return finObj
 	
-def parserDate(string):
+	 
+def parserStringToDate(string):
 	"""Funkcja zmieniająca ciąg znaków postaci "YYYY-MM-DD" na obiekt klasy datatime.date"""
 	string = string.split('-')
 	x = datetime.date(int(string[0]),int(string[1]),int(string[2]))
 	return x
 
+def parserDateToString(date):
+	"""Funkcja zmieniająca obiekt datetime.date na string postaci YYYYMMDD"""
+	date = str(date)
+	date = date.replace('-','')
+	return date
 
-
-for x in US_INDICES:
-	print x[1]
-	createWithCurrentValueFromYahoo(x[0], x[1], 'stock')
-	
+print parserDateToString(datetime.date.today())
+#for x in US_INDICES:
+	#print x[1]
+x = createWithArchivesFromStooq('Octava', '08N', 'stock')
+for k in x.valuesMonthly:
+	print k 
 
 
 
