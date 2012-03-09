@@ -7,7 +7,6 @@ import re
 import csv
 import datetime
 import urllib2
-import urllib
 import cStringIO
 
 #Lista indeksów US
@@ -26,24 +25,36 @@ class FinancialObject:
 		self.dataSource = dataSource
 		self.lastUpdate = lastUpdate
 		self.currentValue = [] #para wartość i data pobrania
-		self.previousValues = []  #lista w wartości z tego samego dnia ale pobranych wczesniej postac [datetime, value]
+		self.previousValues = []  #lista w wartości z tego samego dnia ale pobranych wcześniej postaci: [datetime, value]
 		self.valuesDaily = [] #lista list w przypadku yahoo postaci [[date,open,high,low,close,volume,adj close], [date, ...], ...] 
 					# w przypadku Stooq bez adj close.
 		self.valuesWeekly = [] # jak wyżej tylko dla danych tygodniowych
 		self.valuesMonthly = [] # jak wyżej tylko dla danych miesięcznych
+
+	def getCurrentValue(self):
+		"""Metoda aktualizująca dane dotyczące aktualnej wartości obiektu oraz przenosząca poprzednią wartość do listy poprzednich wartości"""
+		day = datetime.timedelta(days=1)
+		lastUpdate = self.lastUpdate + day
+		if self.dataSource == "Yahoo":
+			tmpObj = createWithCurrentValueFromYahoo(self.name, self.abbreviation, self.financialType)
+		elif self.dataSource == "Stooq":
+			tmpObj = createWithCurrentValueFromStooq(self.name, self.abbreviation, self.financialType)
+		self.previousValues = self.previousValues + self.currentValue
+		self.currentValue = tmpObj.currentValue
 
 	def updateArchive(self):
 		"""Metoda aktualizująca dane istniejącego obiektu. Tworzy nowy tymczasowy obiekt i kopiuje jego zawartość do obiektu 'self'. """
 		day = datetime.timedelta(days=1)
 		lastUpdate = self.lastUpdate + day
 		if self.dataSource == "Yahoo":
-			tmpObj = getArchivesFromYahoo(self.name, self.abbreviation, self.financialType, lastUpdate)
-			self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
-			self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
-			self.valuesMonthly = self.valuesMonthly + tmpObj.valuesMonthly
-	
-			
+			tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, lastUpdate)
+		elif self.dataSource == "Stooq":
+			tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, lastUpdate)
+		self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
+		self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
+		self.valuesMonthly = self.valuesMonthly + tmpObj.valuesMonthly
 #koniec definicji klasy
+
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
 
@@ -65,8 +76,26 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType):
 	
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
-	print finObj.currentValue
+	return finObj
 
+def createWithCurrentValueFromStooq(name, abbreviation, financialType):
+	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
+
+	finObj = FinancialObject(name,abbreviation, financialType, "Stooq")
+
+	url = "http://stooq.pl/q/g/?s="+abbreviation.lower()
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+		return
+	pageSource = site.read()
+	pattern = '_c2>([0-9]*,*[0-9]+\.*[0-9]+)<'
+	pattern = re.compile(pattern)
+	m = re.search(pattern,pageSource)
+	timeNow = datetime.datetime.now()
+	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	return finObj
 
 def createWithArchivesFromYahoo(name, abbreviation, financialType, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający archiwalne dane pobrane ze strony finance.yahoo dotyczące obiektu zdefiniowanego w parametrach funkcji"""
@@ -186,12 +215,22 @@ def parserDateToString(date):
 	date = date.replace('-','')
 	return date
 
-print parserDateToString(datetime.date.today())
+def updateDatabase():
+	"""Funkcja sprawdzająca czy na rynkach pojawiły się nowe spółki, jeśli tak to dodaje spółki do bazy danych. """
+	pass
+
+
 #for x in US_INDICES:
 	#print x[1]
-x = createWithArchivesFromStooq('Octava', '08N', 'stock')
+x = createWithCurrentValueFromStooq('Octava', 'BPH', 'stock')
+x.getCurrentValue()
+print x.currentValue
+print x.previousValues
 for k in x.valuesMonthly:
 	print k 
+
+
+
 
 
 
