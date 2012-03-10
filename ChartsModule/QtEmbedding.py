@@ -23,6 +23,7 @@ class ApplicationWindow(QtGui.QMainWindow):
         chart.rmVolumeBars()
         chart.setMainIndicator("Test")                
         chart.setOscPlot("Test")
+        chart.setMainType("candlestick")        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)        
 

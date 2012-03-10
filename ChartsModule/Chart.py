@@ -8,13 +8,18 @@ import matplotlib.dates as mdates
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.finance import candlestick
+from matplotlib.patches import Rectangle
 from PyQt4 import QtGui
 
 class Data:
     """To w założeniu będzie jakaś zewnętrzna klasa, z której będe pobierał dane
     stworzyłem pustą tylko po to żeby się nie sypało przy odwołaniach do niej"""
     def __init__(self):
+        self.open=[]
         self.close=[]
+        self.low=[]
+        self.high=[]
         self.date=[]
         self.volume=[]        
         self.indicTest=[]        
@@ -25,10 +30,25 @@ class Data:
         #step = datetime.timedelta(hours=1)
         for i in range(100):
             self.date.append(date)
+            self.open.append(random.random())
             self.close.append(random.random())
+            self.low.append(min(self.open[i],self.close[i])-random.random())
+            self.high.append(max(self.open[i],self.close[i])+random.random())            
             self.volume.append(random.random())            
             self.indicTest.append(random.random())
             date+=step                
+            
+    def get_quotes(self):
+        """Podaje dane w formacie dla candlesticka"""
+        quotes=[]
+        for i in range(100):
+            time=mdates.date2num(self.date[i])
+            open=self.open[i]
+            close=self.close[i]
+            high=self.high[i]
+            low=self.low[i]                
+            quotes.append((time, open, close, high, low))
+        return quotes
 
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -77,7 +97,7 @@ class Chart(FigureCanvas):
         self.updatePlot()
         
     def setMainType(self, type):
-        """Ustawiamy typ głównego wykresu ('point','line','candle','none')"""
+        """Ustawiamy typ głównego wykresu ('point','line','candlestick','none')"""
         self.mainType=type
         self.updateMainPlot()
         
@@ -101,7 +121,7 @@ class Chart(FigureCanvas):
             ax.plot(self.data.date,self.data.close,'b-',label=self.data.ticker)
         elif self.mainType=='point':
             ax.plot(self.data.date,self.data.close,'b.',label=self.data.ticker)
-        elif self.mainType=='candle':
+        elif self.mainType=='candlestick':
             self.drawCandlePlot()
         else:            
             return
@@ -140,8 +160,26 @@ class Chart(FigureCanvas):
         self.formatDateAxis(self.volumeBars)
         
     def drawCandlePlot(self):
-        """To będzie wyświetlać (wkrótce) główny wykres jako świecowy"""
-        pass
+        """To będzie wyświetlać (wkrótce) główny wykres jako świecowy"""    
+        
+        """candlestick potrzebuje danych w postaci piątek (time, open, close, high, low). 
+        time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
+        Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
+        odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
+        lines, patches = candlestick(self.mainPlot,self.data.get_quotes(),width=0.7,colorup='w',colordown='k')                
+        #to po to żeby się wyświetlała legenda
+        lines[0].set_label(self.data.ticker) 
+        #poniższe dwie linie są po to, żeby wykres wypełniał całą szerokość
+        self.mainPlot.xaxis_date()                
+        self.mainPlot.autoscale_view()   
+        """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
+        stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
+        Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
+        Poniższy kod to naprawia"""
+        for line in lines:                        
+            line.set_zorder(line.get_zorder()-2)
+        for rect in patches:                                    
+            rect.update({'edgecolor':'k','linewidth':0.5})            
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
