@@ -43,8 +43,17 @@ class AbstractTab(QtGui.QWidget):
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.optionsFrame.setLineWidth(3)
         self.horizontalLayout.addWidget(self.optionsFrame)
-
-        
+        #ustawiamy zarządce rozkładu vertical
+        self.optionsLayout = QtGui.QVBoxLayout(self.optionsFrame)
+        #przycisk rysowania wykresu
+        self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
+        self.chartButton.resize(self.chartButton.sizeHint())
+        self.optionsLayout.addWidget(self.chartButton)
+        #przycisk wyjscia
+        self.quitButton = QtGui.QPushButton('Quit',self.optionsFrame)
+        self.quitButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        self.optionsLayout.addWidget(self.quitButton)
+                
         """Ramka przechowujaca wykresy"""
         self.chartsFrame = QtGui.QFrame(self)
         sizePolicy3 = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,
@@ -57,12 +66,13 @@ class AbstractTab(QtGui.QWidget):
         self.chartsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.chartsFrame.setLineWidth(3)
         self.horizontalLayout.addWidget(self.chartsFrame)
+        #ustawiamy zarządce rozkładu vertical
+        self.chartsLayout = QtGui.QVBoxLayout(self.chartsFrame)
+
 
         
                 
-        """ przycisk wyjścia z programu"""
-        quitButton = QtGui.QPushButton('Quit',self.optionsFrame)
-        quitButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
-        quitButton.resize(quitButton.sizeHint())
+        
+        
          
     
