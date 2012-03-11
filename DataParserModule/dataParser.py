@@ -9,20 +9,26 @@ import datetime
 import urllib2
 import cStringIO
 
-#Lista indeksów US
+#ZMIENNE GLOBALNE
+DATABASE_UPDATE = datetime.date(2012,1,1)
+INDEX_LIST = []
+STOCK_LIST = []
+
+
 US_INDICES = [["Dow Jones Composite Average", "^DJA"], ["Dow Jones Industrial Average", "^DJI"], ["Dow Jones Transportation Average", "^DJT"], ["Dow Jones Utility Average", "^DJU"],["NYSE COMPOSITE INDEX","^NYA"],["NYSE International 100","^NYI"], ["NYSE TMT","^NYY"], ["NYSE US 100","^NY"], ["NYSE World Leaders","^NYL"], ["NASDAQ Bank","^IXBK"], ["NASDAQ Biotechnology","^NBI"], ["NASDAQ Composite","^IXIC"], ["NASDAQ Computer","^IXK"], ["NASDAQ Financial 100","^IXF"], ["NASDAQ Industrial","^IXID"], ["NASDAQ Insurance","^IXIS"], ["NASDAQ Other Finance","^IXFN"], ["NASDAQ Telecommunications","^IXUT"], ["NASDAQ Transportation","^IXTR"], ["NASDAQ-100","^NDX"], ["S&P 100 INDEX","^OEX"],  ["S&P 400 MIDCAP INDEX","^MID"],  ["S&P 500","^GSPC"],  ["S&P COMPOSITE 1500 INDEX","^SPSUPX"],  ["S&P SMALLCAP 600 INDEX","^SML"], ["AMEX COMPOSITE INDEX","^XAX"], ["AMEX INTERACTIVE WEEK INTERNET","^IIX"], ["AMEX NETWORKING INDEX","^NWX"], ["DJUS Market Index (full-cap)","^DWC"], ["MAJOR MARKET INDEX","^XMI"], ["NYSE Arca Tech 100 Index","^PSE"], ["PHLX Semiconductor","^SOX"], ["Russell 1000","^RUI"], ["Russell 2000","^RUT"], ["Russell 3000","^RUA"], ["13-WEEK TREASURY BILL","^IRX"], ["CBOE Interest Rate 10-Year T-No","^TNX"], ["Treasury Yield 30 Years","^TYX"], ["Treasury Yield 5 Years","^FVX"], ["PHLX Gold/Silver Sector", "^XAU"]]
 
 #Brak danych: ["BATS 1000 Index","^BATSK"]
 
 
-class FinancialObject:
+class FinancialObject(object):
 	"""Klasa definiująca obiekt finansowy (index,spółkę,surowiec,obligację, etc.), w której przechowywane będą archiwalne notowania i 		   być może obliczone wskaźniki. """
 	
-	def __init__ (self, name, abbreviation, financialType, dataSource, lastUpdate = datetime.date(1971,1,1)):
+	def __init__ (self, name, abbreviation, financialType, dataSource, detail = None,lastUpdate = datetime.date(1971,1,1)):
 		self.name = name
 		self.abbreviation = abbreviation 
 		self.financialType = financialType
 		self.dataSource = dataSource
+		self.detail = detail #Informacja szczegółowa -> Index - kraj / Społka - index
 		self.lastUpdate = lastUpdate
 		self.currentValue = [] #para wartość i data pobrania
 		self.previousValues = []  #lista w wartości z tego samego dnia ale pobranych wcześniej postaci: [datetime, value]
@@ -55,10 +61,10 @@ class FinancialObject:
 		self.valuesMonthly = self.valuesMonthly + tmpObj.valuesMonthly
 #koniec definicji klasy
 
-def createWithCurrentValueFromYahoo(name, abbreviation, financialType):
+def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
 
-	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo")
+	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail)
 
 	url = "http://finance.yahoo.com/q?s="+abbreviation
 	try:
@@ -78,10 +84,10 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType):
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
 	return finObj
 
-def createWithCurrentValueFromStooq(name, abbreviation, financialType):
+def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
 
-	finObj = FinancialObject(name,abbreviation, financialType, "Stooq")
+	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
 
 	url = "http://stooq.pl/q/g/?s="+abbreviation.lower()
 	try:
@@ -97,10 +103,10 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType):
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
 	return finObj
 
-def createWithArchivesFromYahoo(name, abbreviation, financialType, sinceDate = datetime.date(1971,1,1)):
+def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający archiwalne dane pobrane ze strony finance.yahoo dotyczące obiektu zdefiniowanego w parametrach funkcji"""
 	currentDate = datetime.date.today()
-	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", currentDate)
+	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail, currentDate)
 
 	# DAILY
 	url = 'http://ichart.finance.yahoo.com/table.csv?s='+abbreviation+'&a='+str(sinceDate.day)+'&b='+str(sinceDate.month-1)	 
@@ -146,10 +152,10 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, sinceDate = d
 
 	return finObj
 
-def createWithArchivesFromStooq(name, abbreviation, financialType, sinceDate = datetime.date(1971,1,1)):
+def createWithArchivesFromStooq(name, abbreviation, financialType, detail, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony stooq.pl"""
 
-	finObj = FinancialObject(name,abbreviation, financialType, "Stooq")
+	finObj = FinancialObject(name,abbreviation, financialType, detail, "Stooq")
 	currentDate = datetime.date.today()
 
 	try:
@@ -217,21 +223,73 @@ def parserDateToString(date):
 
 def updateDatabase():
 	"""Funkcja sprawdzająca czy na rynkach pojawiły się nowe spółki, jeśli tak to dodaje spółki do bazy danych. """
-	pass
+	month = DATABASE_UPDATE.ctime()[4:7:1]
+	year = DATABASE_UPDATE.year%100
+
+	url = "http://biz.yahoo.com/ipo/prc_"+month.lower()+str(year)+".html"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+		return
+	pageSource = site.read()
+	pattern = '(?s)Prev(.*)Prev'
+	pattern = re.compile(pattern)
+	m = re.search(pattern,pageSource)
+	pageSource = m.group(0)
+
+	pattern = '>([0-9][0-9]*-[A-Z][a-z][a-z]-[0-9][0-9])</td><td>(.*)</td><td.*>([A-Z][A-Z][A-Z]*)<.*>M<'
+	for m in re.finditer(pattern,pageSource):
+		print m.group(1) + m.group(2) + m.group(3)
+
+def loadData():
+	"""Funkcja wczytująca dane z 'bazy danych' na temat dostępnych do wyszukania obiektów finansowych i zapisuje je do zmiennych globalnych""" 
+	global INDEX_LIST
+	global STOCK_LIST
+	csvFile  = open('data1.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
+	dataCsv.next()
+	for row in dataCsv:
+		INDEX_LIST = INDEX_LIST + [[row[0],row[1],row[2],'America']]
+	
+	csvFile  = open('data2.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
+	dataCsv.next()
+	for row in dataCsv:
+		STOCK_LIST = STOCK_LIST + [[row[0],row[1],row[2],row[3]]]
 
 
-#for x in US_INDICES:
-	#print x[1]
+"""for x in US_INDICES:
+	print x[1]+','+x[0]+',Yahoo'
 x = createWithCurrentValueFromStooq('Octava', 'BPH', 'stock')
 x.getCurrentValue()
 print x.currentValue
 print x.previousValues
 for k in x.valuesMonthly:
 	print k 
+updateDatabase()"""
+"""
+for x in STOCK_LIST:
+	print x[0]
+	x = createWithCurrentValueFromYahoo(x[1],x[0],'stock')"""
 
+"""csvFile  = open('companylist.csv', "rb")
+dataCsv = csv.reader(csvFile)
+dataCsv.next()
+i = 0
+for row in dataCsv:
+	print row[0]+','+row[1]+',Yahoo,NASDAQ'"""
 
+### PRZYKŁADOWE UŻYCIE ###
+loadData() #Wczytuje dane do zmiennych globalnych
 
+#załóżmy, że użytkownik chce informacje dotyczące "21Vianet Group Inc."
 
+finObj = createWithCurrentValueFromYahoo(STOCK_LIST[6][1],STOCK_LIST[6][0],'stock',STOCK_LIST[6][3]) #tworzymy obiekt z aktualną wartością akcji
 
+finObj.updateArchive() #pobieramy wartości archiwalne do obiektu
+print "Aktualna wartość: " + str(finObj.currentValue[0])
+for x in finObj.valuesWeekly:
+	print x
 
 
