@@ -110,39 +110,4 @@ def testRSI():
         result = RSI(a,14)
         return result
 
-# Zwraca najwiekszy element tablicy
-def highest(array):
-        max = array[0]
-        for i in range(0,array.size):
-                if array[i] > max:
-                        max = array[i]
-        return max
-
-# Zwraca najmniejszy element tablicy
-def lowest(array):
-        min = array[0]
-        for i in range(0,array.size):
-                if array[i] < min:
-                        min = array[i]
-        return min
-
-# Inaczej zwany oscylator %R Wazne aby przekazywac tablice tej samej dlugosci
-# Zwraca tablice wielkosci size-duration z wartosciami oscylatora %R
-def williamsOscilator(highTable,lowTable,closeTable,duration):
-        size = highTable.size
-        values = zeros(size-duration+3)
-        j = 0
-        for i in range(duration-1,size+2):
-                lowestValue = lowest(lowTable[i-duration+1:i+1])
-                highestValue = highest(highTable[i-duration+1:i+1])
-                values[j] = ((highestValue - closeTable[i])/(highestValue - lowestValue))*(-100.0)
-                j += 1
-        return values
-# Funkcja do testowania oscylatora williamsa, wartosci pobrane z http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:williams_r
-def testR():
-        high = array([127.01,127.62,126.59,127.35,128.17,128.43,127.37,126.42,126.9,126.85,125.65,125.72,127.16,127.72,127.69,128.22,128.27,127.74,128.77,129.29,130.06,129.12,129.29,128.47,128.09,128.65,129.14,128.64])
-        low = array([125.36,126.16,124.93,126.09,126.82,126.48,126.03,124.83,126.39,125.72,124.56,124.57,125.07,126.86,126.63,126.8,126.13,125.92,126.99,127.81,128.47,128.06,127.61,127.6,127.0,126.9,127.49,127.4])
-        close = array([1,1,1,1,1,1,1,1,1,1,1,1,1,127.29,127.18,128.01,127.11,127.73,127.06,127.33,128.71,127.87,128.58,128.6,127.93,128.11,127.6,127.6,128.69,128.27])
-        return williamsOscilator(high,low,close, 14)   
-
 
