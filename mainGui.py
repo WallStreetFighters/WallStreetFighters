@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from PyQt4 import QtGui, QtCore
-from Tab import AbstractTab
+from GUIModule.Tab import AbstractTab
+from ChartsModule.Chart import Chart
 
 class GuiMainWindow(object):
     """Klasa odpowiedzialna za GUI głownego okna aplikacji"""
@@ -15,7 +17,10 @@ class GuiMainWindow(object):
 
 	"""Każde okno zakłaki tworzymy poprzez stworzenie obiektu klasy
 	AbstractTab z modułu Tab w której zdefiniowane są wspólne komponenty
-	dla każdej zakładki"""
+	dla każdej zakładki.
+	AbstractTab.optionsFrame
+            AbstractTab.optionsFrame.chartButton
+	"""
         #tabs - przechowywanie zakładek
 	self.verticalLayout = QtGui.QVBoxLayout(self.centralWidget)
         self.tabs = QtGui.QTabWidget(self.centralWidget)
@@ -25,7 +30,8 @@ class GuiMainWindow(object):
         #tab A
 	self.tabA = AbstractTab()
         self.tabA.setObjectName("tabA")
-        
+        #slot  wyswietlanie wykresu
+        self.tabA.chartButton.clicked.connect(self.paintChart)
         self.tabs.addTab(self.tabA,"tabA")
         
         # tab B
@@ -52,6 +58,13 @@ class GuiMainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+    def paintChart(self):
+            chart = Chart(self.tabA)
+            self.tabA.chartsLayout.addWidget(chart)
+            chart.rmVolumeBars()
+            chart.addVolumeBars()
+            
+            
 
         
        
