@@ -18,9 +18,10 @@ class ApplicationWindow(QtGui.QMainWindow):
         """można też kilka wykresów w jednym oknie - ich poukładanie (pionowo/poziomo)
         to już kwestia ustawień layoutu Qt, czyli działka Dawida"""
         #chart2 = Chart(self.main_widget)
-        #l.addWidget(chart2)                        
+        #l.addWidget(chart2)                            
         chart.setOscPlot("Test")        
-        chart.setMainIndicator("Test")        
+        chart.setMainIndicator("Test")          
+        chart.setScaleType('log');
         chart.setMainType("candlestick")                
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)        

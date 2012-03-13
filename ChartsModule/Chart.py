@@ -69,6 +69,8 @@ class Chart(FigureCanvas):
     oscType = None #typ oscylatora (RSI, momentum, ...)
     mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
     
+    scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')
+    
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.05, 0.9     
     #wysokość wolumenu i wykresu oscylatora
@@ -94,8 +96,7 @@ class Chart(FigureCanvas):
         """Ustawiamy model danych, który ma reprezentować wykres. Zakładam, że
             będzie istnieć jedna klasa, z której będę mógł pobrać dane podstawowe
             oraz wszystkie wskaźniki dla tych danych"""
-        self.data=data
-        #w zaleznosci od horyzontu czasoweg formatujemy osie czasu        
+        self.data=data        
         self.updatePlot()
         
     def setMainType(self, type):
@@ -129,6 +130,7 @@ class Chart(FigureCanvas):
             return
         if self.mainIndicator != None:
             self.updateMainIndicator()       
+        self.mainPlot.set_yscale(self.scaleType)
         #legenda
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
@@ -154,7 +156,14 @@ class Chart(FigureCanvas):
             return
         self.volumeBars.set_visible(False)        
         self.fixPositions()                            
-        self.fixLabels()                        
+        self.fixLabels()
+    
+    def setScaleType(self,type):    
+        """Ustawia skalę liniową lub logarytmiczną na głównym wykresie."""
+        if(type) not in ['linear','log']:
+            return        
+        self.scaleType=type
+        self.updateMainPlot()
         
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""
@@ -162,7 +171,7 @@ class Chart(FigureCanvas):
         self.formatDateAxis(self.volumeBars)
         
     def drawCandlePlot(self):
-        """To będzie wyświetlać (wkrótce) główny wykres jako świecowy"""    
+        """Wyświetla główny wykres w postaci świecowej"""    
         
         """candlestick potrzebuje danych w postaci piątek (time, open, close, high, low). 
         time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
