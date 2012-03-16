@@ -37,14 +37,26 @@ class AbstractTab(QtGui.QWidget):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.optionsFrame.sizePolicy().hasHeightForWidth())
         self.optionsFrame.setSizePolicy(sizePolicy2)
+
         # ustawimy maksymalna szerokosc kolumny na 150
         self.optionsFrame.setMaximumSize(QtCore.QSize(150, 16777215))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.optionsFrame.setLineWidth(3)
         self.horizontalLayout.addWidget(self.optionsFrame)
+
         #ustawiamy zarządce rozkładu vertical
         self.optionsLayout = QtGui.QVBoxLayout(self.optionsFrame)
+        
+        #pola do wprowadzania okresu
+        self.label = QtGui.QLabel('Range:',self.optionsFrame) 
+        self.optionsLayout.addWidget(self.label)
+        self.startDateEdit = QtGui.QDateEdit(self.optionsFrame)
+        self.optionsLayout.addWidget(self.startDateEdit)
+        self.endDateEdit = QtGui.QDateEdit(self.optionsFrame)
+        self.optionsLayout.addWidget(self.endDateEdit)
+        #koniec pola do wprowadzania okresu
+        
         #przycisk rysowania wykresu
         self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
         self.chartButton.resize(self.chartButton.sizeHint())
@@ -53,6 +65,10 @@ class AbstractTab(QtGui.QWidget):
         self.quitButton = QtGui.QPushButton('Quit',self.optionsFrame)
         self.quitButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
         self.optionsLayout.addWidget(self.quitButton)
+
+        #Spacer
+        self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.optionsLayout.addItem(self.spacer)
                 
         """Ramka przechowujaca wykresy"""
         self.chartsFrame = QtGui.QFrame(self)
