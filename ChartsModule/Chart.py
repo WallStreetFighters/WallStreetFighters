@@ -198,8 +198,7 @@ class Chart(FigureCanvas):
         for line in lines:                        
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5}) 
-        self.mainPlot.add_line(Line2D([734107,734111],[0.2,0.4]))
+            rect.update({'edgecolor':'k','linewidth':0.5})         
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -327,22 +326,32 @@ class Chart(FigureCanvas):
 
     def clearLines(self):
         """Usuwa wszystkie linie narysowane dodatkowo na wykresie (tzn. nie kurs i nie wskaźniki)"""
-        pass
+        for line in self.additionalLines:            
+            line.remove()
+        self.additionalLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
 
     def onClick(self, event):
-        """Ustawiamy punkt początkowy tam, gdzie kliknęliśmy"""
-        if(self.drawingMode==False):
+        """Rysujemy linię pomiędzy dwoma kolejnymi kliknięciami. Później to będzie 
+        pewnie mniej biedne (z podglądem na żywo), ale pół dnia siedziałem żeby to
+        gówno w ogóle zadziałało."""        
+        if self.drawingMode==False:
             return
-        if(self.x0==None or self.y0==None):
-            self.x0, self.y0 = event.xdata, event.ydata
-            self.firstPoint=True
-        else:
-            x1, y1 = event.xdata, event.ydata        
-            newLine=Line2D([self.x0,x1],[self.y0,y1])                
-            self.mainPlot.add_line(newLine)                                            
-            newLine.figure.draw_artist(newLine)                                        
-            self.blit(self.fig.bbox)
-            self.x0, self.y0 = None,None
+        if event.button==3: #nie no kurwa, RMB to tutaj button 3 -_-
+            self.clearLines()            
+        elif event.button==1:
+            if self.x0==None or self.y0==None :
+                self.x0, self.y0 = event.xdata, event.ydata
+                self.firstPoint=True
+            else:
+                x1, y1 = event.xdata, event.ydata        
+                newLine=Line2D([self.x0,x1],[self.y0,y1])                
+                self.mainPlot.add_line(newLine)
+                self.additionalLines.append(newLine)
+                newLine.figure.draw_artist(newLine)                                        
+                self.blit(self.mainPlot.bbox)    #blit to taki redraw (to tego szukałem pół dnia)
+                self.x0, self.y0 = None,None
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
