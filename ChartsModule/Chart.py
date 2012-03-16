@@ -11,6 +11,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.patches import Rectangle
 from PyQt4 import QtGui
+from matplotlib.lines import Line2D
 
 class Data:
     """To w założeniu będzie jakaś zewnętrzna klasa, z której będe pobierał dane
@@ -63,18 +64,22 @@ class Chart(FigureCanvas):
     fig = None #rysowany wykres (tzn. obiekt klasy Figure)
     mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
     volumeBars = None #wykres wolumenu
-    oscPlot = None #wykres oscylatora
+    oscPlot = None #wykres oscylatora    
+    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)    
     
     mainType = None #typ głównego wykresu
     oscType = None #typ oscylatora (RSI, momentum, ...)
     mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
     
-    scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')
+    x0, y0 = None,None      #współrzędne początku linii        
+    drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
+    
+    scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')            
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.05, 0.9     
     #wysokość wolumenu i wykresu oscylatora
-    volHeight, oscHeight = 0.1, 0.15    
+    volHeight, oscHeight = 0.1, 0.15        
     
     def __init__(self, parent=None, data=Data(), width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
@@ -90,7 +95,8 @@ class Chart(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         self.addMainPlot()
-        self.addVolumeBars()                
+        self.addVolumeBars()                                
+        self.mpl_connect('button_press_event', self.onClick)        
            
     def setData(self, data):
         """Ustawiamy model danych, który ma reprezentować wykres. Zakładam, że
@@ -192,7 +198,8 @@ class Chart(FigureCanvas):
         for line in lines:                        
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})                                
+            rect.update({'edgecolor':'k','linewidth':0.5}) 
+        self.mainPlot.add_line(Line2D([734107,734111],[0.2,0.4]))
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -311,7 +318,31 @@ class Chart(FigureCanvas):
             mainBounds[1]+=self.volHeight
             mainBounds[3]-=self.volHeight
             self.volumeBars.set_position(volBounds)
-        self.mainPlot.set_position(mainBounds)                
+        self.mainPlot.set_position(mainBounds)     
+    
+    def setDrawingMode(self, mode):
+        """Włączamy (True) lub wyłączamy (False) tryb rysowania po wykresie"""
+        self.drawingMode=mode            
+        x0, y0 = None,None
+
+    def clearLines(self):
+        """Usuwa wszystkie linie narysowane dodatkowo na wykresie (tzn. nie kurs i nie wskaźniki)"""
+        pass
+
+    def onClick(self, event):
+        """Ustawiamy punkt początkowy tam, gdzie kliknęliśmy"""
+        if(self.drawingMode==False):
+            return
+        if(self.x0==None or self.y0==None):
+            self.x0, self.y0 = event.xdata, event.ydata
+            self.firstPoint=True
+        else:
+            x1, y1 = event.xdata, event.ydata        
+            newLine=Line2D([self.x0,x1],[self.y0,y1])                
+            self.mainPlot.add_line(newLine)                                            
+            newLine.figure.draw_artist(newLine)                                        
+            self.blit(self.fig.bbox)
+            self.x0, self.y0 = None,None
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
