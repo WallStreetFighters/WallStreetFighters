@@ -22,12 +22,44 @@ class AbstractTab(QtGui.QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.listsFrame.sizePolicy().hasHeightForWidth())
         self.listsFrame.setSizePolicy(sizePolicy)
-        # ustawimy maksymalna szerokosc kolumny na 150
-        self.listsFrame.setMaximumSize(QtCore.QSize(150, 16777215))
+        # ustawimy maksymalna szerokosc kolumny na 250
+        self.listsFrame.setMaximumSize(QtCore.QSize(250, 16777215))
         self.listsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.listsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.listsFrame.setLineWidth(3)
         self.horizontalLayout.addWidget(self.listsFrame)
+
+        #ustawiamy zarządce rozkładu vertical
+        self.listsLayout = QtGui.QVBoxLayout(self.listsFrame)
+        
+        # Tool Box przechowujący listy
+        self.listsToolBox = QtGui.QToolBox(self.listsFrame)
+
+        #Index
+        self.indexPage = QtGui.QWidget(self.listsFrame)
+        self.indexPageLayout = QtGui.QHBoxLayout(self.indexPage)
+        self.listsToolBox.addItem(self.indexPage, "Index")
+        self.indexListView = QtGui.QListWidget(self.listsFrame)
+        self.indexPageLayout.addWidget(self.indexListView)
+        
+
+        #Stock
+        self.stockPage = QtGui.QWidget(self.listsFrame)
+        self.stockPageLayout = QtGui.QHBoxLayout(self.stockPage)
+        self.listsToolBox.addItem(self.stockPage , "Stock")
+        self.stockListView = QtGui.QListWidget(self.listsFrame)
+        self.stockPageLayout.addWidget(self.stockListView)
+
+        #forex
+        self.forexPage = QtGui.QWidget(self.listsFrame)
+        self.forexPageLayout = QtGui.QHBoxLayout(self.forexPage)
+        self.listsToolBox.addItem(self.forexPage, "Forex")
+        self.forexListView = QtGui.QListWidget(self.listsFrame)
+        self.forexPageLayout.addWidget(self.forexListView)
+        
+        self.listsLayout.addWidget(self.listsToolBox)
+        # koniec Tool Box
+        
 
         """Ramka przechowujaca opcje"""
         self.optionsFrame = QtGui.QFrame(self)
@@ -38,6 +70,7 @@ class AbstractTab(QtGui.QWidget):
         sizePolicy2.setHeightForWidth(self.optionsFrame.sizePolicy().hasHeightForWidth())
         self.optionsFrame.setSizePolicy(sizePolicy2)
 
+        
         # ustawimy maksymalna szerokosc kolumny na 150
         self.optionsFrame.setMaximumSize(QtCore.QSize(150, 16777215))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
