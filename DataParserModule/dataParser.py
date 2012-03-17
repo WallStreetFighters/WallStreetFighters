@@ -239,11 +239,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, since
 	#WEEKLY
 	url2 = url2.replace('&i=d', '&i=w')
 	site = opener.open(url2)
-	csvString = site.read()
-<<<<<<< HEAD
-	print csvString
-=======
->>>>>>> chart
+	csvString = site.read()	
 	csvString = cStringIO.StringIO(csvString)
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
@@ -256,10 +252,6 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, since
 
 	#MONTHLY
 	url2 = url2.replace('&i=w', '&i=m')
-<<<<<<< HEAD
-	print url2
-=======
->>>>>>> chart
 	site = opener.open(url2)
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
