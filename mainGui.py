@@ -90,7 +90,7 @@ class GuiMainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         """l"""
-        self.loadLists()
+        #self.loadLists()
     def paintChart(self):
             chart = Chart(self.tabA)
             self.tabA.chartsLayout.addWidget(chart)

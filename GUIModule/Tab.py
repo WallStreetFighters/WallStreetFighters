@@ -56,6 +56,28 @@ class AbstractTab(QtGui.QWidget):
         self.listsToolBox.addItem(self.forexPage, "Forex")
         self.forexListView = QtGui.QListWidget(self.listsFrame)
         self.forexPageLayout.addWidget(self.forexListView)
+
+        #Bond
+        self.bondPage = QtGui.QWidget(self.listsFrame)
+        self.bondPageLayout = QtGui.QHBoxLayout(self.bondPage)
+        self.listsToolBox.addItem(self.bondPage, "Bond")
+        self.bondListView = QtGui.QListWidget(self.listsFrame)
+        self.bondPageLayout.addWidget(self.bondListView)
+
+
+        #Commodity
+        self.commodityPage = QtGui.QWidget(self.listsFrame)
+        self.commodityPageLayout = QtGui.QHBoxLayout(self.commodityPage)
+        self.listsToolBox.addItem(self.commodityPage, "Commodity")
+        self.commodityListView = QtGui.QListWidget(self.listsFrame)
+        self.commodityPageLayout.addWidget(self.commodityListView)
+
+        #Futures contract
+        self.futuresContractPage = QtGui.QWidget(self.listsFrame)
+        self.futuresContractPageLayout = QtGui.QHBoxLayout(self.futuresContractPage)
+        self.listsToolBox.addItem(self.futuresContractPage, "Futures Contract")
+        self.futuresContractListView = QtGui.QListWidget(self.listsFrame)
+        self.futuresContractPageLayout.addWidget(self.futuresContractListView)
         
         self.listsLayout.addWidget(self.listsToolBox)
         # koniec Tool Box
