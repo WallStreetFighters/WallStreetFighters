@@ -10,14 +10,10 @@ import urllib2
 import cStringIO
 
 #ZMIENNE GLOBALNE
-DATABASE_UPDATE = datetime.date(2012,1,1)
+DATABASE_LAST_UPDATE = datetime.date(2012,1,1)
 INDEX_LIST = []
 STOCK_LIST = []
-
-
-US_INDICES = [["Dow Jones Composite Average", "^DJA"], ["Dow Jones Industrial Average", "^DJI"], ["Dow Jones Transportation Average", "^DJT"], ["Dow Jones Utility Average", "^DJU"],["NYSE COMPOSITE INDEX","^NYA"],["NYSE International 100","^NYI"], ["NYSE TMT","^NYY"], ["NYSE US 100","^NY"], ["NYSE World Leaders","^NYL"], ["NASDAQ Bank","^IXBK"], ["NASDAQ Biotechnology","^NBI"], ["NASDAQ Composite","^IXIC"], ["NASDAQ Computer","^IXK"], ["NASDAQ Financial 100","^IXF"], ["NASDAQ Industrial","^IXID"], ["NASDAQ Insurance","^IXIS"], ["NASDAQ Other Finance","^IXFN"], ["NASDAQ Telecommunications","^IXUT"], ["NASDAQ Transportation","^IXTR"], ["NASDAQ-100","^NDX"], ["S&P 100 INDEX","^OEX"],  ["S&P 400 MIDCAP INDEX","^MID"],  ["S&P 500","^GSPC"],  ["S&P COMPOSITE 1500 INDEX","^SPSUPX"],  ["S&P SMALLCAP 600 INDEX","^SML"], ["AMEX COMPOSITE INDEX","^XAX"], ["AMEX INTERACTIVE WEEK INTERNET","^IIX"], ["AMEX NETWORKING INDEX","^NWX"], ["DJUS Market Index (full-cap)","^DWC"], ["MAJOR MARKET INDEX","^XMI"], ["NYSE Arca Tech 100 Index","^PSE"], ["PHLX Semiconductor","^SOX"], ["Russell 1000","^RUI"], ["Russell 2000","^RUT"], ["Russell 3000","^RUA"], ["13-WEEK TREASURY BILL","^IRX"], ["CBOE Interest Rate 10-Year T-No","^TNX"], ["Treasury Yield 30 Years","^TYX"], ["Treasury Yield 5 Years","^FVX"], ["PHLX Gold/Silver Sector", "^XAU"]]
-
-#Brak danych: ["BATS 1000 Index","^BATSK"]
+FOREX_LIST = []
 
 
 class FinancialObject(object):
@@ -42,9 +38,9 @@ class FinancialObject(object):
 		day = datetime.timedelta(days=1)
 		lastUpdate = self.lastUpdate + day
 		if self.dataSource == "Yahoo":
-			tmpObj = createWithCurrentValueFromYahoo(self.name, self.abbreviation, self.financialType)
+			tmpObj = createWithCurrentValueFromYahoo(self.name, self.abbreviation, self.financialType, self.detail)
 		elif self.dataSource == "Stooq":
-			tmpObj = createWithCurrentValueFromStooq(self.name, self.abbreviation, self.financialType)
+			tmpObj = createWithCurrentValueFromStooq(self.name, self.abbreviation, self.financialType,self.detail)
 		self.previousValues = self.previousValues + self.currentValue
 		self.currentValue = tmpObj.currentValue
 
@@ -59,6 +55,61 @@ class FinancialObject(object):
 		self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
 		self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
 		self.valuesMonthly = self.valuesMonthly + tmpObj.valuesMonthly
+
+	def getArray(self, time):
+		"""Funkcja zwracająca rekordowaną tablicę (numpy.recarray) dla informacji w odstępie czasu przekazanym jako parametr funkcji. 
+                Pozwala to dostać się do poszczególnych tablic używając odpowiednich rekordów: 'date' 'open' etc."""
+		if self.financialType == 'forex':
+			tmplist = []
+			if time == 'daily':
+				for x in self.valuesDaily:
+					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4])]
+			if time == 'weekly':
+				for x in self.valuesWeekly:
+					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4])]
+			if time == 'monthly':
+				for x in self.valuesMonthly:
+					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4])]
+			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float)])
+		else:
+			tmplist = []
+			if time == 'daily':
+				for x in self.valuesDaily:
+					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
+			if time == 'weekly':
+				for x in self.valuesWeekly:
+					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
+			if time == 'monthly':
+				for x in self.valuesMonthly:
+					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
+			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float),('volume',int)])
+			
+	def getIndex(self, begin, end, time = 'daily'):
+		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
+		if time == 'daily':
+			finish = 0
+			while (end < self.valuesDaily[finish][0]):
+				finish += 1
+			start = finish
+			while (begin < self.valuesDaily[start][0]):
+				start += 1
+			return [finish,start]
+		if time == 'weekly':
+			finish = 0
+			while (end < self.valuesWeekly[finish][0]):
+				finish += 1
+			start = finish
+			while (begin < self.valuesWeekly[start][0]):
+				start += 1
+			return [finish,start]
+		if time == 'monthly':
+			finish = 0
+			while (end < self.valuesMonthly[finish][0]):
+				finish += 1
+			start = finish
+			while (begin < self.valuesMonthly[start][0]):
+				start += 1
+			return [finish,start]
 #koniec definicji klasy
 
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
@@ -96,7 +147,7 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 		print "Something wrong happend! Check your internet connection!"
 		return
 	pageSource = site.read()
-	pattern = '_c2>([0-9]*,*[0-9]+\.*[0-9]+)<'
+	pattern = '_c[0-9]>([0-9]*,*[0-9]+\.*[0-9]+)<'
 	pattern = re.compile(pattern)
 	m = re.search(pattern,pageSource)
 	timeNow = datetime.datetime.now()
@@ -169,7 +220,6 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, since
 		opener.addheaders = [('Cookie', x)]
 		url2 = 'http://stooq.pl/q/d/l/?s='+abbreviation.lower()+'&d1='+parserDateToString(sinceDate)+'&d2='
 		url2 = url2 + parserDateToString(currentDate)+'&i=d'
-		print url2
 		site = opener.open(url2)
 
 	except urllib2.URLError, ex:
@@ -180,31 +230,46 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, since
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
 	for row in dataCsv:
-		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+		if financialType == 'forex':
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
+		else:
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
 		finObj.valuesDaily = finObj.valuesDaily + dataRow
 
 	#WEEKLY
 	url2 = url2.replace('&i=d', '&i=w')
 	site = opener.open(url2)
 	csvString = site.read()
+<<<<<<< HEAD
 	print csvString
+=======
+>>>>>>> chart
 	csvString = cStringIO.StringIO(csvString)
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
 	for row in dataCsv:
-		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+		if financialType == 'forex':
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
+		else:
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
 		finObj.valuesWeekly = finObj.valuesWeekly + dataRow
 
 	#MONTHLY
 	url2 = url2.replace('&i=w', '&i=m')
+<<<<<<< HEAD
 	print url2
+=======
+>>>>>>> chart
 	site = opener.open(url2)
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
 	for row in dataCsv:
-		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+		if financialType == 'forex':
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
+		else:
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
 		finObj.valuesMonthly = finObj.valuesMonthly + dataRow
 	return finObj
 	
@@ -223,8 +288,8 @@ def parserDateToString(date):
 
 def updateDatabase():
 	"""Funkcja sprawdzająca czy na rynkach pojawiły się nowe spółki, jeśli tak to dodaje spółki do bazy danych. """
-	month = DATABASE_UPDATE.ctime()[4:7:1]
-	year = DATABASE_UPDATE.year%100
+	month = DATABASE_LAST_UPDATE.ctime()[4:7:1]
+	year = DATABASE_LAST_UPDATE.year%100
 
 	url = "http://biz.yahoo.com/ipo/prc_"+month.lower()+str(year)+".html"
 	try:
@@ -246,6 +311,8 @@ def loadData():
 	"""Funkcja wczytująca dane z 'bazy danych' na temat dostępnych do wyszukania obiektów finansowych i zapisuje je do zmiennych globalnych""" 
 	global INDEX_LIST
 	global STOCK_LIST
+	global FOREX_LIST
+	global DATABASE_LAST_UPDATE
 	csvFile  = open('data1.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
 	dataCsv.next()
@@ -254,32 +321,90 @@ def loadData():
 	
 	csvFile  = open('data2.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
+	flag = True
+	for row in dataCsv:
+		if flag == True:
+			DATABASE_LAST_UPDATE = parserStringToDate(row[1])
+			flag = False
+		else:	
+			STOCK_LIST = STOCK_LIST + [[row[0],row[1],row[2],row[3]]]
+	
+	csvFile  = open('data3.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
 	dataCsv.next()
 	for row in dataCsv:
-		STOCK_LIST = STOCK_LIST + [[row[0],row[1],row[2],row[3]]]
+		FOREX_LIST = FOREX_LIST + [[row[0],row[1],row[2],row[3]]]
 
+def getAdvDec(date):
+	"""Funkcja zwracająca listę krotek postaci(LICZBA_WZROSTÓW,LICZBA_SPADKÓW,LICZBA_BEZZMIAN) dla indeksów NYSE, AMEX, NASDAQ"""
+	list = []
+	url = 'http://unicorn.us.com/advdec/'+ str(date.year)+'/adu'+ parserDateToString(date) +'.txt'
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.HTTPError, ex:
+		if ex.code == 404:
+			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
+			return [[0,0,0],[0,0,0],[0,0,0]]
+		return
+	pageSource = site.read()
+	pageSource = pageSource.replace(' ','')
+	csvString = cStringIO.StringIO(pageSource)
+	dataCsv = csv.reader(csvString)
+	dataCsv.next()
+	dataCsv.next()
+	for row in dataCsv:
+		list += [[row[1],row[2],row[3]]]
+	return list
+	
+def getAdvDecInPeriodOfTime(begin,end,index):
+	tmplist = []
+	day = datetime.timedelta(days=1)
+	if index == 'NYSE':
+		while(begin != end):
+			x = getAdvDec(begin)
+			tmplist += [tuple([str(begin)]+x[0])]
+			begin += day
+		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
+	if index == 'AMEX':
+		while(begin != end):
+			x = getAdvDec(begin)
+			tmplist += [tuple([str(begin)]+x[1])]
+			begin += day
+		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
+	if index == 'NASDAQ':
+		while(begin != end):
+			x = getAdvDec(begin)
+			tmplist += [tuple([str(begin)]+x[2])]
+			begin += day
+		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
 
 """for x in US_INDICES:
-	print x[1]+','+x[0]+',Yahoo'
-x = createWithCurrentValueFromStooq('Octava', 'BPH', 'stock')
+	print x[1]+','+x[0]+',Yahoo'""" """
+x = createWithCurrentValueFromStooq('USD/GPB', 'plngbp', 'forex', 'gbp')
 x.getCurrentValue()
 print x.currentValue
 print x.previousValues
 for k in x.valuesMonthly:
 	print k 
-updateDatabase()"""
+updateDatabase()
 """
-for x in STOCK_LIST:
-	print x[0]
-	x = createWithCurrentValueFromYahoo(x[1],x[0],'stock')"""
-
-"""csvFile  = open('companylist.csv', "rb")
+"""
+loadData()
+i = 1
+for x in FOREX_LIST:
+	i = i+1
+	x = createWithArchivesFromStooq(x[1],x[0],'forex',x[3])
+	print DATABASE_LAST_UPDATE
+"""
+"""
+csvFile  = open('companylist(1).csv', "rb")
 dataCsv = csv.reader(csvFile)
 dataCsv.next()
 i = 0
 for row in dataCsv:
-	print row[0]+','+row[1]+',Yahoo,NASDAQ'"""
-
+	print row[0]+','+row[1]+',Yahoo,AMEX'
+"""
+"""
 ### PRZYKŁADOWE UŻYCIE ###
 loadData() #Wczytuje dane do zmiennych globalnych
 
@@ -289,7 +414,17 @@ finObj = createWithCurrentValueFromYahoo(STOCK_LIST[6][1],STOCK_LIST[6][0],'stoc
 
 finObj.updateArchive() #pobieramy wartości archiwalne do obiektu
 print "Aktualna wartość: " + str(finObj.currentValue[0])
-for x in finObj.valuesWeekly:
-	print x
+
+a = finObj.getArray('daily')
+print a['date']
+
+x = finObj.getIndex(datetime.date(2011,8,8),datetime.date(2012,2,17),'daily')
+print x
+print finObj.valuesDaily[x[0]][0]
+print finObj.valuesDaily[x[1]][0]
 
 
+#x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+
+#print x['adv']
+"""
