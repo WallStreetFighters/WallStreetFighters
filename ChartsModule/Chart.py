@@ -13,53 +13,13 @@ from matplotlib.patches import Rectangle
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 
-class Data:
-    """To w założeniu będzie jakaś zewnętrzna klasa, z której będe pobierał dane
-    stworzyłem pustą tylko po to żeby się nie sypało przy odwołaniach do niej"""
-    datasize=100
-    
-    def __init__(self):
-        self.open=[]
-        self.close=[]
-        self.low=[]
-        self.high=[]
-        self.date=[]
-        self.volume=[]        
-        self.indicTest=[]        
-        self.oscTest=np.sin(0.25*np.arange(self.datasize))       
-        self.ticker="XYZ"
-        date = datetime.datetime(2010, 12, 01)        
-        #step = datetime.timedelta(days=1)
-        step = datetime.timedelta(hours=1)
-        for i in range(self.datasize):
-            self.date.append(date)
-            self.open.append(random.random())
-            self.close.append(random.random())
-            self.low.append(min(self.open[i],self.close[i])-random.random())
-            self.high.append(max(self.open[i],self.close[i])+random.random())            
-            self.volume.append(random.random())            
-            self.indicTest.append(random.random())
-            date+=step                
-            
-    def get_quotes(self):
-        """Podaje dane w formacie dla candlesticka"""
-        quotes=[]
-        for i in range(self.datasize):
-            time=mdates.date2num(self.date[i])
-            open=self.open[i]
-            close=self.close[i]
-            high=self.high[i]
-            low=self.low[i]                
-            quotes.append((time, open, close, high, low))
-        return quotes
-
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
     Paweł, na jednym wykresie wyświetlam jeden wskaźnik i jeden oscylator, a jak ktoś
     będzie chciał więcej, to kliknie sobie jakiś guzik, który mu pootwiera kilka wykresów
     w nowym oknie."""
     
-    data = None  #obiekt przechowujący dane
+    finObj = None  #obiekt klasy FinancialObject przechowujący dane
     
     fig = None #rysowany wykres (tzn. obiekt klasy Figure)
     mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
@@ -76,16 +36,17 @@ class Chart(FigureCanvas):
     
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')            
     
+    timeAxis = None #oś czasu w postaci obiektów klasy Datetime
+    
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.05, 0.9     
     #wysokość wolumenu i wykresu oscylatora
     volHeight, oscHeight = 0.1, 0.15        
     
-    def __init__(self, parent=None, data=Data(), width=8, height=6, dpi=100):
+    def __init__(self, parent, finObj, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
         dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
-        
-        self.data=data
+        self.setData(finObj)
         self.mainType='line'                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
         FigureCanvas.__init__(self, self.fig)
@@ -93,17 +54,21 @@ class Chart(FigureCanvas):
         FigureCanvas.setSizePolicy(self,
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
-        FigureCanvas.updateGeometry(self)
+        FigureCanvas.updateGeometry(self)        
         self.addMainPlot()
-        self.addVolumeBars()                                
+        self.addVolumeBars()                                        
         self.mpl_connect('button_press_event', self.onClick)        
            
-    def setData(self, data):
-        """Ustawiamy model danych, który ma reprezentować wykres. Zakładam, że
-            będzie istnieć jedna klasa, z której będę mógł pobrać dane podstawowe
-            oraz wszystkie wskaźniki dla tych danych"""
-        self.data=data        
-        self.updatePlot()
+    def setData(self, finObj):
+        """Ustawiamy model danych, który ma reprezentować wykres. Następnie
+        konieczne jest jego ponowne odrysowanie"""
+        self.finObj=finObj
+        dataArray=finObj.getArray('daily')
+        self.timeAxis=[]                        
+        for date in dataArray['date']:
+            self.timeAxis.append(datetime.datetime.strptime(date,"%Y-%m-%d"))        
+        if(self.mainPlot!=None):
+            self.updatePlot()
         
     def setMainType(self, type):
         """Ustawiamy typ głównego wykresu ('point','line','candlestick','none')"""
@@ -124,12 +89,17 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
     
     def updateMainPlot(self):
+        if(self.mainPlot==None):
+            return
         ax=self.mainPlot                
         ax.clear()
+        dataArray=self.finObj.getArray('daily')
+        print(dataArray['close'])
+        print(self.timeAxis)
         if self.mainType=='line' :
-            ax.plot(self.data.date,self.data.close,'b-',label=self.data.ticker)
+            ax.plot(self.timeAxis,dataArray['close'],'b-',label=self.finObj.name)
         elif self.mainType=='point':
-            ax.plot(self.data.date,self.data.close,'b.',label=self.data.ticker)
+            ax.plot(self.timeAxis,dataArray['close'],'b.',label=self.finObj.name)
         elif self.mainType=='candlestick':
             self.drawCandlePlot()
         else:            
@@ -173,7 +143,7 @@ class Chart(FigureCanvas):
         
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""
-        self.volumeBars.vlines(self.data.date,0,self.data.volume)
+        self.volumeBars.vlines(self.timeAxis,0,self.finObj.getArray('daily')['volume'])
         self.formatDateAxis(self.volumeBars)
         
     def drawCandlePlot(self):
@@ -187,7 +157,7 @@ class Chart(FigureCanvas):
         lines, patches = candlestick(self.mainPlot,self.data.get_quotes(),
                                     width=0.7*timedelta,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.ticker) 
+        lines[0].set_label(self.finObj.name) 
         #poniższe dwie linie są po to, żeby wykres wypełniał całą szerokość
         self.mainPlot.xaxis_date()                
         self.mainPlot.autoscale_view()   
@@ -198,7 +168,7 @@ class Chart(FigureCanvas):
         for line in lines:                        
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})         
+            rect.update({'edgecolor':'k','linewidth':0.5})    
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -264,9 +234,8 @@ class Chart(FigureCanvas):
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu"""
-        mindate=self.data.date[0].date()
-        maxdate=self.data.date[-1].date()
-        #dwie pozyższe linie to PROWIZORKA, korzystam ze zwykłej listy a nie numPy array
+        mindate=self.timeAxis[0].date()
+        maxdate=self.timeAxis[-1].date()        
         #jeśli horyzont czasowy jest krótszy niż 7 dni, wyświetlamy z godzinami
         if((maxdate-mindate).days < 7):
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d\n%H:%M'))
