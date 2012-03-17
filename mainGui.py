@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import operator
 from PyQt4 import QtGui, QtCore
 from GUIModule.Tab import AbstractTab
 from ChartsModule.Chart import Chart
@@ -28,9 +29,31 @@ class GuiMainWindow(object):
         self.tabs.setGeometry(QtCore.QRect(10, 10, 980, 640))
         self.tabs.setObjectName("Tabs")
 
+        #załadowanie List
+        dataParser.loadData()
+
+        # inicjujemy model danych dla Index
+        indexModel = self.ListModel(list=dataParser.INDEX_LIST)
+        # inicjujemy model danych dla Stock
+        stockModel = self.ListModel(list=dataParser.STOCK_LIST)
+        # inicjujemy model danych dla Forex
+        forexModel = self.ListModel(list=dataParser.FOREX_LIST)
+
         """tab A wskaźniki i oscylatory""" 
 	self.tabA = AbstractTab()
         self.tabA.setObjectName("tabA")
+
+        #ustawiamy modele danych 
+        self.tabA.indexListView.setModel(indexModel)
+        self.tabA.stockListView.setModel(stockModel)
+        self.tabA.forexListView.setModel(forexModel)
+        
+        # set horizontal header properties
+        hh = self.tabA.indexListView.horizontalHeader()
+        hh.setStretchLastSection(True)
+
+        # set column width to fit contents
+        self.tabA.indexListView.resizeColumnsToContents()
 
         self.idicatorsLabel = QtGui.QLabel('Indicators:',self.tabA.optionsFrame)
         self.tabA.optionsLayout.addWidget(self.idicatorsLabel)
@@ -89,21 +112,49 @@ class GuiMainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        """l"""
-        #self.loadLists()
+      
+
+    """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
+    class ListModel(QtCore.QAbstractTableModel):
+        def __init__(self,list, parent = None):
+            QtCore.QAbstractTableModel.__init__(self, parent)
+            self.list = list
+            self.headerdata = ['symbol', 'name', '']
+            print len(self.list)
+            print len(self.list[0])            
+        
+        def rowCount(self, parent):
+            return len(self.list)
+        def columnCount(self,parent):
+            return 2
+        def headerData(self, col, orientation, role):
+            if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+                return QtCore.QVariant(self.headerdata[col])
+            return QtCore.QVariant()
+        
+        def data(self, index, role):
+            if not index.isValid():
+                return QtCore.QVariant()
+            elif role != QtCore.Qt.DisplayRole:
+                return QtCore.QVariant()
+            return QtCore.QVariant(self.list[index.row()][index.column()])
+        
+        def sort(self, Ncol, order):
+            """Sort table by given column number.
+            """
+            self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+            self.list = sorted(self.list, key=operator.itemgetter(Ncol))        
+            if order == QtCore.Qt.DescendingOrder:
+                self.list.reverse()
+            self.emit(QtCore.SIGNAL("layoutChanged()"))
+        
+
     def paintChart(self):
             chart = Chart(self.tabA)
             self.tabA.chartsLayout.addWidget(chart)
             chart.rmVolumeBars()
             chart.addVolumeBars()
 
-    """ przykładowo dodaje liste w przyszłości inna forma listy"""
-    def loadLists(self):
-        dataParser.loadData()
-        for l in dataParser.STOCK_LIST:
-            item = QtGui.QListWidgetItem()
-            item.setText(l[1])
-            self.tabA.stockListView.addItem(item)
         
             
             

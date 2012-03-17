@@ -39,7 +39,8 @@ class AbstractTab(QtGui.QWidget):
         self.indexPage = QtGui.QWidget(self.listsFrame)
         self.indexPageLayout = QtGui.QHBoxLayout(self.indexPage)
         self.listsToolBox.addItem(self.indexPage, "Index")
-        self.indexListView = QtGui.QListWidget(self.listsFrame)
+        self.indexListView = QtGui.QTableView(self.listsFrame)
+        self.tableStyle(self.indexListView) #ustawiamy styl tabeli
         self.indexPageLayout.addWidget(self.indexListView)
         
 
@@ -47,21 +48,24 @@ class AbstractTab(QtGui.QWidget):
         self.stockPage = QtGui.QWidget(self.listsFrame)
         self.stockPageLayout = QtGui.QHBoxLayout(self.stockPage)
         self.listsToolBox.addItem(self.stockPage , "Stock")
-        self.stockListView = QtGui.QListWidget(self.listsFrame)
+        self.stockListView = QtGui.QTableView(self.listsFrame)
+        self.tableStyle(self.stockListView)#ustawiamy styl tabeli
         self.stockPageLayout.addWidget(self.stockListView)
 
         #forex
         self.forexPage = QtGui.QWidget(self.listsFrame)
         self.forexPageLayout = QtGui.QHBoxLayout(self.forexPage)
         self.listsToolBox.addItem(self.forexPage, "Forex")
-        self.forexListView = QtGui.QListWidget(self.listsFrame)
+        self.forexListView = QtGui.QTableView(self.listsFrame)
+        self.tableStyle(self.forexListView)#ustawiamy styl tabeli
         self.forexPageLayout.addWidget(self.forexListView)
 
         #Bond
         self.bondPage = QtGui.QWidget(self.listsFrame)
         self.bondPageLayout = QtGui.QHBoxLayout(self.bondPage)
         self.listsToolBox.addItem(self.bondPage, "Bond")
-        self.bondListView = QtGui.QListWidget(self.listsFrame)
+        self.bondListView = QtGui.QTableView(self.listsFrame)
+        self.tableStyle(self.bondListView)
         self.bondPageLayout.addWidget(self.bondListView)
 
 
@@ -69,14 +73,16 @@ class AbstractTab(QtGui.QWidget):
         self.commodityPage = QtGui.QWidget(self.listsFrame)
         self.commodityPageLayout = QtGui.QHBoxLayout(self.commodityPage)
         self.listsToolBox.addItem(self.commodityPage, "Commodity")
-        self.commodityListView = QtGui.QListWidget(self.listsFrame)
+        self.commodityListView = QtGui.QTableView(self.listsFrame)
+        self.tableStyle(self.commodityListView)
         self.commodityPageLayout.addWidget(self.commodityListView)
 
         #Futures contract
         self.futuresContractPage = QtGui.QWidget(self.listsFrame)
         self.futuresContractPageLayout = QtGui.QHBoxLayout(self.futuresContractPage)
         self.listsToolBox.addItem(self.futuresContractPage, "Futures Contract")
-        self.futuresContractListView = QtGui.QListWidget(self.listsFrame)
+        self.futuresContractListView = QtGui.QTableView(self.listsFrame)
+        self.tableStyle(self.futuresContractListView)
         self.futuresContractPageLayout.addWidget(self.futuresContractListView)
         
         self.listsLayout.addWidget(self.listsToolBox)
@@ -140,7 +146,20 @@ class AbstractTab(QtGui.QWidget):
 	    #Spacer
             self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
             self.optionsLayout.addItem(self.spacer)
-
+       
+    def tableStyle(self,table):
+        # hide grid
+        table.setShowGrid(False)
+        # set the font
+        font = QtGui.QFont("Courier New", 8)
+        table.setFont(font)
+        # hide vertical header
+        vh = table.verticalHeader()
+        vh.setVisible(False)
+        # set column width to fit contents
+        #table.resizeColumnsToContents()
+        # enable sorting
+        table.setSortingEnabled(True)
 
 
         
