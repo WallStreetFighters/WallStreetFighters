@@ -22,8 +22,8 @@ class AbstractTab(QtGui.QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.listsFrame.sizePolicy().hasHeightForWidth())
         self.listsFrame.setSizePolicy(sizePolicy)
-        # ustawimy maksymalna szerokosc kolumny na 250
-        self.listsFrame.setMaximumSize(QtCore.QSize(250, 16777215))
+        # ustawimy maksymalna szerokosc kolumny na 350
+        self.listsFrame.setMaximumSize(QtCore.QSize(350, 16777215))
         self.listsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.listsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.listsFrame.setLineWidth(3)
@@ -89,20 +89,8 @@ class AbstractTab(QtGui.QWidget):
         self.endDateEdit = QtGui.QDateEdit(self.optionsFrame)
         self.optionsLayout.addWidget(self.endDateEdit)
         #koniec pola do wprowadzania okresu
-        
-        #przycisk rysowania wykresu
-        self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
-        self.chartButton.resize(self.chartButton.sizeHint())
-        self.optionsLayout.addWidget(self.chartButton)
-        #przycisk wyjscia
-        self.quitButton = QtGui.QPushButton('Quit',self.optionsFrame)
-        self.quitButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
-        self.optionsLayout.addWidget(self.quitButton)
-
-        #Spacer
-        self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.optionsLayout.addItem(self.spacer)
-                
+			
+	                
         """Ramka przechowujaca wykresy"""
         self.chartsFrame = QtGui.QFrame(self)
         sizePolicy3 = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred,
@@ -117,6 +105,20 @@ class AbstractTab(QtGui.QWidget):
         self.horizontalLayout.addWidget(self.chartsFrame)
         #ustawiamy zarządce rozkładu vertical
         self.chartsLayout = QtGui.QVBoxLayout(self.chartsFrame)
+
+    def addChartButton(self):        
+            #przycisk rysowania wykresu
+            self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
+            self.chartButton.resize(self.chartButton.sizeHint())
+            self.optionsLayout.addWidget(self.chartButton)
+            #przycisk wyjscia
+            self.quitButton = QtGui.QPushButton('Quit',self.optionsFrame)
+            self.quitButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
+            self.optionsLayout.addWidget(self.quitButton)
+	    #Spacer
+            self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
+            self.optionsLayout.addItem(self.spacer)
+
 
 
         
