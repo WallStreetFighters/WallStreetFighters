@@ -319,6 +319,14 @@ class Chart(FigureCanvas):
         self.drawingMode=mode            
         x0, y0 = None,None
     
+    def drawLine(self, x0,y0,x1,y1):
+        """Dodaje linię (trend) do wykresu."""
+        newLine=Line2D([x0,x1],[y0,y1],color='k')                
+        self.mainPlot.add_line(newLine)
+        self.additionalLines.append(newLine)
+        newLine.figure.draw_artist(newLine)                                        
+        self.blit(self.mainPlot.bbox)    #blit to taki redraw
+    
     def clearLines(self):
         """Usuwa wszystkie linie narysowane dodatkowo na wykresie (tzn. nie kurs i nie wskaźniki)"""
         for line in self.additionalLines:            
@@ -341,11 +349,7 @@ class Chart(FigureCanvas):
                 self.firstPoint=True
             else:
                 x1, y1 = event.xdata, event.ydata        
-                newLine=Line2D([self.x0,x1],[self.y0,y1])                
-                self.mainPlot.add_line(newLine)
-                self.additionalLines.append(newLine)
-                newLine.figure.draw_artist(newLine)                                        
-                self.blit(self.mainPlot.bbox)    #blit to taki redraw (to tego szukałem pół dnia)
+                self.drawLine(self.x0,self.y0,x1,y1)                
                 self.x0, self.y0 = None,None
             
 def getBoundsAsRect(axes):

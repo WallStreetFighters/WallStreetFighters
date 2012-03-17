@@ -25,8 +25,9 @@ class ApplicationWindow(QtGui.QMainWindow):
         l.addWidget(chart)                        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
-        chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),'weekly')
-        chart.setMainType('candlestick')        
+        #chart.setDrawingMode(True)
+        #chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),'weekly')
+        #chart.setMainType('candlestick')        
         
 qApp = QtGui.QApplication(sys.argv)
 os.chdir("../DataParserModule") #zmieniamy katalog roboczy żeby pliki .wsf się ładowały
