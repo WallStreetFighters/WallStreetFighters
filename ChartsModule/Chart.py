@@ -6,6 +6,9 @@ import datetime
 import random
 import matplotlib.dates as mdates
 import numpy as np
+import WallStreetFighters.TechAnalysisModule.oscylatory as oscillators
+import WallStreetFighters.TechAnalysisModule.srednie as averages
+import WallStreetFighters.TechAnalysisModule.indexy as indexes
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
@@ -25,13 +28,14 @@ class ChartData:
         if(end==None):
             end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
         indexes=finObj.getIndex(start.date(),end.date(),step)        
+        self.fullArray=finObj.getArray(step)[::-1]
         dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
         self.name=finObj.name
-        self.open=dataArray['open']
-        self.close=dataArray['close']
-        self.low=dataArray['low']
-        self.high=dataArray['high']
-        self.volume=dataArray['open']        
+        self.open=dataArray['open'].tolist()
+        self.close=dataArray['close'].tolist()
+        self.low=dataArray['low'].tolist()
+        self.high=dataArray['high'].tolist()
+        self.volume=dataArray['open'].tolist()        
         self.date = []                    
         for date in dataArray['date']:
             self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))        
@@ -44,7 +48,58 @@ class ChartData:
             high=self.high[i]
             low=self.low[i]
             self.quotes.append((time, open, close, high, low))
-                
+    
+    def momentum(self, duration=10):
+        array=self.close[:]
+        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
+        if(startIdx-duration < 0):
+            for i in range (duration-startIdx):
+                array.insert(0,self.close[0])            
+            for i in range (startIdx):
+                array.insert(0,self.fullArray['close'][i])                                
+        else:
+            for i in range (duration):
+                array.insert(0,self.fullArray['close'][startIdx-duration+i])                                
+        return oscillators.momentum(np.array(array), duration)
+    
+    def SMA(self, duration):        
+        array=self.close[:]            
+        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
+        if(startIdx-len(self.close) < 0):
+            for i in range (len(self.close)-startIdx):
+                array.insert(0,self.close[0])            
+            for i in range (startIdx):
+                array.insert(0,self.fullArray['close'][i])                                
+        else:
+            for i in range (len(self.close)):
+                array.insert(0,self.fullArray['close'][startIdx-len(self.close)+i])                                        
+        return averages.movingAverage(np.array(array),duration,1)
+    
+    def WMA(self, duration):
+        array=self.close[:]            
+        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
+        if(startIdx-len(self.close) < 0):
+            for i in range (len(self.close)-startIdx):
+                array.insert(0,self.close[0])            
+            for i in range (startIdx):
+                array.insert(0,self.fullArray['close'][i])                                
+        else:
+            for i in range (len(self.close)):
+                array.insert(0,self.fullArray['close'][startIdx-len(self.close)+i])                                                
+        return averages.movingAverage(np.array(array),duration,2)
+    
+    def EMA(self, duration):
+        array=self.close[:]            
+        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
+        if(startIdx-len(self.close) < 0):
+            for i in range (len(self.close)-startIdx):
+                array.insert(0,self.close[0])            
+            for i in range (startIdx):
+                array.insert(0,self.fullArray['close'][i])                                
+        else:
+            for i in range (len(self.close)):
+                array.insert(0,self.fullArray['close'][startIdx-len(self.close)+i])                                        
+        return averages.movingAverage(np.array(array),duration,3)
 
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -118,8 +173,7 @@ class Chart(FigureCanvas):
         if(self.mainPlot==None):
             return
         ax=self.mainPlot                
-        ax.clear()        
-        ax.set_xlim(self.data.date[0],self.data.date[-1])        
+        ax.clear()                        
         if self.mainType=='line' :
             ax.plot(self.data.date,self.data.close,'b-',label=self.data.name)
         elif self.mainType=='point':
@@ -130,7 +184,8 @@ class Chart(FigureCanvas):
             return
         if self.mainIndicator != None:
             self.updateMainIndicator()       
-        self.mainPlot.set_yscale(self.scaleType)
+        ax.set_xlim(self.data.date[0],self.data.date[-1])
+        ax.set_yscale(self.scaleType)
         #legenda
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
@@ -169,8 +224,14 @@ class Chart(FigureCanvas):
         
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""
-        self.volumeBars.vlines(self.data.date,0,self.data.volume)
-        self.formatDateAxis(self.volumeBars)
+        ax=self.volumeBars
+        ax.clear()
+        ax.vlines(self.data.date,0,self.data.volume)
+        for label in self.volumeBars.get_yticklabels():
+            label.set_visible(False)
+        ax.set_xlim(self.data.date[0],self.data.date[-1])
+        self.formatDateAxis(ax)
+        self.fixLabels()
         
     def drawCandlePlot(self):
         """Wyświetla główny wykres w postaci świecowej"""    
@@ -205,12 +266,13 @@ class Chart(FigureCanvas):
         """Odrysowuje wskaźnik na głównym wykresie"""
         ax=self.mainPlot
         type=self.mainIndicator
-        ax.hold(True) #hold on
-        if type=='Test':
-            indicValues=self.data.indicTest
-        elif type=='SMA':
-            pass        
-        # ....  
+        ax.hold(True) #hold on        
+        if type=='SMA':
+            indicValues=self.data.SMA(20)        
+        elif type=='WMA':
+            indicValues=self.data.WMA(20)        
+        elif type=='EMA':
+            indicValues=self.data.EMA(20)        
         else:
             ax.hold(False)
             return
@@ -219,7 +281,7 @@ class Chart(FigureCanvas):
     
     def setOscPlot(self, type):
         """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
-        self.oscType=type        
+        self.oscType=type                
         if self.oscPlot==None:
             oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
             self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
@@ -240,22 +302,22 @@ class Chart(FigureCanvas):
         """Odrysowuje wykres oscylatora"""
         if self.oscPlot==None:
             return
-        ax=self.oscPlot        
+        ax=self.oscPlot                
         type=self.oscType
-        ax.clear()
-        if type == 'Test':
-            oscData=self.data.oscTest
-        elif type == 'RSI':
-            pass        
+        ax.clear()            
+        if type == 'momentum':
+            oscData=self.data.momentum()
         # ..... 
         else:
             ax.hold(False)
             return
         ax.plot(self.data.date,oscData,'g-',label=type)
+        ax.set_xlim(self.data.date[0],self.data.date[-1])
         #legenda
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.oscPlot)
+        self.fixLabels()
         
 
     def formatDateAxis(self,ax):
