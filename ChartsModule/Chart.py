@@ -27,7 +27,8 @@ class ChartData:
             start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
         if(end==None):
             end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
-        indexes=finObj.getIndex(start.date(),end.date(),step)        
+        indexes=finObj.getIndex(start.date(),end.date(),step)
+        #potrzebujemy też pełnej tabeli do obliczania wskaźników
         self.fullArray=finObj.getArray(step)[::-1]
         dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
         self.name=finObj.name
@@ -49,56 +50,48 @@ class ChartData:
             low=self.low[i]
             self.quotes.append((time, open, close, high, low))
     
-    def momentum(self, duration=10):
-        array=self.close[:]
-        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
-        if(startIdx-duration < 0):
-            for i in range (duration-startIdx):
-                array.insert(0,self.close[0])            
-            for i in range (startIdx):
-                array.insert(0,self.fullArray['close'][i])                                
+    def getEarlierValues(self, length, type='close'):
+        """Funkcja używana do wskaźników, które potrzebują wartości z okresu
+        wcześniejszego niż dany okres (czyli chyba do wszystkich). Jeśli wcześniejsze
+        wartości istnieją, są one pobierane z tablicy self.fullArray. W przeciwnym wypadku
+        kopiujemy wartość początkową na wcześniejsze wartości.
+        length = ilość dodatkowych wartości, które potrzebujemy"""
+        if(type=='open'):
+            array=self.open[:]
+        elif(type=='close'):
+            array=self.open[:]
+        elif(type=='high'):
+            array=self.high[:]
+        elif(type=='low'):
+            array=self.low[:]
         else:
-            for i in range (duration):
-                array.insert(0,self.fullArray['close'][startIdx-duration+i])                                
+            return None
+        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
+        first=array[0]
+        if(startIdx-length < 0):
+            for i in range (length-startIdx):
+                array.insert(0,first)            
+            for i in range (startIdx):
+                array.insert(0,self.fullArray[type][i])                                
+        else:
+            for i in range (length):
+                array.insert(0,self.fullArray[type][startIdx-length+i])
+        return array
+    
+    def momentum(self, duration=10):
+        array=self.getEarlierValues(duration)
         return oscillators.momentum(np.array(array), duration)
     
     def SMA(self, duration):        
-        array=self.close[:]            
-        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
-        if(startIdx-len(self.close) < 0):
-            for i in range (len(self.close)-startIdx):
-                array.insert(0,self.close[0])            
-            for i in range (startIdx):
-                array.insert(0,self.fullArray['close'][i])                                
-        else:
-            for i in range (len(self.close)):
-                array.insert(0,self.fullArray['close'][startIdx-len(self.close)+i])                                        
+        array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,1)
     
     def WMA(self, duration):
-        array=self.close[:]            
-        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
-        if(startIdx-len(self.close) < 0):
-            for i in range (len(self.close)-startIdx):
-                array.insert(0,self.close[0])            
-            for i in range (startIdx):
-                array.insert(0,self.fullArray['close'][i])                                
-        else:
-            for i in range (len(self.close)):
-                array.insert(0,self.fullArray['close'][startIdx-len(self.close)+i])                                                
+        array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,2)
     
     def EMA(self, duration):
-        array=self.close[:]            
-        startIdx=self.fullArray['date'].tolist().index(self.date[0].strftime("%Y-%m-%d"))
-        if(startIdx-len(self.close) < 0):
-            for i in range (len(self.close)-startIdx):
-                array.insert(0,self.close[0])            
-            for i in range (startIdx):
-                array.insert(0,self.fullArray['close'][i])                                
-        else:
-            for i in range (len(self.close)):
-                array.insert(0,self.fullArray['close'][startIdx-len(self.close)+i])                                        
+        array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,3)
 
 class Chart(FigureCanvas):
