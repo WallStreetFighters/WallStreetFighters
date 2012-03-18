@@ -164,15 +164,12 @@ class GuiMainWindow(object):
         
 
     def paintChart(self):
-
-        self.tabA.chartsLayout.removeWidget(chart)
         pageIndex = self.tabA.listsToolBox.currentIndex() #sprawdzamy z jakiej listy korzystamy
         dateStart = self.tabA.startDateEdit.date()  # początek daty
         start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
         
-        dateEnd = self.tabA.startDateEdit.date()     # koniec daty
+        dateEnd = self.tabA.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-
         indicator = 'momentum'
         if self.tabA.momentumCheckBox.isChecked():
             indicator = "momentum"
@@ -215,11 +212,12 @@ class GuiMainWindow(object):
             finObj.updateArchive()
             chart = Chart(self.tabA, finObj)
             self.tabA.chartsLayout.addWidget(chart)
+            chart.setOscPlot('momentum')
+            chart.setMainIndicator('SMA')
             chart.setDrawingMode(painting)
-            chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),step)
+            chart.setData(finObj,start,end,step)
             chart.setMainType(chartType)
-            if hideVolumen:
-                chart.rmVolumen()
+            chart.rmVolumeBars()
             
        
 
