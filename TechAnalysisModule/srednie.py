@@ -79,7 +79,7 @@ def standardDeviation(array):
 # mode - 1: Gorna wstega Bollingera, 2: Dolna wstega Bollingera
 # D - stala uzywana do odchylania wsteg, domyslnie 2
 def bollingerBands(array,duration,mode,D):
-	values = zeros(duration)
+	values = zeros(array.size/2)
 	size = array.size
 	j = 0
 	for i in range(size/2,size):

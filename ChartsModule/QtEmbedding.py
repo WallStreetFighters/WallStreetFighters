@@ -27,8 +27,10 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.setCentralWidget(self.main_widget)
         chart.setOscPlot('RSI')
         chart.setDrawingMode(True)
-        chart.setData(finObj,datetime.datetime(2003,10,10),datetime.datetime(2004,2,2),'daily')
-        #chart.setMainType('candlestick')                        
+        #50% spadku jednego dnia - fajnie wskaźniki głupieją :)
+        chart.setData(finObj,datetime.datetime(2005,2,1),datetime.datetime(2005,4,1),'daily') 
+        chart.setMainIndicator('bollinger')
+        chart.setMainType('candlestick')                        
         
 qApp = QtGui.QApplication(sys.argv)
 os.chdir("../DataParserModule") #zmieniamy katalog roboczy żeby pliki .wsf się ładowały

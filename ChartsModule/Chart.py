@@ -83,17 +83,13 @@ class ChartData:
         return oscillators.momentum(np.array(array), duration)
     
     def RSI(self, duration=10):
-        array=self.getEarlierValues(duration)
-        print oscillators.RSI(np.array(array), duration)
+        array=self.getEarlierValues(duration)        
         return oscillators.RSI(np.array(array), duration)
     
     def CCI(self, duration=10):
         highs=np.array(self.getEarlierValues(duration-1,'high'))
         lows=np.array(self.getEarlierValues(duration-1,'low'))
-        closes=np.array(self.getEarlierValues(duration-1,'close'))
-        print len(self.date)
-        print len(highs)
-        print len(oscillators.CCI(closes,lows,highs,duration))
+        closes=np.array(self.getEarlierValues(duration-1,'close'))        
         return oscillators.CCI(closes,lows,highs,duration)        
     
     def ROC(self, duration=10):
@@ -103,10 +99,7 @@ class ChartData:
     def williams(self, duration=10):
         highs=np.array(self.getEarlierValues(duration-3,'high'))
         lows=np.array(self.getEarlierValues(duration-3,'low'))
-        closes=np.array(self.getEarlierValues(duration-3,'close'))
-        print len(highs)
-        print len(lows)
-        print len(closes)
+        closes=np.array(self.getEarlierValues(duration-3,'close'))        
         return oscillators.williamsOscilator(highs,lows,closes,duration)
     
     def SMA(self, duration=20):        
@@ -120,6 +113,16 @@ class ChartData:
     def EMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,3)
+    
+    def bollingerUpper(self, duration=20):
+        array=self.getEarlierValues(len(self.close))
+        print len(array)
+        print len(averages.bollingerBands(np.array(array),duration,2,2))
+        return averages.bollingerBands(np.array(array),duration,1,2)
+    
+    def bollingerLower(self, duration=20):
+        array=self.getEarlierValues(len(self.close))        
+        return averages.bollingerBands(np.array(array),duration,2,2)
     
     
 
@@ -295,6 +298,9 @@ class Chart(FigureCanvas):
             indicValues=self.data.WMA()        
         elif type=='EMA':
             indicValues=self.data.EMA()        
+        elif type=='bollinger':            
+            ax.plot(self.data.date,self.data.bollingerUpper(),'r-',label=type)
+            indicValues=self.data.bollingerLower()
         else:
             ax.hold(False)
             return
