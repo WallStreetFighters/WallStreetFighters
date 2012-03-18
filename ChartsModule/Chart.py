@@ -82,17 +82,46 @@ class ChartData:
         array=self.getEarlierValues(duration)
         return oscillators.momentum(np.array(array), duration)
     
-    def SMA(self, duration):        
+    def RSI(self, duration=10):
+        array=self.getEarlierValues(duration)
+        print oscillators.RSI(np.array(array), duration)
+        return oscillators.RSI(np.array(array), duration)
+    
+    def CCI(self, duration=10):
+        highs=np.array(self.getEarlierValues(duration-1,'high'))
+        lows=np.array(self.getEarlierValues(duration-1,'low'))
+        closes=np.array(self.getEarlierValues(duration-1,'close'))
+        print len(self.date)
+        print len(highs)
+        print len(oscillators.CCI(closes,lows,highs,duration))
+        return oscillators.CCI(closes,lows,highs,duration)        
+    
+    def ROC(self, duration=10):
+        array=self.getEarlierValues(duration)
+        return oscillators.ROC(np.array(array), duration)
+    
+    def williams(self, duration=10):
+        highs=np.array(self.getEarlierValues(duration-3,'high'))
+        lows=np.array(self.getEarlierValues(duration-3,'low'))
+        closes=np.array(self.getEarlierValues(duration-3,'close'))
+        print len(highs)
+        print len(lows)
+        print len(closes)
+        return oscillators.williamsOscilator(highs,lows,closes,duration)
+    
+    def SMA(self, duration=20):        
         array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,1)
     
-    def WMA(self, duration):
+    def WMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,2)
     
-    def EMA(self, duration):
+    def EMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
         return averages.movingAverage(np.array(array),duration,3)
+    
+    
 
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -261,11 +290,11 @@ class Chart(FigureCanvas):
         type=self.mainIndicator
         ax.hold(True) #hold on        
         if type=='SMA':
-            indicValues=self.data.SMA(20)        
+            indicValues=self.data.SMA()        
         elif type=='WMA':
-            indicValues=self.data.WMA(20)        
+            indicValues=self.data.WMA()        
         elif type=='EMA':
-            indicValues=self.data.EMA(20)        
+            indicValues=self.data.EMA()        
         else:
             ax.hold(False)
             return
@@ -300,7 +329,14 @@ class Chart(FigureCanvas):
         ax.clear()            
         if type == 'momentum':
             oscData=self.data.momentum()
-        # ..... 
+        elif type == 'CCI':
+            oscData=self.data.CCI()
+        elif type == 'ROC':
+            oscData=self.data.ROC()
+        elif type == 'RSI':
+            oscData=self.data.RSI()
+        elif type == 'williams':
+            oscData=self.data.williams()
         else:
             ax.hold(False)
             return
