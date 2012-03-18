@@ -5,6 +5,7 @@ import datetime
 import operator
 import os
 from PyQt4 import QtGui, QtCore
+import GUIModule.RSSgui as RSSgui
 from GUIModule.Tab import AbstractTab
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
@@ -87,6 +88,8 @@ class GuiMainWindow(object):
 
         #przycisk wyswietlanie wykresu (przyciski dodajemy na sam koniec okna)
         self.tabB.addChartButton()
+        
+        
         self.tabs.addTab(self.tabB,"tabB")
         
         self.tabs.addTab(self.tabB,"tabB")
@@ -100,6 +103,14 @@ class GuiMainWindow(object):
         self.tabs.addTab(self.tabC,"tabC")
         
         """Koniec tabC"""
+        """ Rss tab"""
+        self.RSSTab = QtGui.QWidget()
+        self.tabs.addTab(self.RSSTab,"RSS")
+        self.rssWidget = RSSgui.RSSWidget(self.RSSTab)
+        self.tabB.chartsLayout.addWidget(self.rssWidget)
+        self.verticalLayout2 = QtGui.QVBoxLayout(self.RSSTab)
+        self.verticalLayout2.addWidget(self.rssWidget)
+    
 	""" koniec ustawiania Zakładek"""
 
 	
