@@ -134,30 +134,59 @@ class AbstractTab(QtGui.QWidget):
         #ustawiamy zarządce rozkładu vertical
         self.chartsLayout = QtGui.QVBoxLayout(self.chartsFrame)
 
-    def addChartButton(self):        
-            #przycisk rysowania wykresu
-            self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
-            self.chartButton.resize(self.chartButton.sizeHint())
-            self.optionsLayout.addWidget(self.chartButton)
-            #przycisk wyjscia
-            self.quitButton = QtGui.QPushButton('Quit',self.optionsFrame)
-            self.quitButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
-            self.optionsLayout.addWidget(self.quitButton)
-	    #Spacer
-            self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
-            self.optionsLayout.addItem(self.spacer)
+    def addChartButton(self):
+        # Step combo box
+        self.stepLabel = QtGui.QLabel('Step',self.optionsFrame)#label Step
+        self.optionsLayout.addWidget(self.stepLabel)
+        self.stepComboBox = QtGui.QComboBox(self.optionsFrame)
+        self.stepComboBox.addItem('daily')
+        self.stepComboBox.addItem('weekly')
+        self.stepComboBox.addItem('monthly')
+        self.optionsLayout.addWidget(self.stepComboBox)
+        # chartType comboBox
+        self.chartTypeLabel = QtGui.QLabel('Chart Type',self.optionsFrame)#label Chart Type
+        self.optionsLayout.addWidget(self.chartTypeLabel)
+        self.chartTypeComboBox = QtGui.QComboBox(self.optionsFrame)
+        self.chartTypeComboBox.addItem('line')
+        self.chartTypeComboBox.addItem('point')
+        self.chartTypeComboBox.addItem('candlestick')
+        self.optionsLayout.addWidget(self.chartTypeComboBox)
+        # Scale Type
+        self.scaleTypeLabel = QtGui.QLabel('Scale',self.optionsFrame)
+        self.optionsLayout.addWidget(self.scaleTypeLabel)
+        self.linearRadioButton = QtGui.QRadioButton('linear',self.optionsFrame)
+        self.optionsLayout.addWidget(self.linearRadioButton)
+        self.logRadioButton = QtGui.QRadioButton('log',self.optionsFrame)
+        self.optionsLayout.addWidget(self.logRadioButton)
+        #wyłaczenie voluminu
+        self.volumenCheckBox = QtGui.QCheckBox('Hide Volumen',self.optionsFrame)
+        self.optionsLayout.addWidget(self.volumenCheckBox)
+        #wlacznie możliwości rysowania na wykeresie
+        self.paintCheckBox = QtGui.QCheckBox('Enable painting',self.optionsFrame)
+        self.optionsLayout.addWidget(self.paintCheckBox)
+        #przycisk rysowania wykresu
+        self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
+        self.chartButton.resize(self.chartButton.sizeHint())
+        self.optionsLayout.addWidget(self.chartButton)
+	#Spacer
+        self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
+        self.optionsLayout.addItem(self.spacer)
        
     def tableStyle(self,table):
         # hide grid
         table.setShowGrid(False)
         # set the font
-        font = QtGui.QFont("Courier New", 8)
+        font = QtGui.QFont("Courier New", 10)
         table.setFont(font)
         # hide vertical header
         vh = table.verticalHeader()
         vh.setVisible(False)
         # set column width to fit contents
-        #table.resizeColumnsToContents()
+        table.resizeColumnsToContents()
+        # set horizontal header properties
+        hh = table.horizontalHeader()
+        hh.setStretchLastSection(True)
+        
         # enable sorting
         table.setSortingEnabled(True)
 

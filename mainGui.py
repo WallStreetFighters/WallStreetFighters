@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import datetime
 import operator
+import os
 from PyQt4 import QtGui, QtCore
 from GUIModule.Tab import AbstractTab
 from ChartsModule.Chart import Chart
@@ -39,7 +41,8 @@ class GuiMainWindow(object):
         # inicjujemy model danych dla Forex
         forexModel = self.ListModel(list=dataParser.FOREX_LIST)
 
-        """tab A wskaźniki i oscylatory""" 
+        """tab A wskaźniki i oscylatory"""
+        
 	self.tabA = AbstractTab()
         self.tabA.setObjectName("tabA")
 
@@ -48,13 +51,7 @@ class GuiMainWindow(object):
         self.tabA.stockListView.setModel(stockModel)
         self.tabA.forexListView.setModel(forexModel)
         
-        # set horizontal header properties
-        hh = self.tabA.indexListView.horizontalHeader()
-        hh.setStretchLastSection(True)
-
-        # set column width to fit contents
-        self.tabA.indexListView.resizeColumnsToContents()
-
+        
         self.idicatorsLabel = QtGui.QLabel('Indicators:',self.tabA.optionsFrame)
         self.tabA.optionsLayout.addWidget(self.idicatorsLabel)
         #check box dla wskaźnika momentum
@@ -63,6 +60,12 @@ class GuiMainWindow(object):
         #check box dla ROC
         self.tabA.rocCheckBox = QtGui.QCheckBox("ROC",self.tabA.optionsFrame)
         self.tabA.optionsLayout.addWidget(self.tabA.rocCheckBox)
+        #check box dla SMA
+        self.tabA.smaCheckBox = QtGui.QCheckBox("SMA",self.tabA.optionsFrame)
+        self.tabA.optionsLayout.addWidget(self.tabA.smaCheckBox)
+        #check box dla EMA
+        self.tabA.emaCheckBox = QtGui.QCheckBox("EMA",self.tabA.optionsFrame)
+        self.tabA.optionsLayout.addWidget(self.tabA.emaCheckBox)
         #check box dla CCI
         self.tabA.cciCheckBox = QtGui.QCheckBox("CCI",self.tabA.optionsFrame)
         self.tabA.optionsLayout.addWidget(self.tabA.cciCheckBox)
@@ -150,10 +153,64 @@ class GuiMainWindow(object):
         
 
     def paintChart(self):
-            chart = Chart(self.tabA)
+
+        self.tabA.chartsLayout.removeWidget(chart)
+        pageIndex = self.tabA.listsToolBox.currentIndex() #sprawdzamy z jakiej listy korzystamy
+        dateStart = self.tabA.startDateEdit.date()  # początek daty
+        start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
+        
+        dateEnd = self.tabA.startDateEdit.date()     # koniec daty
+        end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
+
+        indicator = 'momentum'
+        if self.tabA.momentumCheckBox.isChecked():
+            indicator = "momentum"
+        elif self.tabA.smaCheckBox.isChecked():
+            indicator = "SMA"
+        elif self.tabA.emaCheckBox.isChecked():
+            indicator = "EMA"
+        #step
+        step = self.tabA.stepComboBox.currentText()
+
+        #chartType
+        chartType = self.tabA.chartTypeComboBox.currentText()
+        hideVolumen =self.tabA.volumenCheckBox.isChecked() 
+        #painting
+        painting = self.tabA.paintCheckBox.isChecked()
+        
+        
+        # Jeśli wybrano instrument Index
+        if pageIndex == 0:
+            indexes = self.tabA.indexListView.selectedIndexes()
+            index= indexes[0].row()
+            finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
+            finObj.updateArchive()
+            chart = Chart(self.tabA, finObj)
             self.tabA.chartsLayout.addWidget(chart)
+            chart.setOscPlot('momentum')
+            chart.setDrawingMode(True)
+            chart.setData(finObj,dateStart,dateEnd,'weekly')
+            chart.setMainType('candlestick')        
+            chart.setData(finObj)
+            chart.setMainIndicator('SMA')
             chart.rmVolumeBars()
-            chart.addVolumeBars()
+            chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),'daily')
+            chart.setMainIndicator('EMA')
+        # Jeśli wybrano instrument Stock
+        if pageIndex == 1:
+            indexes = self.tabA.stockListView.selectedIndexes()
+            index= indexes[0].row()
+            finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
+            finObj.updateArchive()
+            chart = Chart(self.tabA, finObj)
+            self.tabA.chartsLayout.addWidget(chart)
+            chart.setDrawingMode(painting)
+            chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),step)
+            chart.setMainType(chartType)
+            if hideVolumen:
+                chart.rmVolumen()
+            
+       
 
         
             
