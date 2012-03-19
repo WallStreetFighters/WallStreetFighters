@@ -146,4 +146,3 @@ def testR():
         return williamsOscilator(high,low,close, 14)   
 
 
-
