@@ -11,6 +11,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.patches import Rectangle
+from matplotlib.ticker import IndexLocator
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 
@@ -32,7 +33,7 @@ class ChartData:
         #potrzebujemy też pełnej tabeli do obliczania wskaźników
         self.fullArray=finObj.getArray(step)[::-1]
         dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]
-        if(len(self.fullArray)==0 or len(self.dataArray==0)):
+        if(len(self.fullArray)==0 or len(dataArray)==0):
             self.corrupted=True
             return
         self.name=finObj.name
@@ -220,7 +221,7 @@ class Chart(FigureCanvas):
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)        
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
@@ -234,7 +235,7 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.volumeBars.set_visible(True)
         self.fixPositions()
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def rmVolumeBars(self):
         """Ukrywa wykres wolumenu"""
@@ -242,7 +243,7 @@ class Chart(FigureCanvas):
             return
         self.volumeBars.set_visible(False)        
         self.fixPositions()                            
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def setScaleType(self,type):    
         """Ustawia skalę liniową lub logarytmiczną na głównym wykresie.
@@ -263,7 +264,7 @@ class Chart(FigureCanvas):
             label.set_visible(False)
         ax.set_xlim(self.data.date[0],self.data.date[-1])
         self.formatDateAxis(ax)
-        self.fixLabels()
+        self.fixTimeLabels()
         
     def drawCandlePlot(self):
         """Wyświetla główny wykres w postaci świecowej"""    
@@ -327,7 +328,7 @@ class Chart(FigureCanvas):
         self.updateOscPlot()
         self.oscPlot.set_visible(True)
         self.fixPositions()
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def rmOscPlot(self):
         """Ukrywa wykres oscylatora"""
@@ -335,7 +336,7 @@ class Chart(FigureCanvas):
             return
         self.oscPlot.set_visible(False)        
         self.fixPositions()                            
-        self.fixLabels()
+        self.fixTimeLabels()
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
@@ -363,8 +364,19 @@ class Chart(FigureCanvas):
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.oscPlot)
-        self.fixLabels()
-        
+        self.fixOscLabels()
+        self.fixTimeLabels()
+    
+    def fixOscLabels(self):
+        """Metoda ustawia zakres osi poprawny dla danego oscylatora. Ponadto przenosi
+        etykiety na prawą stronę, żeby nie nachodziły na kurs akcji"""
+        ax=self.oscPlot
+        ax.set_ylim(0, 100)
+        ax.set_yticks([30,70])
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label1On = False
+            tick.label2On = True
+            tick.label2.set_size(7)
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu"""
@@ -379,7 +391,7 @@ class Chart(FigureCanvas):
             label.set_size(7)            
             label.set_horizontalalignment('center')                        
     
-    def fixLabels(self):
+    def fixTimeLabels(self):
         """Włącza wyświetlanie etykiet osi czasu pod odpowiednim (tzn. najniższym)
         wykresem, a usuwa w pozostałych"""
         #oscylator jest zawsze na samym dole
