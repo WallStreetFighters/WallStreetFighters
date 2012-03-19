@@ -6,9 +6,7 @@ import datetime
 import random
 import matplotlib.dates as mdates
 import numpy as np
-import WallStreetFighters.TechAnalysisModule.oscylatory as oscillators
-import WallStreetFighters.TechAnalysisModule.srednie as averages
-import WallStreetFighters.TechAnalysisModule.indexy as indexes
+import WallStreetFighters.TechAnalysisModule.oscilators as indicators
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
@@ -80,49 +78,49 @@ class ChartData:
     
     def momentum(self, duration=10):
         array=self.getEarlierValues(duration)
-        return oscillators.momentum(np.array(array), duration)
+        return indicators.momentum(np.array(array), duration)
     
     def RSI(self, duration=10):
         array=self.getEarlierValues(duration)        
-        return oscillators.RSI(np.array(array), duration)
+        return indicators.RSI(np.array(array), duration)
     
     def CCI(self, duration=10):
         highs=np.array(self.getEarlierValues(duration-1,'high'))
         lows=np.array(self.getEarlierValues(duration-1,'low'))
         closes=np.array(self.getEarlierValues(duration-1,'close'))        
-        return oscillators.CCI(closes,lows,highs,duration)        
+        return indicators.CCI(closes,lows,highs,duration)        
     
     def ROC(self, duration=10):
         array=self.getEarlierValues(duration)
-        return oscillators.ROC(np.array(array), duration)
+        return indicators.ROC(np.array(array), duration)
     
     def williams(self, duration=10):
         highs=np.array(self.getEarlierValues(duration-3,'high'))
         lows=np.array(self.getEarlierValues(duration-3,'low'))
         closes=np.array(self.getEarlierValues(duration-3,'close'))        
-        return oscillators.williamsOscilator(highs,lows,closes,duration)
+        return indicators.williamsOscilator(highs,lows,closes,duration)
     
     def SMA(self, duration=20):        
         array=self.getEarlierValues(len(self.close))
-        return averages.movingAverage(np.array(array),duration,1)
+        return indicators.movingAverage(np.array(array),duration,1)
     
     def WMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
-        return averages.movingAverage(np.array(array),duration,2)
+        return indicators.movingAverage(np.array(array),duration,2)
     
     def EMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
-        return averages.movingAverage(np.array(array),duration,3)
+        return indicators.movingAverage(np.array(array),duration,3)
     
     def bollingerUpper(self, duration=20):
         array=self.getEarlierValues(len(self.close))
         print len(array)
-        print len(averages.bollingerBands(np.array(array),duration,2,2))
-        return averages.bollingerBands(np.array(array),duration,1,2)
+        print len(indicators.bollingerBands(np.array(array),duration,2,2))
+        return indicators.bollingerBands(np.array(array),duration,1,2)
     
     def bollingerLower(self, duration=20):
         array=self.getEarlierValues(len(self.close))        
-        return averages.bollingerBands(np.array(array),duration,2,2)
+        return indicators.bollingerBands(np.array(array),duration,2,2)
     
     
 
