@@ -6,9 +6,9 @@ import datetime
 import random
 import matplotlib.dates as mdates
 import numpy as np
-import WallStreetFighters.TechAnalysisModule.oscylatory as oscillators
-import WallStreetFighters.TechAnalysisModule.srednie as averages
-import WallStreetFighters.TechAnalysisModule.indexy as indexes
+import TechAnalysisModule.oscylatory as oscillators
+import TechAnalysisModule.srednie as averages
+import TechAnalysisModule.indexy as indexes
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
