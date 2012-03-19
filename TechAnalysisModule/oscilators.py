@@ -8,6 +8,91 @@ def simpleArthmeticAverage(array):
 	result /= array.size
 	return result
 
+# liczy srednia wazona gdzie najmniejsza wage = 1 ma pierwszy element, najwieksza wage element ostatni z waga rowna dlugosci tablicy
+def weightedAverage(array):
+	result = 0
+	tableSum = arange(1,array.size+1,1)
+	divisor = tableSum.sum()
+	for i in range(array.size):
+		result += array[i]*(i+1)
+	result /= divisor
+	return result
+
+# liczy srednia expotencjalna gdzie alfa = 2/(1+N)
+# Najwiekszy 'potencjal' ma wartosc ostatnia, pierwsza wartosc ma potencjal (1-alfa)^N
+def expotentialAverage(array):
+	result = 0
+	divisor = 0
+	factor = 2.0/(array.size+1)
+	for i in range(array.size):
+		result += array[i]*((1-factor)**(array.size-i-1))
+		divisor += (1-factor)**(array.size-i-1)
+	result /= divisor
+	return result
+
+# Indeks new High/new Low. Zwraca pojedyncza wartosc, przekazujemy zazwyczaj tablice zamkniec gieldy.
+def highLowIndex(array):
+	size = array.size
+	highest = array[0]
+	lowest = array[0]
+	numberOfHighest = 1.0
+	numberOfLowest = 1.0
+	for i in range(1,size):
+		if array[i] > highest:
+			highest = array[i]
+			numberOfHighest += 1.0
+		if array[i] < lowest:
+			lowest = array[i]
+			numberOfLowest += 1.0
+	return (numberOfHighest/(numberOfHighest+numberOfLowest))*100
+
+# Standardowe odchylenie dla tablicy array, koniecznie jednowymiarowa
+def standardDeviation(array):
+	size = array.size
+	average = simpleArthmeticAverage(array)
+	total = 0
+	for i in range(0,size):
+		total += (array[i] - average)**2
+	total /= size
+	total = math.sqrt(total)
+	return total
+
+# Oblicza tablice wartosci Wsteg Bollingera :
+# array - wartosci gieldowe(najlepiej kolejne zamkniecia gield)
+# duration - okres obliczanego wskaznika, WAZNE ABY array BYLA 2x WIEKSZA NIZ duration (patrz movingAverage)
+# mode - 1: Gorna wstega Bollingera, 2: Dolna wstega Bollingera
+# D - stala uzywana do odchylania wsteg, domyslnie 2
+def bollingerBands(array,duration,mode,D):
+	values = zeros(array.size/2)
+	size = array.size
+	j = 0
+	for i in range(size/2,size):
+		tempTable = array[i-duration+1:i+1]
+		if mode == 1:
+			values[j] = simpleArthmeticAverage(tempTable)+(D*standardDeviation(tempTable))
+		if mode == 2:
+			values[j] = simpleArthmeticAverage(tempTable)-(D*standardDeviation(tempTable))
+		j += 1
+	return values
+
+# array - tablica z wartosciami cen zamkniec itp, duration - czas trwania liczonej sredniej krokowej
+# Zwraca tablice jednowymiarowa z wartosciami sredniej krokowej dla przedzialu [size/2,size-1], aby obliczyc wartosci tablica wejsciowa musi byc 2x wieksza od zakresu(duration)
+# modes : 1-SMA(simple moving average), 2-WMA(weighted moving average), 3-EMA(expotential moving average) 
+def movingAverage(array,duration,mode):
+        values = zeros(array.size/2)
+        size = array.size
+        j = 0
+        for i in range(size/2,size):
+                tempTable = array[i-duration+1:i+1]
+                if mode == 1:
+                        values[j] = simpleArthmeticAverage(tempTable)
+                if mode == 2:
+                        values[j] = weightedAverage(tempTable)
+                if mode == 3:
+                        values[j] = expotentialAverage(tempTable)
+                j += 1
+        return values
+
 # Zwraca tablice wartosci wskaznika Impetu(Momentum) dla danej tablicy. Co wazne, ilosc obliczonych wartosci to rozmiar tablicy - duration
 def momentum(array,duration):
 	values = zeros(array.size-duration)
@@ -57,14 +142,6 @@ def CCI(closeTable,lowTable,highTable,duration):
 		j += 1
 	return values
 
-# funkcja testujaca CCI, wartosci wziete stad http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:commodity_channel_index_cci		
-def test():
-	high = array([24.2,24.07,24.04,23.87,23.67,23.59,23.8,23.8,24.3,24.15,24.05,24.06,23.88,25.14,25.2,25.07,25.22,25.37,25.36,25.26,24.82,24.44,24.65,24.84,24.75,24.51,24.68,24.67,23.84,24.3])
-	low = array([23.85,23.72,23.64,23.37,23.46,23.18,23.4,23.57,24.05,23.77,23.6,23.84,23.64,23.94,24.74,24.77,24.9,24.93,24.96,24.93,24.21,24.21,24.43,24.44,24.2,24.25,24.21,24.15,23.63,23.76])
-	close = array([23.89,23.95,23.67,23.78,23.5,23.32,23.75,23.79,24.14,23.81,23.78,23.86,23.7,24.96,24.88,24.96,25.18,25.07,25.27,25.0,24.46,24.28,24.62,24.58,24.53,24.35,24.34,24.23,23.76,24.2])
-	result = CCI(close,low,high,20)
-	return result
-
 # Korzysta z niej RSI, sumuje elementy tablicy i w zaleznosci od mode, zmienia znak lub nie :)
 def sumUnderCondition(array,mode):
         result = 0
@@ -98,17 +175,12 @@ def RSI(array, duration):
                 k += 1
                 if j < size:
                         if gainLossTable[j] > 0:
-                                averageGain = (averageGain*13 + gainLossTable[j])/14.0
-                                averageLoss = (averageLoss*13 + 0)/14.0
+                                averageGain = (averageGain*13 + gainLossTable[j])/duration
+                                averageLoss = (averageLoss*13 + 0)/duration
                         if gainLossTable[j] <= 0:
-                                averageGain = (averageGain*13 + 0)/14.0
-                                averageLoss = (averageLoss*13 + (-1)*gainLossTable[j])/14.0
+                                averageGain = (averageGain*13 + 0)/duration
+                                averageLoss = (averageLoss*13 + (-1)*gainLossTable[j])/duration
         return values
-# Funkcja do testowania poprawnych wynikow wskaznika RSI, wartosci pobrane z http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi
-def testRSI():
-        a = array([44.34,44.09,44.15,43.61,44.33,44.83,45.10,45.42,45.84,46.08,45.89,46.03,45.61,46.28,46.28,46.0,46.03,46.41,46.22,45.64,46.21,46.25,45.71,46.45,45.78,45.35,44.03,44.18,44.22,44.57,43.42,42.66,43.13])
-        result = RSI(a,14)
-        return result
 
 # Zwraca najwiekszy element tablicy
 def highest(array):
@@ -130,19 +202,47 @@ def lowest(array):
 # Zwraca tablice wielkosci size-duration z wartosciami oscylatora %R
 def williamsOscilator(highTable,lowTable,closeTable,duration):
         size = highTable.size
-        values = zeros(size-duration+3)
+        values = zeros(size-duration)
         j = 0
-        for i in range(duration-1,size+2):
+        for i in range(duration-1,size-1):
                 lowestValue = lowest(lowTable[i-duration+1:i+1])
                 highestValue = highest(highTable[i-duration+1:i+1])
                 values[j] = ((highestValue - closeTable[i])/(highestValue - lowestValue))*(-100.0)
                 j += 1
         return values
-# Funkcja do testowania oscylatora williamsa, wartosci pobrane z http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:williams_r
+def testR1():
+        high = array([2.11,2.15,2.22,2.28,2.30])
+        low = array([2.00,2.08,2.10,2.15,2.20])
+        open = array([2.05,2.10,2.15,2.20,2.25])
+        return williamsOscilator(high,low,open,1)
+
 def testR():
         high = array([127.01,127.62,126.59,127.35,128.17,128.43,127.37,126.42,126.9,126.85,125.65,125.72,127.16,127.72,127.69,128.22,128.27,127.74,128.77,129.29,130.06,129.12,129.29,128.47,128.09,128.65,129.14,128.64])
         low = array([125.36,126.16,124.93,126.09,126.82,126.48,126.03,124.83,126.39,125.72,124.56,124.57,125.07,126.86,126.63,126.8,126.13,125.92,126.99,127.81,128.47,128.06,127.61,127.6,127.0,126.9,127.49,127.4])
         close = array([1,1,1,1,1,1,1,1,1,1,1,1,1,127.29,127.18,128.01,127.11,127.73,127.06,127.33,128.71,127.87,128.58,128.6,127.93,128.11,127.6,127.6,128.69,128.27])
-        return williamsOscilator(high,low,close, 14)   
+        return williamsOscilator(high,low,close, 14) 
 
+# Nalezy przekazac tablice ilosci spadajacych i wzrastajacych spolek.
+# Kazdy indeks odpowiada jednemu dniu. 
+def adLine(advances, declines):
+        size = advances.size
+        values = zeros(size)
+        for i in range(0,size):
+                netAdvance = advances[i]-declines[i]
+                if i==0:
+                        values[i] = netAdvance
+                else:
+                        values[i] = values[i-1] + netAdvance
+        return values
 
+# Minimalne przekazane tablice musza miec conajmmniej 40 wartosci.
+# Wersja nieprzetestowana
+def mcClellanOscillator(advances,declines):
+        size = advances.size
+        values = zeros(size)
+        ratioAdjusted = zeros(size)
+        for i in range(0,size):
+                ratioAdjusted[i] = advances[i]-declines[i]
+        result19 = movingAverage(ratioAdjusted,19,3)
+        result39 = movingAverage(ratioAdjusted,39,3)
+        return result19-result39
