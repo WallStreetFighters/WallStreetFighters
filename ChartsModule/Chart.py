@@ -6,13 +6,12 @@ import datetime
 import random
 import matplotlib.dates as mdates
 import numpy as np
-import TechAnalysisModule.oscylatory as oscillators
-import TechAnalysisModule.srednie as averages
-import TechAnalysisModule.indexy as indexes
+import WallStreetFighters.TechAnalysisModule.oscilators as indicators
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.patches import Rectangle
+from matplotlib.ticker import IndexLocator
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 
@@ -22,6 +21,9 @@ class ChartData:
     co daje mi FinancialObject Marcina"""     
     
     def __init__(self, finObj, start=None, end=None, step='monthly'):
+        if start>=end:
+            self.corrupted=True
+            return
         #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
             start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
@@ -30,7 +32,10 @@ class ChartData:
         indexes=finObj.getIndex(start.date(),end.date(),step)
         #potrzebujemy też pełnej tabeli do obliczania wskaźników
         self.fullArray=finObj.getArray(step)[::-1]
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]
+        if(len(self.fullArray)==0 or len(dataArray)==0):
+            self.corrupted=True
+            return
         self.name=finObj.name
         self.open=dataArray['open'].tolist()
         self.close=dataArray['close'].tolist()
@@ -49,6 +54,7 @@ class ChartData:
             high=self.high[i]
             low=self.low[i]
             self.quotes.append((time, open, close, high, low))
+        self.corrupted=False
     
     def getEarlierValues(self, length, type='close'):
         """Funkcja używana do wskaźników, które potrzebują wartości z okresu
@@ -80,49 +86,49 @@ class ChartData:
     
     def momentum(self, duration=10):
         array=self.getEarlierValues(duration)
-        return oscillators.momentum(np.array(array), duration)
+        return indicators.momentum(np.array(array), duration)
     
     def RSI(self, duration=10):
         array=self.getEarlierValues(duration)        
-        return oscillators.RSI(np.array(array), duration)
+        return indicators.RSI(np.array(array), duration)
     
     def CCI(self, duration=10):
         highs=np.array(self.getEarlierValues(duration-1,'high'))
         lows=np.array(self.getEarlierValues(duration-1,'low'))
         closes=np.array(self.getEarlierValues(duration-1,'close'))        
-        return oscillators.CCI(closes,lows,highs,duration)        
+        return indicators.CCI(closes,lows,highs,duration)        
     
     def ROC(self, duration=10):
         array=self.getEarlierValues(duration)
-        return oscillators.ROC(np.array(array), duration)
+        return indicators.ROC(np.array(array), duration)
     
     def williams(self, duration=10):
         highs=np.array(self.getEarlierValues(duration-3,'high'))
         lows=np.array(self.getEarlierValues(duration-3,'low'))
         closes=np.array(self.getEarlierValues(duration-3,'close'))        
-        return oscillators.williamsOscilator(highs,lows,closes,duration)
+        return indicators.williamsOscilator(highs,lows,closes,duration)
     
     def SMA(self, duration=20):        
         array=self.getEarlierValues(len(self.close))
-        return averages.movingAverage(np.array(array),duration,1)
+        return indicators.movingAverage(np.array(array),duration,1)
     
     def WMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
-        return averages.movingAverage(np.array(array),duration,2)
+        return indicators.movingAverage(np.array(array),duration,2)
     
     def EMA(self, duration=20):
         array=self.getEarlierValues(len(self.close))
-        return averages.movingAverage(np.array(array),duration,3)
+        return indicators.movingAverage(np.array(array),duration,3)
     
     def bollingerUpper(self, duration=20):
         array=self.getEarlierValues(len(self.close))
         print len(array)
-        print len(averages.bollingerBands(np.array(array),duration,2,2))
-        return averages.bollingerBands(np.array(array),duration,1,2)
+        print len(indicators.bollingerBands(np.array(array),duration,2,2))
+        return indicators.bollingerBands(np.array(array),duration,1,2)
     
     def bollingerLower(self, duration=20):
         array=self.getEarlierValues(len(self.close))        
-        return averages.bollingerBands(np.array(array),duration,2,2)
+        return indicators.bollingerBands(np.array(array),duration,2,2)
     
     
 
@@ -195,7 +201,7 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
     
     def updateMainPlot(self):
-        if(self.mainPlot==None):
+        if(self.mainPlot==None or self.data.corrupted):
             return
         ax=self.mainPlot                
         ax.clear()                        
@@ -215,7 +221,7 @@ class Chart(FigureCanvas):
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)        
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
@@ -229,7 +235,7 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.volumeBars.set_visible(True)
         self.fixPositions()
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def rmVolumeBars(self):
         """Ukrywa wykres wolumenu"""
@@ -237,7 +243,7 @@ class Chart(FigureCanvas):
             return
         self.volumeBars.set_visible(False)        
         self.fixPositions()                            
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def setScaleType(self,type):    
         """Ustawia skalę liniową lub logarytmiczną na głównym wykresie.
@@ -248,15 +254,17 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
         
     def updateVolumeBars(self):
-        """Odświeża rysowanie wolumenu"""
+        """Odświeża rysowanie wolumenu"""                
+        if self.data.corrupted:
+            return
         ax=self.volumeBars
-        ax.clear()
+        ax.clear()        
         ax.vlines(self.data.date,0,self.data.volume)
         for label in self.volumeBars.get_yticklabels():
             label.set_visible(False)
         ax.set_xlim(self.data.date[0],self.data.date[-1])
         self.formatDateAxis(ax)
-        self.fixLabels()
+        self.fixTimeLabels()
         
     def drawCandlePlot(self):
         """Wyświetla główny wykres w postaci świecowej"""    
@@ -265,6 +273,8 @@ class Chart(FigureCanvas):
         time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
+        if self.data.corrupted:
+            return
         timedelta=mdates.date2num(self.data.date[1])-mdates.date2num(self.data.date[0])        
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7*timedelta,colorup='w',colordown='k')                
@@ -289,6 +299,8 @@ class Chart(FigureCanvas):
     
     def updateMainIndicator(self):
         """Odrysowuje wskaźnik na głównym wykresie"""
+        if self.data.corrupted:
+            return
         ax=self.mainPlot
         type=self.mainIndicator
         ax.hold(True) #hold on        
@@ -316,7 +328,7 @@ class Chart(FigureCanvas):
         self.updateOscPlot()
         self.oscPlot.set_visible(True)
         self.fixPositions()
-        self.fixLabels()
+        self.fixTimeLabels()
     
     def rmOscPlot(self):
         """Ukrywa wykres oscylatora"""
@@ -324,11 +336,11 @@ class Chart(FigureCanvas):
             return
         self.oscPlot.set_visible(False)        
         self.fixPositions()                            
-        self.fixLabels()
+        self.fixTimeLabels()
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
-        if self.oscPlot==None:
+        if self.oscPlot==None or self.data.corrupted:
             return
         ax=self.oscPlot                
         type=self.oscType
@@ -352,8 +364,19 @@ class Chart(FigureCanvas):
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.oscPlot)
-        self.fixLabels()
-        
+        self.fixOscLabels()
+        self.fixTimeLabels()
+    
+    def fixOscLabels(self):
+        """Metoda ustawia zakres osi poprawny dla danego oscylatora. Ponadto przenosi
+        etykiety na prawą stronę, żeby nie nachodziły na kurs akcji"""
+        ax=self.oscPlot
+        ax.set_ylim(0, 100)
+        ax.set_yticks([30,70])
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label1On = False
+            tick.label2On = True
+            tick.label2.set_size(7)
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu"""
@@ -368,7 +391,7 @@ class Chart(FigureCanvas):
             label.set_size(7)            
             label.set_horizontalalignment('center')                        
     
-    def fixLabels(self):
+    def fixTimeLabels(self):
         """Włącza wyświetlanie etykiet osi czasu pod odpowiednim (tzn. najniższym)
         wykresem, a usuwa w pozostałych"""
         #oscylator jest zawsze na samym dole
