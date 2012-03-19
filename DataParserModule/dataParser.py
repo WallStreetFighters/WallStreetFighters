@@ -240,7 +240,6 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, since
 	#WEEKLY
 	url2 = url2.replace('&i=d', '&i=w')
 	site = opener.open(url2)
-	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
@@ -424,5 +423,9 @@ print finObj.valuesDaily[x[1]][0]
 #x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
 
 #print x['adv']
+<<<<<<< HEAD
 >>>>>>> chart
 """
+=======
+"""
+>>>>>>> 7e45d72b6b6818199f385fa69d03d21f28bcd265
