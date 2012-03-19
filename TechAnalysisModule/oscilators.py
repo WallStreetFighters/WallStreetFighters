@@ -175,11 +175,11 @@ def RSI(array, duration):
                 k += 1
                 if j < size:
                         if gainLossTable[j] > 0:
-                                averageGain = (averageGain*13 + gainLossTable[j])/duration
-                                averageLoss = (averageLoss*13 + 0)/duration
+                                averageGain = (averageGain*(duration-1) + gainLossTable[j])/duration
+                                averageLoss = (averageLoss*(duration-1) + 0)/duration
                         if gainLossTable[j] <= 0:
-                                averageGain = (averageGain*13 + 0)/duration
-                                averageLoss = (averageLoss*13 + (-1)*gainLossTable[j])/duration
+                                averageGain = (averageGain*(duration-1) + 0)/duration
+                                averageLoss = (averageLoss*(duration-1) + (-1)*gainLossTable[j])/duration
         return values
 
 # Zwraca najwiekszy element tablicy

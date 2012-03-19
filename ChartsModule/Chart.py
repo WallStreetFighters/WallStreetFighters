@@ -20,6 +20,9 @@ class ChartData:
     co daje mi FinancialObject Marcina"""     
     
     def __init__(self, finObj, start=None, end=None, step='monthly'):
+        if start>=end:
+            self.corrupted=True
+            return
         #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
             start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
@@ -28,7 +31,10 @@ class ChartData:
         indexes=finObj.getIndex(start.date(),end.date(),step)
         #potrzebujemy też pełnej tabeli do obliczania wskaźników
         self.fullArray=finObj.getArray(step)[::-1]
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]
+        if(len(self.fullArray)==0 or len(self.dataArray==0)):
+            self.corrupted=True
+            return
         self.name=finObj.name
         self.open=dataArray['open'].tolist()
         self.close=dataArray['close'].tolist()
@@ -47,6 +53,7 @@ class ChartData:
             high=self.high[i]
             low=self.low[i]
             self.quotes.append((time, open, close, high, low))
+        self.corrupted=False
     
     def getEarlierValues(self, length, type='close'):
         """Funkcja używana do wskaźników, które potrzebują wartości z okresu
@@ -193,7 +200,7 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
     
     def updateMainPlot(self):
-        if(self.mainPlot==None):
+        if(self.mainPlot==None or self.data.corrupted):
             return
         ax=self.mainPlot                
         ax.clear()                        
@@ -246,9 +253,11 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
         
     def updateVolumeBars(self):
-        """Odświeża rysowanie wolumenu"""
+        """Odświeża rysowanie wolumenu"""                
+        if self.data.corrupted:
+            return
         ax=self.volumeBars
-        ax.clear()
+        ax.clear()        
         ax.vlines(self.data.date,0,self.data.volume)
         for label in self.volumeBars.get_yticklabels():
             label.set_visible(False)
@@ -263,6 +272,8 @@ class Chart(FigureCanvas):
         time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
+        if self.data.corrupted:
+            return
         timedelta=mdates.date2num(self.data.date[1])-mdates.date2num(self.data.date[0])        
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7*timedelta,colorup='w',colordown='k')                
@@ -287,6 +298,8 @@ class Chart(FigureCanvas):
     
     def updateMainIndicator(self):
         """Odrysowuje wskaźnik na głównym wykresie"""
+        if self.data.corrupted:
+            return
         ax=self.mainPlot
         type=self.mainIndicator
         ax.hold(True) #hold on        
@@ -326,7 +339,7 @@ class Chart(FigureCanvas):
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
-        if self.oscPlot==None:
+        if self.oscPlot==None or self.data.corrupted:
             return
         ax=self.oscPlot                
         type=self.oscType
