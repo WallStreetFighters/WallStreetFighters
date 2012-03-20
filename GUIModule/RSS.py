@@ -27,6 +27,7 @@ class RSSReader:
 			xmldoc = minidom.parse(urlInfo)
 		else:
 			print "Error Getting URL"
+		
 		return xmldoc
 	
 	def GetItemText(self,xmlNode):
@@ -49,6 +50,7 @@ class RSSReader:
 		return ""
 	
 	def CreateRSSItem(self,itemNode):
+
 		"""Create an RSS item and return it"""
 		title = self.GetChildText(itemNode,"title")
 		description = self.GetChildText(itemNode,"description")
@@ -56,6 +58,7 @@ class RSSReader:
 		return RSSItem(title,description,link)
 	
 	def GetItems(self):
+		print 'koniec getXmldocument'
 		"""Generator to get items"""
 		for itemNode in self.xmldoc.documentElement.childNodes:
 				if (itemNode.nodeName == "item"):

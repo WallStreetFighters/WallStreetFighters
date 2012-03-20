@@ -46,7 +46,7 @@ class RSSWidget(QtGui.QWidget):
         self.itemView.setFont(font)
         self.itemView.setObjectName("itemView")
         self.verticalLayout.addWidget(self.itemView)
-        QtCore.QObject.connect(self.itemView,QtCore.SIGNAL("itemClicked(QListWidgetItem*)"),self.showDescription)
+        conect = QtCore.QObject.connect(self.itemView,QtCore.SIGNAL("itemClicked(QListWidgetItem*)"),self.showDescription)
         self.horizontalLayout.addWidget(self.listFrame)
         self.frame = QtGui.QFrame(self)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
@@ -64,7 +64,6 @@ class RSSWidget(QtGui.QWidget):
         self.horizontalLayout_2.addWidget(self.textBrowser)
         self.horizontalLayout.addWidget(self.frame)
     def showItems(self):
-        
 	for rssItem in self.listItems:
 	    if (rssItem):
                 self.descriptionList.append(rssItem.description)
@@ -74,7 +73,6 @@ class RSSWidget(QtGui.QWidget):
 		
     def showDescription(self):
        index = self.itemView.currentRow()
-       self.textBrowser.clear()
        item = self.descriptionList[index]
        self.textBrowser.setText(item)
        

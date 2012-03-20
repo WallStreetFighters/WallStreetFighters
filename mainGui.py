@@ -54,30 +54,30 @@ class GuiMainWindow(object):
         
         
         self.idicatorsLabel = QtGui.QLabel('Indicators:',self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.idicatorsLabel)
+        self.tabA.optionsLayout.addWidget(self.idicatorsLabel,0,4,1,1)
         #check box dla wskaźnika momentum
         self.tabA.momentumCheckBox = QtGui.QCheckBox("Momentum",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.momentumCheckBox)
+        self.tabA.optionsLayout.addWidget(self.tabA.momentumCheckBox,1,6,1,1)
         #check box dla ROC
         self.tabA.rocCheckBox = QtGui.QCheckBox("ROC",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.rocCheckBox)
+        self.tabA.optionsLayout.addWidget(self.tabA.rocCheckBox,1,4,1,1)
         #check box dla SMA
         self.tabA.smaCheckBox = QtGui.QCheckBox("SMA",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.smaCheckBox)
+        self.tabA.optionsLayout.addWidget(self.tabA.smaCheckBox,2,4,1,1)
         #check box dla EMA
         self.tabA.emaCheckBox = QtGui.QCheckBox("EMA",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.emaCheckBox)
+        self.tabA.optionsLayout.addWidget(self.tabA.emaCheckBox,0,5,1,1)
         #check box dla CCI
         self.tabA.cciCheckBox = QtGui.QCheckBox("CCI",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.cciCheckBox)
+        self.tabA.optionsLayout.addWidget(self.tabA.cciCheckBox,1,5,1,1)
         #check box dla RSI
         self.tabA.rsiCheckBox = QtGui.QCheckBox("RSI",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.rsiCheckBox)
+        self.tabA.optionsLayout.addWidget(self.tabA.rsiCheckBox,2,5,1,1)
         #check box dla Williams Oscilator
         self.tabA.williamsOscilatorCheckBox = QtGui.QCheckBox("Williams Oscilator",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.williamsOscilatorCheckBox)    
+        self.tabA.optionsLayout.addWidget(self.tabA.williamsOscilatorCheckBox,0,6,1,1)    
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
-        self.tabA.addChartButton()
+        self.tabA.optionsLayout.addWidget(self.tabA.addChartButton(),0,7,3,4)
         self.tabA.chartButton.clicked.connect(self.paintChart)
         self.tabs.addTab(self.tabA,"tabA")
         """koniec tab A """
@@ -87,11 +87,7 @@ class GuiMainWindow(object):
         self.tabB.setObjectName("tabB")
 
         #przycisk wyswietlanie wykresu (przyciski dodajemy na sam koniec okna)
-        self.tabB.addChartButton()
-        
-        
-        self.tabs.addTab(self.tabB,"tabB")
-        
+        self.tabB.optionsLayout.addWidget(self.tabB.addChartButton(),0,4,3,4)
         self.tabs.addTab(self.tabB,"tabB")
         """ koniec tab B"""
 
@@ -99,7 +95,7 @@ class GuiMainWindow(object):
         self.tabC = AbstractTab()
         self.tabC.setObjectName("tabC")
         self.tabs.addTab(self.tabC,"tabC")
-        self.tabC.addChartButton()
+        self.tabC.optionsLayout.addWidget(self.tabC.addChartButton(),0,7,3,4)
         self.tabs.addTab(self.tabC,"tabC")
         
         """Koniec tabC"""
@@ -195,15 +191,13 @@ class GuiMainWindow(object):
             finObj.updateArchive()
             chart = Chart(self.tabA, finObj)
             self.tabA.chartsLayout.addWidget(chart)
-            chart.setOscPlot('momentum')
-            chart.setDrawingMode(True)
-            chart.setData(finObj,dateStart,dateEnd,'weekly')
-            chart.setMainType('candlestick')        
-            chart.setData(finObj)
-            chart.setMainIndicator('SMA')
-            chart.rmVolumeBars()
-            chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),'daily')
-            chart.setMainIndicator('EMA')
+            chart.setOscPlot(indicator)
+            chart.setDrawingMode(painting)
+            chart.setData(finObj,start,end,step)
+            chart.setMainType(chartType)
+            if hideVolumen:
+                chart.rmVolumeBars()
+            
         # Jeśli wybrano instrument Stock
         if pageIndex == 1:
             indexes = self.tabA.stockListView.selectedIndexes()
@@ -212,12 +206,12 @@ class GuiMainWindow(object):
             finObj.updateArchive()
             chart = Chart(self.tabA, finObj)
             self.tabA.chartsLayout.addWidget(chart)
-            chart.setOscPlot('momentum')
-            chart.setMainIndicator('SMA')
+            chart.setOscPlot(indicator)
             chart.setDrawingMode(painting)
             chart.setData(finObj,start,end,step)
             chart.setMainType(chartType)
-            chart.rmVolumeBars()
+            if hideVolumen:
+                chart.rmVolumeBars()
             
        
 
