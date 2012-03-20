@@ -8,12 +8,17 @@ import csv
 import datetime
 import urllib2
 import cStringIO
+import pickle
 
 #ZMIENNE GLOBALNE
+REMEMBER_COUNT = 5
 DATABASE_LAST_UPDATE = datetime.date(2012,1,1)
 INDEX_LIST = []
 STOCK_LIST = []
 FOREX_LIST = []
+RESOURCE_LIST = []
+BOND_LIST = []
+HISTORY_LIST = []
 
 
 class FinancialObject(object):
@@ -113,9 +118,14 @@ class FinancialObject(object):
 
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
+	
+	global HISTORY_LIST
+	finObj = isInHistory(abbreviation)
+	if finObj != None:
+		finObj.getCurrentValue()
+		return finObj
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail)
-
 	url = "http://finance.yahoo.com/q?s="+abbreviation
 	try:
 		site = urllib2.urlopen(url)
@@ -132,11 +142,17 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	HISTORY_LIST += [finObj]
 	return finObj
 
 def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
-
+	
+	global HISTORY_LIST
+	finObj = isInHistory(abbreviation)
+	if finObj != None:
+		finObj.getCurrentValue()
+		return finObj
 	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
 
 	url = "http://stooq.pl/q/g/?s="+abbreviation.lower()
@@ -151,10 +167,17 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	m = re.search(pattern,pageSource)
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	HISTORY_LIST += [finObj]
 	return finObj
 
 def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający archiwalne dane pobrane ze strony finance.yahoo dotyczące obiektu zdefiniowanego w parametrach funkcji"""
+	
+	global HISTORY_LIST
+	finObj = isInHistory(abbreviation)
+	if finObj != None:
+		finObj.updateArchive()
+		return finObj
 	currentDate = datetime.date.today()
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail, currentDate)
 
@@ -199,12 +222,17 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, since
 	for row in dataCsv:
 		dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5]),float(row[6])]]
 		finObj.valuesMonthly = finObj.valuesMonthly + dataRow
-
+	HISTORY_LIST += [finObj]
 	return finObj
 
 def createWithArchivesFromStooq(name, abbreviation, financialType, detail, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony stooq.pl"""
 
+	global HISTORY_LIST
+	finObj = isInHistory(abbreviation)
+	if finObj != None:
+		finObj.updateArchive()
+		return finObj
 	finObj = FinancialObject(name,abbreviation, financialType, detail, "Stooq")
 	currentDate = datetime.date.today()
 
@@ -262,6 +290,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, since
 		else:
 			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
 		finObj.valuesMonthly = finObj.valuesMonthly + dataRow
+	HISTORY_LIST += [finObj]	
 	return finObj
 	
 	 
@@ -303,13 +332,15 @@ def loadData():
 	global INDEX_LIST
 	global STOCK_LIST
 	global FOREX_LIST
+	global RESOURCE_LIST
+	global BOND_LIST
 	global DATABASE_LAST_UPDATE
+	global HISTORY_LIST
 	csvFile  = open('data1.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
 	dataCsv.next()
 	for row in dataCsv:
 		INDEX_LIST = INDEX_LIST + [[row[0],row[1],row[2],'America']]
-	
 	csvFile  = open('data2.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
 	flag = True
@@ -325,6 +356,18 @@ def loadData():
 	dataCsv.next()
 	for row in dataCsv:
 		FOREX_LIST = FOREX_LIST + [[row[0],row[1],row[2],row[3]]]
+	csvFile  = open('data4.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
+	dataCsv.next()
+	for row in dataCsv:
+		RESOURCE_LIST = RESOURCE_LIST + [[row[0],row[1],row[2],row[3]]]
+	csvFile  = open('data5.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
+	dataCsv.next()
+	for row in dataCsv:
+		BOND_LIST = BOND_LIST + [[row[0],row[1],row[2],row[3]]]
+
+
 
 def getAdvDec(date):
 	"""Funkcja zwracająca listę krotek postaci(LICZBA_WZROSTÓW,LICZBA_SPADKÓW,LICZBA_BEZZMIAN) dla indeksów NYSE, AMEX, NASDAQ"""
@@ -336,6 +379,9 @@ def getAdvDec(date):
 		if ex.code == 404:
 			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
 			return [[0,0,0],[0,0,0],[0,0,0]]
+		return
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
 		return
 	pageSource = site.read()
 	pageSource = pageSource.replace(' ','')
@@ -369,6 +415,17 @@ def getAdvDecInPeriodOfTime(begin,end,index):
 			begin += day
 		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
 
+def isInHistory(abbreviation):
+	"""Funkcja sprawdzająca czy obiekt finansowy o podanym skrócie znajduje się w historii"""
+	for x in HISTORY_LIST:
+		if x.abbreviation == abbreviation:
+			return x
+		else:
+			return None
+
+def saveHistory():
+	"""Funkcja zapisująca bierzącą historie w pliku"""
+
 """for x in US_INDICES:
 	print x[1]+','+x[0]+',Yahoo'""" """
 x = createWithCurrentValueFromStooq('USD/GPB', 'plngbp', 'forex', 'gbp')
@@ -379,14 +436,19 @@ for k in x.valuesMonthly:
 	print k 
 updateDatabase()
 """
-"""
+
 loadData()
 i = 1
-for x in FOREX_LIST:
+
+
+for x in STOCK_LIST:
 	i = i+1
-	x = createWithArchivesFromStooq(x[1],x[0],'forex',x[3])
-	print DATABASE_LAST_UPDATE
-"""
+	z = createWithCurrentValueFromStooq(x[1],x[0],'forex',x[3])
+	y = createWithArchivesFromStooq(x[1],x[0],'forex',x[3])
+	#print x.name + " " + str(x.currentValue)
+
+for x in HISTORY_LIST:
+	print x.name
 """
 csvFile  = open('companylist(1).csv', "rb")
 dataCsv = csv.reader(csvFile)
@@ -415,6 +477,6 @@ print finObj.valuesDaily[x[0]][0]
 print finObj.valuesDaily[x[1]][0]
 """
 
-x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+#x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
 
-print x['adv']
+#print x['adv']
