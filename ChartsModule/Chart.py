@@ -6,12 +6,12 @@ import datetime
 import random
 import matplotlib.dates as mdates
 import numpy as np
-import WallStreetFighters.TechAnalysisModule.oscilators as indicators
+import TechAnalysisModule.oscilators as indicators
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.patches import Rectangle
-from matplotlib.ticker import IndexLocator
+from matplotlib.ticker import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 
@@ -24,6 +24,7 @@ class ChartData:
         if start>=end:
             self.corrupted=True
             return
+        self.step=(step)
         #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
             start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
@@ -155,7 +156,7 @@ class Chart(FigureCanvas):
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
-    margin, maxSize = 0.05, 0.9     
+    margin, maxSize = 0.1, 0.8     
     #wysokość wolumenu i wykresu oscylatora
     volHeight, oscHeight = 0.1, 0.15        
     
@@ -217,6 +218,12 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(self.data.date[0],self.data.date[-1])
         ax.set_yscale(self.scaleType)
+        ax.set_ylim(0.9*min(self.data.low),1.1*max(self.data.high))
+        if(self.scaleType=='log'):            
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
+            ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
+        for label in (ax.get_yticklabels() + ax.get_yminorticklabels()):
+            label.set_size(8)
         #legenda
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
@@ -274,8 +281,13 @@ class Chart(FigureCanvas):
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
         if self.data.corrupted:
-            return
-        timedelta=mdates.date2num(self.data.date[1])-mdates.date2num(self.data.date[0])        
+            return                
+        if self.data.step=='daily':
+            timedelta=1.0
+        elif self.data.step=='weekly':
+            timedelta=7.0
+        elif self.data.step=='monthly':
+            timedelta=30.0
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7*timedelta,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
