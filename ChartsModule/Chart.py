@@ -24,6 +24,7 @@ class ChartData:
         if start>=end:
             self.corrupted=True
             return
+        self.step=(step)
         #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
             start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
@@ -280,8 +281,13 @@ class Chart(FigureCanvas):
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
         if self.data.corrupted:
-            return
-        timedelta=mdates.date2num(self.data.date[1])-mdates.date2num(self.data.date[0])        
+            return                
+        if self.data.step=='daily':
+            timedelta=1.0
+        elif self.data.step=='weekly':
+            timedelta=7.0
+        elif self.data.step=='monthly':
+            timedelta=30.0
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7*timedelta,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
