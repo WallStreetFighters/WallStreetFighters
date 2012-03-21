@@ -104,9 +104,9 @@ class ChartData:
         return indicators.ROC(np.array(array), duration)
     
     def williams(self, duration=10):
-        highs=np.array(self.getEarlierValues(duration-3,'high'))
-        lows=np.array(self.getEarlierValues(duration-3,'low'))
-        closes=np.array(self.getEarlierValues(duration-3,'close'))        
+        highs=np.array(self.getEarlierValues(duration,'high'))
+        lows=np.array(self.getEarlierValues(duration,'low'))
+        closes=np.array(self.getEarlierValues(duration,'close'))        
         return indicators.williamsOscilator(highs,lows,closes,duration)
     
     def SMA(self, duration=20):        
@@ -383,8 +383,14 @@ class Chart(FigureCanvas):
         """Metoda ustawia zakres osi poprawny dla danego oscylatora. Ponadto przenosi
         etykiety na prawą stronę, żeby nie nachodziły na kurs akcji"""
         ax=self.oscPlot
-        ax.set_ylim(0, 100)
-        ax.set_yticks([30,70])
+        type=self.oscType                
+        if type == 'ROC':
+            ax.set_ylim(-100, 100)
+        elif type == 'RSI':
+            ax.set_ylim(0, 100)
+            ax.set_yticks([30,70])
+        elif type == 'williams':
+            ax.set_ylim(-100,0)        
         for tick in ax.yaxis.get_major_ticks():
             tick.label1On = False
             tick.label2On = True

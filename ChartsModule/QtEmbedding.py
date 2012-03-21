@@ -18,17 +18,17 @@ class ApplicationWindow(QtGui.QMainWindow):
         l = QtGui.QVBoxLayout(self.main_widget)
         parser.loadData()         
 
-        finObj = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[6][1],
-        parser.STOCK_LIST[6][0],'stock',parser.STOCK_LIST[6][3]) 
+        finObj = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[2][1],
+        parser.STOCK_LIST[2][0],'stock',parser.STOCK_LIST[2][3]) 
         finObj.updateArchive() 
         chart = Chart(self.main_widget, finObj)                
         l.addWidget(chart)                        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
-        chart.setOscPlot('RSI')
+        chart.setOscPlot('williams')        
         chart.setDrawingMode(True)                
         chart.setMainIndicator('SMA')
-        chart.setData(finObj,datetime.datetime(2011,10,1),datetime.datetime(2012,01,1),'daily')
+        chart.setData(finObj,datetime.datetime(2011,8,1),datetime.datetime(2012,01,1),'daily')
         chart.setMainType('candlestick')                        
         chart.setScaleType('log')          
         chart.setScaleType('linear')          
