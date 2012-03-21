@@ -2,14 +2,7 @@
 import sys
 from PyQt4 import QtGui,QtCore
 
-class AbstractTab(QtGui.QWidget):
-    """klasa bazowa dla każdej z zakładek aplikacji"""
-    def __init__(self,parent=None):
-         QtGui.QWidget.__init__(self,parent)
-         self.initUi()
-    def initUi(self):
-        
-        
+def tabUi(self):
         self.horizontalLayout = QtGui.QHBoxLayout(self)
         """Każdą zakładkę dzielimy jak na razie na 3 obszary: opcje,
         listy , wykresy """
@@ -40,7 +33,7 @@ class AbstractTab(QtGui.QWidget):
         self.indexPageLayout = QtGui.QHBoxLayout(self.indexPage)
         self.listsToolBox.addItem(self.indexPage, "Index")
         self.indexListView = QtGui.QTableView(self.listsFrame)
-        self.tableStyle(self.indexListView) #ustawiamy styl tabeli
+        tableStyle(self,self.indexListView) #ustawiamy styl tabeli
         self.indexPageLayout.addWidget(self.indexListView)
         
 
@@ -49,7 +42,7 @@ class AbstractTab(QtGui.QWidget):
         self.stockPageLayout = QtGui.QHBoxLayout(self.stockPage)
         self.listsToolBox.addItem(self.stockPage , "Stock")
         self.stockListView = QtGui.QTableView(self.listsFrame)
-        self.tableStyle(self.stockListView)#ustawiamy styl tabeli
+        tableStyle(self,self.stockListView)#ustawiamy styl tabeli
         self.stockPageLayout.addWidget(self.stockListView)
 
         #forex
@@ -57,7 +50,7 @@ class AbstractTab(QtGui.QWidget):
         self.forexPageLayout = QtGui.QHBoxLayout(self.forexPage)
         self.listsToolBox.addItem(self.forexPage, "Forex")
         self.forexListView = QtGui.QTableView(self.listsFrame)
-        self.tableStyle(self.forexListView)#ustawiamy styl tabeli
+        tableStyle(self,self.forexListView)#ustawiamy styl tabeli
         self.forexPageLayout.addWidget(self.forexListView)
 
         #Bond
@@ -65,7 +58,7 @@ class AbstractTab(QtGui.QWidget):
         self.bondPageLayout = QtGui.QHBoxLayout(self.bondPage)
         self.listsToolBox.addItem(self.bondPage, "Bond")
         self.bondListView = QtGui.QTableView(self.listsFrame)
-        self.tableStyle(self.bondListView)
+        tableStyle(self,self.bondListView)
         self.bondPageLayout.addWidget(self.bondListView)
 
 
@@ -74,7 +67,7 @@ class AbstractTab(QtGui.QWidget):
         self.commodityPageLayout = QtGui.QHBoxLayout(self.commodityPage)
         self.listsToolBox.addItem(self.commodityPage, "Commodity")
         self.commodityListView = QtGui.QTableView(self.listsFrame)
-        self.tableStyle(self.commodityListView)
+        tableStyle(self,self.commodityListView)
         self.commodityPageLayout.addWidget(self.commodityListView)
 
         #Futures contract
@@ -82,7 +75,7 @@ class AbstractTab(QtGui.QWidget):
         self.futuresContractPageLayout = QtGui.QHBoxLayout(self.futuresContractPage)
         self.listsToolBox.addItem(self.futuresContractPage, "Futures Contract")
         self.futuresContractListView = QtGui.QTableView(self.listsFrame)
-        self.tableStyle(self.futuresContractListView)
+        tableStyle(self,self.futuresContractListView)
         self.futuresContractPageLayout.addWidget(self.futuresContractListView)
         
         self.listsLayout.addWidget(self.listsToolBox)
@@ -141,7 +134,7 @@ class AbstractTab(QtGui.QWidget):
         #dodajemy ramke zawierajaca wykres i opcje do tab
         self.horizontalLayout.addWidget(self.optionsAndChartsFrame)
 
-    def addChartButton(self):
+def addChartButton(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
@@ -187,7 +180,7 @@ class AbstractTab(QtGui.QWidget):
         #self.gridLayout.addItem(self.spacer,0,5,1,3)
         return self.frame
        
-    def tableStyle(self,table):
+def tableStyle(self,table):
         # hide grid
         table.setShowGrid(False)
         # set the font
