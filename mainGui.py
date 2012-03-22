@@ -41,6 +41,9 @@ class GuiMainWindow(object):
         """tab A wskaźniki i oscylatory"""
 	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel)
         self.tabs.addTab(self.tabA,"tabA")
+        
+        self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
+        self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
         """koniec tab A """
         
         """ tab B
@@ -82,7 +85,41 @@ class GuiMainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+    #metody otwierajace nowe zakladki po podwójnym kliknięciu
+    def newIndexTab(self,qModelIndex):
+        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
+                          qModelIndex,self.settings(),"index",False)
+        nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+        self.tabs.addTab(self.tabA1,nameTab)
+    def newStockTab(self,qModelIndex):
+        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
+                          qModelIndex,self.settings(),"stock",False)
+        nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+        self.tabs.addTab(self.tabA1,nameTab)
+    def settings(self):
+        #funkcja pobiera aktualnie zaznaczone opcje z tabA
+        dateStart = self.tabA.startDateEdit.date()  # początek daty
+        start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
+        
+        dateEnd = self.tabA.endDateEdit.date()     # koniec daty
+        end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
+        indicator = 'momentum'
+        if self.tabA.momentumCheckBox.isChecked():
+            indicator = "momentum"
+        elif self.tabA.smaCheckBox.isChecked():
+            indicator = "SMA"
+        elif self.tabA.emaCheckBox.isChecked():
+            indicator = "EMA"
+        #step
+        step = self.tabA.stepComboBox.currentText()
 
+        #chartType
+        chartType = self.tabA.chartTypeComboBox.currentText()
+        hideVolumen =self.tabA.volumenCheckBox.isChecked() 
+        #painting
+        painting = self.tabA.paintCheckBox.isChecked() 
+        t = {"start":start,"end":end,"indicator":indicator,"step":step,"chartType":chartType,"hideVolumen":hideVolumen,"painting":painting}
+        return t
       
 
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
