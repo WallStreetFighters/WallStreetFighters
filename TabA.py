@@ -66,11 +66,13 @@ class TabA(QtGui.QWidget):
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
         self.optionsLayout.addWidget(addChartButton(self),0,7,3,4)
 
+        
         self.indexListView.pressed.connect(self.selectRow)
         self.stockListView.pressed.connect(self.selectRowStock)
         self.chartButton.clicked.connect(self.paintChart)
         if self.qModelIndex != None:
             self.paint2Chart()
+            
         
 
     def paintChart(self):
@@ -161,7 +163,6 @@ class TabA(QtGui.QWidget):
         self.chart.setMainType(chartType)
         if hideVolumen:
             self.chart.rmVolumeBars()
-
     def selectRow(self):
         self.indexListView.selectRow(self.indexListView.currentIndex().row())
     def selectRowStock(self):

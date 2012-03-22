@@ -73,6 +73,7 @@ class GuiMainWindow(object):
     
 	""" koniec ustawiania Zakładek"""
 
+	self.tabs.tabCloseRequested.connect(self.closeTab)
 	
         self.verticalLayout.addWidget(self.tabs)
         MainWindow.setCentralWidget(self.centralWidget)
@@ -85,17 +86,20 @@ class GuiMainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
     def newIndexTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"index",False)
         nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
         self.tabs.addTab(self.tabA1,nameTab)
+
     def newStockTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"stock",False)
         nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.addTab(self.tabA1,nameTab)
+        self.tabs.addTab(self.tabA1,nameTab)       
+
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA
         dateStart = self.tabA.startDateEdit.date()  # początek daty
@@ -118,8 +122,12 @@ class GuiMainWindow(object):
         hideVolumen =self.tabA.volumenCheckBox.isChecked() 
         #painting
         painting = self.tabA.paintCheckBox.isChecked() 
-        t = {"start":start,"end":end,"indicator":indicator,"step":step,"chartType":chartType,"hideVolumen":hideVolumen,"painting":painting}
+        t = {"start":start,"end":end,"indicator":indicator,"step":step,
+             "chartType":chartType,"hideVolumen":hideVolumen,
+             "painting":painting}
         return t
+    def closeTab(self,i):
+        self.tabs.removeTab(i)
       
 
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
