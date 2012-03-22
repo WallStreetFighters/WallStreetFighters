@@ -2,7 +2,7 @@
 import sys
 from PyQt4 import QtGui,QtCore
 
-def tabUi(self):
+def tabUi(self,showLists=True):
         self.horizontalLayout = QtGui.QHBoxLayout(self)
         """Każdą zakładkę dzielimy jak na razie na 3 obszary: opcje,
         listy , wykresy """
@@ -79,8 +79,9 @@ def tabUi(self):
         self.futuresContractPageLayout.addWidget(self.futuresContractListView)
         
         self.listsLayout.addWidget(self.listsToolBox)
-        # koniec Tool Box
-        self.horizontalLayout.addWidget(self.listsFrame)
+                # koniec Tool Box
+        if showLists:
+            self.horizontalLayout.addWidget(self.listsFrame)
         # koniec ramki przechowywyjącej listy
         
 
