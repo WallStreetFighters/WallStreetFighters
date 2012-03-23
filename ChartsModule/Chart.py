@@ -397,17 +397,21 @@ class Chart(FigureCanvas):
             tick.label2.set_size(7)
 
     def formatDateAxis(self,ax):
-        """Formatuje etykiety osi czasu"""
+        """Formatuje etykiety osi czasu"""        
         mindate=self.data.date[0].date()
         maxdate=self.data.date[-1].date()        
         #jeśli horyzont czasowy jest krótszy niż 7 dni, wyświetlamy z godzinami
         if((maxdate-mindate).days < 7):
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d\n%H:%M'))
         else:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))        
+        """ponieważ automatyczne rozmieszczanie "ticksów" na osi x okazało się
+        być zjebane, ustawiam na sztywno żeby było ich 8"""
+        step = int((mdates.date2num(self.data.date[-1])-mdates.date2num(self.data.date[0]))/8)        
+        ax.xaxis.set_major_locator(mdates.DayLocator(interval=step))        
         for label in ax.get_xticklabels():
             label.set_size(7)            
-            label.set_horizontalalignment('center')                        
+            label.set_horizontalalignment('center')                                    
     
     def fixTimeLabels(self):
         """Włącza wyświetlanie etykiet osi czasu pod odpowiednim (tzn. najniższym)
