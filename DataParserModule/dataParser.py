@@ -8,10 +8,10 @@ import csv
 import datetime
 import urllib2
 import cStringIO
-import pickle
+import cPickle
 
 #ZMIENNE GLOBALNE
-REMEMBER_COUNT = 5
+REMEMBER_COUNT = 2
 DATABASE_LAST_UPDATE = datetime.date(2012,1,1)
 INDEX_LIST = []
 STOCK_LIST = []
@@ -41,6 +41,10 @@ class FinancialObject(object):
 		self.valuesMonthly = [] # jak wyżej tylko dla danych miesięcznych
 
 	def getCurrentValue(self):
+		
+		global UPDATE_FLAG
+		UPDATE_FLAG = True	
+
 		"""Metoda aktualizująca dane dotyczące aktualnej wartości obiektu oraz przenosząca poprzednią wartość do listy poprzednich wartości"""
 		if self.dataSource == "Yahoo":
 			tmpObj = createWithCurrentValueFromYahoo(self.name, self.abbreviation, self.financialType, self.detail)
@@ -53,7 +57,10 @@ class FinancialObject(object):
 		"""Metoda aktualizująca dane istniejącego obiektu. Tworzy nowy tymczasowy obiekt i kopiuje jego zawartość do obiektu 'self'. """
 		day = datetime.timedelta(days=1)
 		lastUpdate = self.lastUpdate + day		
-	
+
+		global UPDATE_FLAG
+		UPDATE_FLAG = True
+		
 		if self.dataSource == "Yahoo":
 			if timePeriod == 'daily':
 				if self.valuesDaily == []: 
@@ -61,7 +68,7 @@ class FinancialObject(object):
 				elif self.valuesDaily[0][0] == datetime.date.today():
 					return
 				else:
-					date = valuesDaily[0][0]+day
+					date = self.valuesDaily[0][0]+day
 					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
 				self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
 			
@@ -71,7 +78,7 @@ class FinancialObject(object):
 				elif self.valuesWeekly[0][0] == datetime.date.today():
 					return
 				else:
-					date = valuesWeekly[0][0]+day
+					date = self.valuesWeekly[0][0]+day
 					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
 				self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
 			
@@ -81,7 +88,7 @@ class FinancialObject(object):
 				elif self.valuesMonthly[0][0] == datetime.date.today():
 					return
 				else:
-					date = valuesMonthly[0][0]+day
+					date = self.valuesMonthly[0][0]+day
 					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
 				self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
 		
@@ -92,7 +99,7 @@ class FinancialObject(object):
 				elif self.valuesDaily[0][0] == datetime.date.today():
 					return
 				else:
-					date = valuesDaily[0][0]+day
+					date = self.valuesDaily[0][0]+day
 					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
 				self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
 			
@@ -102,7 +109,7 @@ class FinancialObject(object):
 				elif self.valuesWeekly[0][0] == datetime.date.today():
 					return
 				else:
-					date = valuesWeekly[0][0]+day
+					date = self.valuesWeekly[0][0]+day
 					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
 				self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
 			
@@ -112,7 +119,7 @@ class FinancialObject(object):
 				elif self.valuesMonthly[0][0] == datetime.date.today():
 					return
 				else:
-					date = valuesMonthly[0][0]+day
+					date = self.valuesMonthly[0][0]+day
 					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)				
 				self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
 
@@ -146,7 +153,14 @@ class FinancialObject(object):
 			
 	def getIndex(self, begin, end, time = 'daily'):
 		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
+		
+		if begin > end:
+			return
 		if time == 'daily':
+			size = len(self.valuesDaily)
+			if begin < self.valuesDaily[size-1][0] or end > self.valuesDaily[0][0]:
+				print "Obiekt nie byl notowany przez prznajmniej część podanego okresu"
+				return [0,0]
 			finish = 0
 			while (end < self.valuesDaily[finish][0]):
 				finish += 1
@@ -155,6 +169,10 @@ class FinancialObject(object):
 				start += 1
 			return [finish,start]
 		if time == 'weekly':
+			size = len(self.valuesWeekly)
+			if begin < self.valuesWeekly[size-1][0] or end > self.valuesWeekly[0][0]:
+				print "Obiekt nie byl notowany przez prznajmniej część podanego okresu"
+				return [0,0]
 			finish = 0
 			while (end < self.valuesWeekly[finish][0]):
 				finish += 1
@@ -163,6 +181,10 @@ class FinancialObject(object):
 				start += 1
 			return [finish,start]
 		if time == 'monthly':
+			size = len(self.valuesMonthly)
+			if begin < self.valuesMonthly[size-1][0] or end > self.valuesMonthly[0][0]:
+				print "Obiekt nie byl notowany przez prznajmniej część podanego okresu"
+				return [0,0]
 			finish = 0
 			while (end < self.valuesMonthly[finish][0]):
 				finish += 1
@@ -177,9 +199,12 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	
 	
 	global HISTORY_LIST
-	finObj = isInHistory(abbreviation)
-	if finObj != None:
-		return finObj
+	global UPDATE_FLAG
+	if UPDATE_FLAG == False:
+		finObj = isInHistory(abbreviation)
+		if finObj != None:
+			finObj.getCurrentValue()
+			return finObj
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail)
 	url = "http://finance.yahoo.com/q?s="+abbreviation
@@ -199,17 +224,26 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
-	#HISTORY_LIST += [finObj]
+	if UPDATE_FLAG == False:
+		if len(HISTORY_LIST) == REMEMBER_COUNT:
+			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
+			HISTORY_LIST[0] = finObj
+		else:
+			HISTORY_LIST = [finObj] + HISTORY_LIST
+	UPDATE_FLAG = False	
 	return finObj
 
 def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
 	
+	
 	global HISTORY_LIST
-	#finObj = isInHistory(abbreviation)
-	#if finObj != None:
-	#	finObj.getCurrentValue()
-	#	return finObj
+	global UPDATE_FLAG
+	if UPDATE_FLAG == False:
+		finObj = isInHistory(abbreviation)
+		if finObj != None:
+			finObj.getCurrentValue()
+			return finObj
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
 
@@ -225,16 +259,25 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	m = re.search(pattern,pageSource)
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
-	#HISTORY_LIST += [finObj]
+	if UPDATE_FLAG == False:
+		if len(HISTORY_LIST) == REMEMBER_COUNT:
+			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
+			HISTORY_LIST[0] = finObj
+		else:
+			HISTORY_LIST = [finObj] + HISTORY_LIST
+	UPDATE_FLAG = False	
 	return finObj
 
 def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający archiwalne dane pobrane ze strony finance.yahoo dotyczące obiektu zdefiniowanego w parametrach funkcji"""
 	
 	global HISTORY_LIST
-	finObj = isInHistory(abbreviation)
-	if finObj != None:
-		return finObj
+	global UPDATE_FLAG
+	if UPDATE_FLAG == False:
+		finObj = isInHistory(abbreviation)
+		if finObj != None:
+			finObj.updateArchive(timePeriod)
+			return finObj
 
 	currentDate = datetime.date.today()
 
@@ -270,16 +313,26 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 		for row in dataCsv:
 			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
 			finObj.valuesMonthly = finObj.valuesMonthly + dataRow
-	#HISTORY_LIST += [finObj]
+	if UPDATE_FLAG == False:
+		if len(HISTORY_LIST) == REMEMBER_COUNT:
+			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
+			HISTORY_LIST[0] = finObj
+		else:
+			HISTORY_LIST += [finObj]
+	UPDATE_FLAG = False	
 	return finObj 
 
 def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony stooq.pl"""
 
 	global HISTORY_LIST
-	finObj = isInHistory(abbreviation)
-	if finObj != None:
-		return finObj
+	global UPDATE_FLAG
+	if UPDATE_FLAG == False:
+		finObj = isInHistory(abbreviation)
+		if finObj != None:
+			finObj.updateArchive(timePeriod)
+			return finObj
+
 	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
 	currentDate = datetime.date.today()
 
@@ -334,7 +387,13 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 				dataRow = [[date,float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
 			finObj.valuesMonthly = finObj.valuesMonthly + dataRow
 		finObj.valuesMonthly = finObj.valuesMonthly[::-1]
-	#HISTORY_LIST += [finObj]	
+	if UPDATE_FLAG == False:
+		if len(HISTORY_LIST) == REMEMBER_COUNT:
+			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
+			HISTORY_LIST[0] = finObj
+		else:
+			HISTORY_LIST = [finObj] + HISTORY_LIST
+	UPDATE_FLAG = False	
 	return finObj
 	
 	 
@@ -463,20 +522,36 @@ def isInHistory(abbreviation):
 	"""Funkcja sprawdzająca czy obiekt finansowy o podanym skrócie znajduje się w historii"""
 	for x in HISTORY_LIST:
 		if x.abbreviation == abbreviation:
-			return x
-		else:
-			return None
+			return x	
+	return None
 
 def saveHistory():
 	"""Funkcja zapisująca bierzącą historie w pliku"""
+	global HISTORY_LIST
+	cPickle.dump(HISTORY_LIST, open('data.wsf', 'wb'))
 
-
-
+def loadHistory():
+	"""Funkcja zapisująca bierzącą historie w pliku"""
+	global HISTORY_LIST
+	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
 ########################################################################################################
 #TAKIE MOJE TESTOWANIE#
 
-
+start = datetime.datetime.now()
 loadData()
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time1: %s" % x
+
+i = 0
+l = ""
+loadHistory()
+z = createWithArchivesFromYahoo('bmw','BM','forex','Yahoo','daily')
+for x in HISTORY_LIST:
+	print x.name
+
+saveHistory()
+
 
 """for x in US_INDICES:
 	print x[1]+','+x[0]+',Yahoo'""" """
@@ -488,12 +563,36 @@ for k in x.valuesMonthly:
 	print k 
 updateDatabase()
 """
-z = createWithArchivesFromStooq('audcad','AUDCAD','forex','stooq','daily')
-print z.name
-z.updateArchive('monthly')
-for x in z.valuesMonthly:
-	print x 
+"""
+sFCCY+SRCE+TCHC+SSRX+EGHT+AXAS+ACTG+ACAD+ANCX+ARAY+ACET+ACNB+BIRT+ACXM+ADUS+ADBE+AEGN+AEHR+AEPI+ATRM+AGEN+AIRM+AMCN+AIXG+ALKS+ALGT+ABVA+ALNC+ALLT+AFAM+AOSL+ALTI+ALTR+ALTE+ASPS+APSA+ALVR+AMRN+AMBT+AMCX+AMED+UHAL+ASBI+AGNC+MTGE+ANCI+AMIC+ALRN+ANAT+APFC+AMRB+AMSC+AMWD+ARGN+ABCB+ASRV+ASRVP+AMTC+AMTCP+ATLO+AMGN+AMPL+AMSG+ALOG+ANLY+ANCB+AMCF+ANGN+ANIK+ANNB+APAGF+ATNY+AINV+AAPL+AMCC+AREX+ARSD+ACGL+ACAT+ARCC+ARKR+ABFS+ARTX+ARRY+ARRS+AROW+ARWR+ARTNA+ARTC+AERL+APWC+ASMI+ASML+AACC+ASBC+ASBCW+ATRO+ASTC+ASUR+ATAI+AFCB+AAME+ACFC+AAWW+ATML+ATMI+ATPG+ATRI+AUDC+AAC+AACOU+AACOW+ADAT+ABTL+AMAP+AVGO+AXTI+BCOM+BOSC+BCPC+BANF+BANFP+BKMU+BOCH+BMRC+BKSC+OZRK+BOVA+BFIN+BANR+MSDXP+BCDS+BBBY+BELFA+BELFB+BNHN+BGSCU+BGFV+BIOD+BIOF+BIIB+BLRX+BMRN+BSTC+BITS+BBOX+BKCC+ADRA+ADRD+ADRE+ADRU+MNGL+MNGLU+MNGLW+BNCN+BODY+BOKF+BOLT+BONA+BBNK+BRID+BCOV+BKBK+BRCM+BYFC+BRKR+BMTC+BSDM+BSQR+BUR+CFFI+CA+CCMP+CZR+CAMP+CFNB+CAFI+CAC+CAMT+CSIQ+CPHC+CPLA+CBKN+CCBG+CPLP+CSWC+CFFN+CPST+CFNL+CRME+CECO+CLBH+CART+CRRB+CACB+CATY+CAZA+CAZAU+CAZAW+CFK+CECE+CELG+CELGZ+CLSN+CEDC+CETV+CFBK+CENT+CENTAtart = datetime.datetime.now()
+try:
+	
+	for x in HISTORY_LIST:
+		x.abbreviation
+except EOFError:
+	pass
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time2: %s" % x
 
+start = datetime.datetime.now()
+z = createWithArchivesFromYahoo('usdpln','CPE','forex','Yahoo','daily')
+print z.getIndex(datetime.date(1989,12,01),datetime.date(1989,12,03))
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time3: %s" % x
+
+#print z.name
+start = datetime.datetime.now()
+saveHistory()
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time4: %s" % x
+print isInHistory('USDPLN')
+for x in HISTORY_LIST:
+	print x.abbreviation
+
+"""
 
 """    
 for x in FOREX_LIST:
@@ -539,4 +638,5 @@ print finObj.valuesDaily[x[1]][0]
 
 #x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
 
-#print x['adv']
+#print x['adv']end = datetime.datetime.now()
+
