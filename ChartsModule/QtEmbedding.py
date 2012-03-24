@@ -1,6 +1,7 @@
 # coding: utf-8
 from PyQt4 import QtGui, QtCore
 from Chart import Chart
+from CompareChart import CompareChart
 import WallStreetFighters.DataParserModule.dataParser as parser
 import sys
 import os
@@ -18,22 +19,17 @@ class ApplicationWindow(QtGui.QMainWindow):
         l = QtGui.QVBoxLayout(self.main_widget)
         parser.loadData()         
 
-        finObj = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[2][1],
+        finObj1 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[2][1],
         parser.STOCK_LIST[2][0],'stock',parser.STOCK_LIST[2][3]) 
-        finObj.updateArchive() 
-        chart = Chart(self.main_widget, finObj)                
+        finObj2 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[6][1],
+        parser.STOCK_LIST[6][0],'stock',parser.STOCK_LIST[6][3]) 
+        finObj1.updateArchive() 
+        finObj2.updateArchive() 
+        chart = CompareChart(self.main_widget, finObj1, finObj2)                
+        chart.setData(finObj1,finObj2,datetime.datetime(2011,8,1),datetime.datetime(2012,3,1),'daily')
         l.addWidget(chart)                        
         self.main_widget.setFocus()
-        self.setCentralWidget(self.main_widget)
-        chart.setOscPlot('RSI')        
-        chart.setDrawingMode(True)                
-        chart.setMainIndicator('SMA')
-        chart.setData(finObj,datetime.datetime(2011,2,1),datetime.datetime(2011,3,1),'daily')                                     
-        chart.setScaleType('log')          
-        chart.setMainType('candlestick')       
-        chart.setScaleType('linear')       
-        chart.formatDateAxis(chart.volumeBars)
-        print "strorzyłem wykresa"
+        self.setCentralWidget(self.main_widget)                
         
 qApp = QtGui.QApplication(sys.argv)
 os.chdir("../DataParserModule") #zmieniamy katalog roboczy żeby pliki .wsf się ładowały

@@ -2,7 +2,6 @@
 __author__="Andrzej Smoliński"
 __date__ ="$2012-02-23 19:00:48$"
 
-import matplotlib.dates as mdates
 from ChartData import ChartData
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -135,8 +134,7 @@ class Chart(FigureCanvas):
         self.fixTimeLabels()
     
     def setScaleType(self,type):    
-        """Ustawia skalę liniową lub logarytmiczną na głównym wykresie.
-        TODO dobrać podstawę logarytmu"""
+        """Ustawia skalę liniową lub logarytmiczną na głównym wykresie."""
         if(type) not in ['linear','log']:
             return        
         self.scaleType=type

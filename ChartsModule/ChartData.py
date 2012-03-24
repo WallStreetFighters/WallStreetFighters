@@ -9,12 +9,15 @@ import TechAnalysisModule.oscilators as indicators
 
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
-    co daje mi FinancialObject Marcina"""     
+    co daje mi FinancialObject Marcina. Czwarty parametr określa czy obliczamy dane
+    do wykresu zwykłego, czy do porównującego. Wersja porównująca wykresy potrzebuje
+    znacznie mniej danych (jedynie procentowa zmiana kursów jednego i drugiego instrumentu
+    w czasie), podczas gdy zwykły chart pobiera OHLC + te dane z unicorna"""     
     
-    def __init__(self, finObj, start=None, end=None, step='monthly'):
+    def __init__(self, finObj, start=None, end=None, step='monthly',compare=False):
         if start>=end:
             self.corrupted=True
-            return
+            return        
         self.step=(step)
         #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
@@ -22,30 +25,44 @@ class ChartData:
         if(end==None):
             end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        #potrzebujemy też pełnej tabeli do obliczania wskaźników
-        self.fullArray=finObj.getArray(step)[::-1]
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]
-        if(len(self.fullArray)==0 or len(dataArray)==0):
+        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+        if(len(dataArray)==0):
             self.corrupted=True
             return
         self.name=finObj.name
-        self.open=dataArray['open'].tolist()
+        self.date = []
         self.close=dataArray['close'].tolist()
-        self.low=dataArray['low'].tolist()
-        self.high=dataArray['high'].tolist()
-        self.volume=dataArray['open'].tolist()        
-        self.date = []                    
         for date in dataArray['date']:
-            self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))        
-        #dane w formacie dla candlesticka
-        self.quotes=[]
-        for i in range(len(dataArray)):
-            time=float(i)
-            open=self.open[i]
-            close=self.close[i]
-            high=self.high[i]
-            low=self.low[i]
-            self.quotes.append((time, open, close, high, low))
+            self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
+        if(compare==False):                        
+            #potrzebujemy pełnej tabeli do obliczania wskaźników
+            self.fullArray=finObj.getArray(step)[::-1]                        
+            self.open=dataArray['open'].tolist()            
+            self.low=dataArray['low'].tolist()
+            self.high=dataArray['high'].tolist()
+            self.volume=dataArray['open'].tolist()   
+            if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
+                    ==len(self.volume)==len(self.date))):
+                self.corrupted=True
+                return
+            #dane w formacie dla candlesticka
+            self.quotes=[]
+            for i in range(len(dataArray)):
+                time=float(i)
+                open=self.open[i]
+                close=self.close[i]
+                high=self.high[i]
+                low=self.low[i]
+                self.quotes.append((time, open, close, high, low))
+        else:
+            self.percentChng=[]
+            firstValue=self.close[0]
+            for value in self.close:                
+                change=(value-firstValue)*100.0/firstValue                                
+                self.percentChng.append(change)
+            if(len(self.date)!=len(self.percentChng)):
+                self.corrupted=True
+                return
         self.corrupted=False
     
     def getEarlierValues(self, length, type='close'):
