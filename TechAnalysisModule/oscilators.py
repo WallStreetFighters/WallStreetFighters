@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from numpy import *
 
 # funkcja liczy zwyczajna srednia artmetyczna z podanej jej tablicy, przekazywac tablice jednowymiarowa!
@@ -253,4 +255,6 @@ def TRIN(advances, declines, advVol, decVol):
     spadkowy. Wynik tej samej długości co wejścia."""
     if(not (advances.size==declines.size==advVol.size==decVol.size)):
         return None
-    return (advances/declines)/(advVol/decVol)
+    numerator=advances.astype(float)/declines.astype(float)
+    denominator=advVol.astype(float)/decVol.astype(float)
+    return numerator/denominator
