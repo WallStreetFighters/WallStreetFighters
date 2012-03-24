@@ -20,6 +20,10 @@ RESOURCE_LIST = []
 BOND_LIST = []
 HISTORY_LIST = []
 
+AMEX_HIST = []
+NYSE_HIST = []
+NASDAQ_HIST = []
+
 UPDATE_FLAG = False
 
 
@@ -439,6 +443,9 @@ def loadData():
 	global BOND_LIST
 	global DATABASE_LAST_UPDATE
 	global HISTORY_LIST
+	global AMEX_HIST
+	global NASDAQ_HIST
+	global NYSE_HIST
 	csvFile  = open('data1.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
 	dataCsv.next()
@@ -468,20 +475,33 @@ def loadData():
 	dataCsv = csv.reader(csvFile)
 	dataCsv.next()
 	for row in dataCsv:
-		BOND_LIST = BOND_LIST + [[row[0],row[1],row[2],row[3]]]
-
+		BOND_LIST = BOND_LIST + [[row[0],row[1],row[2],row[3]]]	
+	csvFile  = open('AMEX.csv', "rb")
+	dataCsv = csv.reader(csvFile)
+	for row in dataCsv:
+		AMEX_HIST += [[parserStringToDate(row[0][0:4:1]+'-'+row[0][4:6:1]+'-'+row[0][6:8:1]),row[1],row[2],row[3],row[4],row[5],row[6]]]
+	csvFile  = open('NASDAQ.csv', "rb")
+	dataCsv = csv.reader(csvFile)
+	for row in dataCsv:
+		NASDAQ_HIST += [[parserStringToDate(row[0][0:4:1]+'-'+row[0][4:6:1]+'-'+row[0][6:8:1]),row[1],row[2],row[3],row[4],row[5],row[6]]]
+	csvFile  = open('NYSE.csv', "rb")
+	dataCsv = csv.reader(csvFile)
+	for row in dataCsv:
+		NYSE_HIST += [[parserStringToDate(row[0][0:4:1]+'-'+row[0][4:6:1]+'-'+row[0][6:8:1]),row[1],row[2],row[3],row[4],row[5],row[6]]]
+	loadHistory()
 
 
 def getAdvDec(date):
 	"""Funkcja zwracająca listę krotek postaci(LICZBA_WZROSTÓW,LICZBA_SPADKÓW,LICZBA_BEZZMIAN) dla indeksów NYSE, AMEX, NASDAQ"""
 	list = []
-	url = 'http://unicorn.us.com/advdec/'+ str(date.year)+'/adu'+ parserDateToString(date) +'.txt'
+	url = 'http://unicorn.us.com/advdec/'+ str(date.year)+'/adU'+ parserDateToString(date) +'.txt'
+	print url
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.HTTPError, ex:
 		if ex.code == 404:
 			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
-			return [[0,0,0],[0,0,0],[0,0,0]]
+			return
 		return
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
@@ -492,31 +512,48 @@ def getAdvDec(date):
 	dataCsv = csv.reader(csvString)
 	dataCsv.next()
 	dataCsv.next()
+ 	i = 0
 	for row in dataCsv:
-		list += [[row[1],row[2],row[3]]]
-	return list
-	
+		if i == 0:
+			csvFile  = open('NYSE.csv', "ab")
+		elif i == 1:
+			csvFile  = open('AMEX.csv', "ab")
+		elif i == 2:
+			csvFile  = open('NASDAQ.csv',"ab")
+		csvFile.write(parserDateToString(date)+','+row[1]+','+row[2]+','+row[3]+','+row[4]+','+row[5]+','+row[6]+'\n')
+		i+=1
+
+def updateAdvDec():
+	size = len(AMEX_HIST)
+	last_date = AMEX_HIST[size-1][0]
+	day = datetime.timedelta(days=1)
+	if last_date + day == datetime.date.today():
+		return
+	else:	
+		now = last_date + day
+		while now != datetime.date.today():
+			getAdvDec(now)
+			now+=day
+
 def getAdvDecInPeriodOfTime(begin,end,index):
 	tmplist = []
 	day = datetime.timedelta(days=1)
 	if index == 'NYSE':
-		while(begin != end):
-			x = getAdvDec(begin)
-			tmplist += [tuple([str(begin)]+x[0])]
-			begin += day
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
+		for row in NYSE_HIST:
+			if row[0] >= begin and row[0] <= end:
+				tmplist +=  [(str(row[0]),row[1],row[2],row[3],row[4],row[5],row[6])]
+		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int),('advv',int),('decv',int),('uncv',int)])
 	if index == 'AMEX':
-		while(begin != end):
-			x = getAdvDec(begin)
-			tmplist += [tuple([str(begin)]+x[1])]
-			begin += day
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
+		for row in AMEX_HIST:
+			if row[0] >= begin and row[0] <= end:
+				tmplist +=  [(str(row[0]),row[1],row[2],row[3],row[4],row[5],row[6])]
+		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int),('advv',int),('decv',int),('uncv',int)])
 	if index == 'NASDAQ':
-		while(begin != end):
-			x = getAdvDec(begin)
-			tmplist += [tuple([str(begin)]+x[2])]
-			begin += day
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
+		for row in NASDAQ_HIST:
+			if row[0] >= begin and row[0] <= end:
+				tmplist +=  [(str(row[0]),row[1],row[2],row[3],row[4],row[5],row[6])]
+		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int),('advv',int),('decv',int),('uncv',int)])
+
 
 def isInHistory(abbreviation):
 	"""Funkcja sprawdzająca czy obiekt finansowy o podanym skrócie znajduje się w historii"""
@@ -536,22 +573,27 @@ def loadHistory():
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
 ########################################################################################################
 #TAKIE MOJE TESTOWANIE#
-
-start = datetime.datetime.now()
 loadData()
+
+
+x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
+print x['advv']
+"""int 
+start = datetime.datetime.now()
+
 end = datetime.datetime.now()
 x = end-start
 print "Excecution_time1: %s" % x
 
 i = 0
-l = ""
+l = ""oin
 loadHistory()
 z = createWithArchivesFromYahoo('bmw','BM','forex','Yahoo','daily')
 for x in HISTORY_LIST:
 	print x.name
 
 saveHistory()
-
+"""
 
 """for x in US_INDICES:
 	print x[1]+','+x[0]+',Yahoo'""" """
@@ -639,4 +681,5 @@ print finObj.valuesDaily[x[1]][0]
 #x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
 
 #print x['adv']end = datetime.datetime.now()
+
 
