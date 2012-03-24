@@ -34,6 +34,8 @@ class Chart(FigureCanvas):
     
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
     
+    num_ticks = 8 #tyle jest etykiet pod wykresem
+    
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.1, 0.8     
     #wysokość wolumenu i wykresu oscylatora
@@ -84,18 +86,19 @@ class Chart(FigureCanvas):
         if(self.mainPlot==None or self.data.corrupted):
             return
         ax=self.mainPlot                
-        ax.clear()                        
+        ax.clear()  
+        x=range(len(self.data.close))
         if self.mainType=='line' :
-            ax.plot(self.data.date,self.data.close,'b-',label=self.data.name)
+            ax.plot(x,self.data.close,'b-',label=self.data.name)
         elif self.mainType=='point':
-            ax.plot(self.data.date,self.data.close,'b.',label=self.data.name)
+            ax.plot(x,self.data.close,'b.',label=self.data.name)
         elif self.mainType=='candlestick':
             self.drawCandlePlot()
         else:            
             return
         if self.mainIndicator != None:
             self.updateMainIndicator()       
-        ax.set_xlim(self.data.date[0],self.data.date[-1])
+        ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
         ax.set_ylim(0.9*min(self.data.low),1.1*max(self.data.high))
         if(self.scaleType=='log'):            
@@ -144,11 +147,12 @@ class Chart(FigureCanvas):
         if self.data.corrupted:
             return
         ax=self.volumeBars
-        ax.clear()        
-        ax.vlines(self.data.date,0,self.data.volume)
+        ax.clear()
+        x=range(len(self.data.close))
+        ax.vlines(x,0,self.data.volume)
         for label in self.volumeBars.get_yticklabels():
             label.set_visible(False)
-        ax.set_xlim(self.data.date[0],self.data.date[-1])
+        ax.set_xlim(x[0],x[-1])
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -160,20 +164,14 @@ class Chart(FigureCanvas):
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
         if self.data.corrupted:
-            return                
-        if self.data.step=='daily':
-            timedelta=1.0
-        elif self.data.step=='weekly':
-            timedelta=7.0
-        elif self.data.step=='monthly':
-            timedelta=30.0
+            return                        
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
-                                    width=0.7*timedelta,colorup='w',colordown='k')                
+                                    width=0.7,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
         lines[0].set_label(self.data.name) 
         #poniższe dwie linie są po to, żeby wykres wypełniał całą szerokość
-        self.mainPlot.xaxis_date()                
-        self.mainPlot.autoscale_view()   
+        #self.mainPlot.xaxis_date()                
+        #self.mainPlot.autoscale_view()   
         """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
         stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
         Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
@@ -194,7 +192,8 @@ class Chart(FigureCanvas):
             return
         ax=self.mainPlot
         type=self.mainIndicator
-        ax.hold(True) #hold on        
+        ax.hold(True) #hold on 
+        x=range(len(self.data.close))
         if type=='SMA':
             indicValues=self.data.SMA()        
         elif type=='WMA':
@@ -202,12 +201,12 @@ class Chart(FigureCanvas):
         elif type=='EMA':
             indicValues=self.data.EMA()        
         elif type=='bollinger':            
-            ax.plot(self.data.date,self.data.bollingerUpper(),'r-',label=type)
+            ax.plot(x,self.data.bollingerUpper(),'r-',label=type)
             indicValues=self.data.bollingerLower()
         else:
             ax.hold(False)
             return
-        ax.plot(self.data.date,indicValues,'r-',label=type)
+        ax.plot(x,indicValues,'r-',label=type)
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
@@ -245,12 +244,13 @@ class Chart(FigureCanvas):
         elif type == 'RSI':
             oscData=self.data.RSI()
         elif type == 'williams':
-            oscData=self.data.williams()
+            oscData=self.data.williams()        
         else:
             ax.hold(False)
             return
-        ax.plot(self.data.date,oscData,'g-',label=type)
-        ax.set_xlim(self.data.date[0],self.data.date[-1])
+        x=range(len(self.data.close))
+        ax.plot(x,oscData,'g-',label=type)
+        ax.set_xlim(x[0],x[-1])
         #legenda
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
@@ -276,20 +276,25 @@ class Chart(FigureCanvas):
             tick.label2.set_size(7)
 
     def formatDateAxis(self,ax):
-        """Formatuje etykiety osi czasu. Ponadto, ponieważ automatyczne rozmieszczanie
-        "ticksów" na osi x okazało się być zjebane, ustawiam na sztywno żeby było ich 8"""
-        mindate=self.data.date[0].date()
-        maxdate=self.data.date[-1].date()        
-        #jeśli horyzont czasowy jest krótszy niż 7 dni, wyświetlamy z godzinami
-        if((maxdate-mindate).days < 7):
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d\n%H:%M'))                                    
+        """Formatuje etykiety osi czasu."""
+        length=len(self.data.date)
+        if(length>self.num_ticks):
+            step=length/self.num_ticks        
         else:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))        
-            step = int((mdates.date2num(self.data.date[-1])-mdates.date2num(self.data.date[0]))/8)        
-            ax.xaxis.set_major_locator(mdates.DayLocator(interval=step))                        
-        for label in ax.get_xticklabels():
-            label.set_size(7)            
+            step=1
+        x=range(0,length,step)
+        ax.xaxis.set_major_locator(FixedLocator(x))
+        ticks=ax.get_xticks()        
+        labels=[]        
+        for i, label in enumerate(ax.get_xticklabels()):
+            label.set_size(7)                       
+            index=int(ticks[i])            
+            if(index>=len(self.data.date)):
+                labels.append('')
+            else:
+                labels.append(self.data.date[index].strftime("%Y-%m-%d"))            
             label.set_horizontalalignment('center')                                    
+        ax.xaxis.set_major_formatter(FixedFormatter(labels))        
     
     def fixTimeLabels(self):
         """Włącza wyświetlanie etykiet osi czasu pod odpowiednim (tzn. najniższym)

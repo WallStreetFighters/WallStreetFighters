@@ -25,14 +25,14 @@ class ApplicationWindow(QtGui.QMainWindow):
         l.addWidget(chart)                        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
-        chart.setOscPlot('williams')        
+        chart.setOscPlot('RSI')        
         chart.setDrawingMode(True)                
         chart.setMainIndicator('SMA')
-        chart.setData(finObj,datetime.datetime(2012,1,1),datetime.datetime(2012,1,4),'daily')
-        print chart.data.date
-        chart.setMainType('candlestick')                        
+        chart.setData(finObj,datetime.datetime(2011,2,1),datetime.datetime(2011,3,1),'daily')                                     
         chart.setScaleType('log')          
-        chart.setScaleType('linear')          
+        chart.setMainType('candlestick')       
+        chart.setScaleType('linear')       
+        chart.formatDateAxis(chart.volumeBars)
         print "strorzyłem wykresa"
         
 qApp = QtGui.QApplication(sys.argv)

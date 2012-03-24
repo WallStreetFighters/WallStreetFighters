@@ -40,7 +40,7 @@ class ChartData:
         #dane w formacie dla candlesticka
         self.quotes=[]
         for i in range(len(dataArray)):
-            time=mdates.date2num(self.date[i])
+            time=float(i)
             open=self.open[i]
             close=self.close[i]
             high=self.high[i]
@@ -101,7 +101,7 @@ class ChartData:
         return indicators.williamsOscilator(highs,lows,closes,duration)
     
     def SMA(self, duration=20):        
-        array=self.getEarlierValues(len(self.close))
+        array=self.getEarlierValues(len(self.close))        
         return indicators.movingAverage(np.array(array),duration,1)
     
     def WMA(self, duration=20):
@@ -120,7 +120,5 @@ class ChartData:
     
     def bollingerLower(self, duration=20):
         array=self.getEarlierValues(len(self.close))        
-        return indicators.bollingerBands(np.array(array),duration,2,2)
-
-
+        return indicators.bollingerBands(np.array(array),duration,2,2)    
 
