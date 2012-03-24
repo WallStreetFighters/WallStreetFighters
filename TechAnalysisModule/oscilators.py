@@ -246,3 +246,11 @@ def mcClellanOscillator(advances,declines):
         result19 = movingAverage(ratioAdjusted,19,3)
         result39 = movingAverage(ratioAdjusted,39,3)
         return result19-result39
+
+def TRIN(advances, declines, advVol, decVol):
+    """TRIN = wskaźnik Armsa. Przekazujemy cztery tablice numpy (jednakowej długości): 
+    ilość wzrostów danego dnia, ilość spadków, wolumen wzrostowy i wolumen 
+    spadkowy. Wynik tej samej długości co wejścia."""
+    if(not (advances.size==declines.size==advVol.size==decVol.size)):
+        return None
+    return (advances/declines)/(advVol/decVol)
