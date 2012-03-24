@@ -28,7 +28,8 @@ class ApplicationWindow(QtGui.QMainWindow):
         chart.setOscPlot('williams')        
         chart.setDrawingMode(True)                
         chart.setMainIndicator('SMA')
-        chart.setData(finObj,datetime.datetime(2011,6,1),datetime.datetime(2012,01,1),'daily')
+        chart.setData(finObj,datetime.datetime(2012,1,1),datetime.datetime(2012,1,4),'daily')
+        print chart.data.date
         chart.setMainType('candlestick')                        
         chart.setScaleType('log')          
         chart.setScaleType('linear')          
