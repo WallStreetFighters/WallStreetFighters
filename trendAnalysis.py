@@ -12,7 +12,6 @@ def regresion(values,numDates):
         a,b = linalg.lstsq(A,values)[0]
         return a,b
 
-
 def trend(a):
         angle = arctan(a)
         angle = angle*(180.0/pi)
@@ -32,17 +31,6 @@ def aInRect(array):
                         return 0
         return 1       
 
-def aInRect2(array):
-        a = (array[1]-array[0])*1.0
-        b = array[0]
-        i = array.size
-        for i in range(2,array.size):
-                y = a*i+b
-                if y > (1+rectVul)*array[i] or y < (1-rectVul)*array[i]:
-                        i = i -1
-        return 1       
-
-
 def findMaxMin(array):
         size = array.size
         a1 = array[0:size/5]
@@ -60,8 +48,11 @@ def findMaxMin(array):
         max3 = a3.max()
         max4 = a4.max()
         max5 = a5.max()
-        x = list(min1, min2, min3, min4, min5)
-        x = array(x)
-        y = map(lambda (x, y): [x, y], list(combinations(a, 2))
-        z = map(aInRect, array(y))
+        x = [min1, min2, min3, min4, min5]
+        x = asarray(x)
+        for i in reversed(range(x.size)):
+            y = asarray(list(combinations(x, i)))
+            z = map(aInRect, asarray(list(combinations(x, i))))
+            if max(z) == 1:
+                return y[z.index(max(z))]
         
