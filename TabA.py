@@ -3,6 +3,8 @@ import sys
 from PyQt4 import QtGui,QtCore
 from GUIModule.Tab import *
 import datetime
+import os
+
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -18,6 +20,7 @@ class TabA(QtGui.QWidget):
         self.listName = listName
         QtGui.QWidget.__init__(self)
         self.initUi()
+        
         """tab A wskaźniki i oscylatory"""
     def initUi(self):
         
@@ -69,7 +72,12 @@ class TabA(QtGui.QWidget):
         
         self.indexListView.pressed.connect(self.selectRow)
         self.stockListView.pressed.connect(self.selectRowStock)
+        self.forexListView.pressed.connect(self.selectRowForex)
         self.chartButton.clicked.connect(self.paintChart)
+        
+        self.startDateEdit.dateChanged.connect(self.checkDate)
+        self.endDateEdit.dateChanged.connect(self.checkDate)
+
         if self.qModelIndex != None:
             self.paint2Chart()
             
@@ -156,6 +164,27 @@ class TabA(QtGui.QWidget):
                 self.chartsLayout.addWidget(self.chart)
                 self.hasChart = True
                 self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+
+        if pageIndex == 2:
+            if self.hasChart == False:
+                print "jestem w pierwszy raz chart Forex"
+                indexes = self.forexListView.selectedIndexes()
+                index= indexes[0].row()
+                self.currnetChart = indexes[0].row()
+            
+                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
+                self.finObj.updateArchive()
+                self.chart = Chart(self, self.finObj)
+                self.chartsLayout.addWidget(self.chart)
+                self.hasChart = True
+                self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+            elif self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
+                print "jestem w zmieniony chart Forex"
+                self.chartsLayout.removeWidget(self.chart)
+                indexes = self.forexListView.selectedIndexes()
+                index= indexes[0].row()
+                self.currnetChart = indexes[0].row()
+
         print "aktualizuje dane "
         self.chart.setOscPlot(indicator)
         self.chart.setDrawingMode(painting)
@@ -163,25 +192,43 @@ class TabA(QtGui.QWidget):
         self.chart.setMainType(chartType)
         if hideVolumen:
             self.chart.rmVolumeBars()
+            
     def selectRow(self):
         self.indexListView.selectRow(self.indexListView.currentIndex().row())
     def selectRowStock(self):
         self.stockListView.selectRow(self.stockListView.currentIndex().row())
+    def selectRowForex(self):
+        self.forexListView.selectRow(self.forexListView.currentIndex().row())
+    def checkDate(self):
+        if self.startDateEdit.date() >= self.endDateEdit.date():
+            self.endDateEdit.setDate(self.startDateEdit.date())
+
     def paint2Chart(self):
         index = self.qModelIndex.row()
+
         if self.listName == "index":
             self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],
                                                                      dataParser.INDEX_LIST[index][0],'index',
                                                                      dataParser.INDEX_LIST[index][3])
+            self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+
         if self.listName == "stock":
             self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],
                                                                      dataParser.STOCK_LIST[index][0],'stock',
                                                                      dataParser.STOCK_LIST[index][3])
+            self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+
+        if self.listName == "forex":
+            self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],
+                                                                     dataParser.FOREX_LIST[index][0],'forex',
+                                                                     dataParser.FOREX_LIST[index][3])
+            self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+
         self.finObj.updateArchive()
         self.chart = Chart(self, self.finObj)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
-        self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+        
         self.chart.setOscPlot(self.settings["indicator"])
         self.chart.setDrawingMode(self.settings["painting"])
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
@@ -190,6 +237,7 @@ class TabA(QtGui.QWidget):
             self.chart.rmVolumeBars()
 
         #przywracamy odpowiednie ustawienia opcji w GUI
+        #data
         self.startDateEdit.setDate(QtCore.QDate(self.settings["start"].year,
                                    self.settings["start"].month,
                                    self.settings["start"].day))

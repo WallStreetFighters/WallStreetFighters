@@ -7,7 +7,6 @@ import os
 from PyQt4 import QtGui, QtCore
 from TabA import TabA
 import GUIModule.RSSgui as RSSgui
-#from GUIModule.Tab import AbstractTab
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -29,6 +28,7 @@ class GuiMainWindow(object):
         self.tabs.setTabsClosable(True)
 
         #załadowanie List
+        os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 
         # inicjujemy model danych dla Index
@@ -44,6 +44,7 @@ class GuiMainWindow(object):
         
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
         self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
+        self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
         """koniec tab A """
         
         """ tab B
@@ -98,6 +99,11 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"stock",False)
         nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+        self.tabs.addTab(self.tabA1,nameTab)
+    def newForexTab(self,qModelIndex):
+        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
+                          qModelIndex,self.settings(),"forex",False)
+        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
         self.tabs.addTab(self.tabA1,nameTab)       
 
     def settings(self):
