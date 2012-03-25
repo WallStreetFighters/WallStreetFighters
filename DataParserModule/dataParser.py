@@ -575,9 +575,11 @@ def loadHistory():
 #TAKIE MOJE TESTOWANIE#
 loadData()
 
+z = createWithArchivesFromYahoo('bmw','ZBB','forex','Yahoo','daily')
+#x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
+#print x['advv']
 
-x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
-print x['advv']
+saveHistory()
 """int 
 start = datetime.datetime.now()
 
@@ -588,11 +590,11 @@ print "Excecution_time1: %s" % x
 i = 0
 l = ""oin
 loadHistory()
-z = createWithArchivesFromYahoo('bmw','BM','forex','Yahoo','daily')
+z = createWithArchivesFromYahoo('bmw','ZBB','forex','Yahoo','daily')
 for x in HISTORY_LIST:
 	print x.name
 
-saveHistory()
+
 """
 
 """for x in US_INDICES:
