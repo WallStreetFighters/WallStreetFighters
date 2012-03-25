@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from numpy import *
 
 # funkcja liczy zwyczajna srednia artmetyczna z podanej jej tablicy, przekazywac tablice jednowymiarowa!
@@ -175,11 +177,11 @@ def RSI(array, duration):
                 k += 1
                 if j < size:
                         if gainLossTable[j] > 0:
-                                averageGain = (averageGain*13 + gainLossTable[j])/duration
-                                averageLoss = (averageLoss*13 + 0)/duration
+                                averageGain = (averageGain*(duration-1) + gainLossTable[j])/duration
+                                averageLoss = (averageLoss*(duration-1) + 0)/duration
                         if gainLossTable[j] <= 0:
-                                averageGain = (averageGain*13 + 0)/duration
-                                averageLoss = (averageLoss*13 + (-1)*gainLossTable[j])/duration
+                                averageGain = (averageGain*(duration-1) + 0)/duration
+                                averageLoss = (averageLoss*(duration-1) + (-1)*gainLossTable[j])/duration
         return values
 
 # Zwraca najwiekszy element tablicy
@@ -246,3 +248,13 @@ def mcClellanOscillator(advances,declines):
         result19 = movingAverage(ratioAdjusted,19,3)
         result39 = movingAverage(ratioAdjusted,39,3)
         return result19-result39
+
+def TRIN(advances, declines, advVol, decVol):
+    """TRIN = wskaźnik Armsa. Przekazujemy cztery tablice numpy (jednakowej długości): 
+    ilość wzrostów danego dnia, ilość spadków, wolumen wzrostowy i wolumen 
+    spadkowy. Wynik tej samej długości co wejścia."""
+    if(not (advances.size==declines.size==advVol.size==decVol.size)):
+        return None
+    numerator=advances.astype(float)/declines.astype(float)
+    denominator=advVol.astype(float)/decVol.astype(float)
+    return numerator/denominator
