@@ -129,9 +129,7 @@ class FinancialObject(object):
 
 
 	def getArray(self, time):
-
 		"""Funkcja zwracająca rekordowaną tablicę (numpy.recarray) dla informacji w odstępie czasu przekazanym jako parametr funkcji. Pozwala to dostać się do poszczególnych tablic używając odpowiednich rekordów: 'date' 'open' etc."""
-
 		if self.financialType == 'forex':
 			tmplist = []
 			if time == 'daily':
@@ -597,50 +595,6 @@ for x in HISTORY_LIST:
 saveHistory()
 """
 
-def getAdvDec(date):
-	"""Funkcja zwracająca listę krotek postaci(LICZBA_WZROSTÓW,LICZBA_SPADKÓW,LICZBA_BEZZMIAN) dla indeksów NYSE, AMEX, NASDAQ"""
-	list = []
-	url = 'http://unicorn.us.com/advdec/'+ str(date.year)+'/adu'+ parserDateToString(date) +'.txt'
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.HTTPError, ex:
-		if ex.code == 404:
-			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
-			return [[0,0,0],[0,0,0],[0,0,0]]
-		return
-	pageSource = site.read()
-	pageSource = pageSource.replace(' ','')
-	csvString = cStringIO.StringIO(pageSource)
-	dataCsv = csv.reader(csvString)
-	dataCsv.next()
-	dataCsv.next()
-	for row in dataCsv:
-		list += [[row[1],row[2],row[3]]]
-	return list
-	
-def getAdvDecInPeriodOfTime(begin,end,index):
-	tmplist = []
-	day = datetime.timedelta(days=1)
-	if index == 'NYSE':
-		while(begin != end):
-			x = getAdvDec(begin)
-			tmplist += [tuple([str(begin)]+x[0])]
-			begin += day
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
-	if index == 'AMEX':
-		while(begin != end):
-			x = getAdvDec(begin)
-			tmplist += [tuple([str(begin)]+x[1])]
-			begin += day
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
-	if index == 'NASDAQ':
-		while(begin != end):
-			x = getAdvDec(begin)
-			tmplist += [tuple([str(begin)]+x[2])]
-			begin += day
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int)])
-
-
 """for x in US_INDICES:
 	print x[1]+','+x[0]+',Yahoo'""" """
 x = createWithCurrentValueFromStooq('USD/GPB', 'plngbp', 'forex', 'gbp')
@@ -722,17 +676,6 @@ x = finObj.getIndex(datetime.date(2011,8,8),datetime.date(2012,2,17),'daily')
 print x
 print finObj.valuesDaily[x[0]][0]
 print finObj.valuesDaily[x[1]][0]
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-
-#x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
-
-#print x['adv']
->>>>>>> chart
-"""
-=======
 """
 
 #x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
@@ -740,4 +683,3 @@ print finObj.valuesDaily[x[1]][0]
 #print x['adv']end = datetime.datetime.now()
 
 
->>>>>>> b9c30fe76a4ac5533e40753369fb6920a438d1c4
