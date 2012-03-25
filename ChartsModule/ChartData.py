@@ -6,6 +6,7 @@ import datetime
 import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
+import DataParserModule.dataParser as parser
 
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
@@ -54,6 +55,7 @@ class ChartData:
                 high=self.high[i]
                 low=self.low[i]
                 self.quotes.append((time, open, close, high, low))
+            self.advDecArray=getAdvDecInPeriodOfTime(start.date(),end.date(),self.name)            
         else:
             self.percentChng=[]
             firstValue=self.close[0]
@@ -139,3 +141,19 @@ class ChartData:
         array=self.getEarlierValues(len(self.close))        
         return indicators.bollingerBands(np.array(array),duration,2,2)    
 
+    def TRIN(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        advVol=self.advDecArray['advv']
+        decVol=self.advDecArray['decv']
+        return indicators.TRIN(advances, declines, advVol, decVol)
+    
+    def mcClellan(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.mcClellanOscillator(advances,declines)
+    
+    def adLine(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.adLine(advances,declines)

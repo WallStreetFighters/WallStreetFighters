@@ -242,7 +242,13 @@ class Chart(FigureCanvas):
         elif type == 'RSI':
             oscData=self.data.RSI()
         elif type == 'williams':
-            oscData=self.data.williams()        
+            oscData=self.data.williams()
+        elif type == 'TRIN':
+            oscData=self.data.TRIN()
+        elif type == 'mcClellan':
+            oscData=self.data.mcClellan()
+        elif type == 'adLine':
+            oscData=self.data.adLine()
         else:
             ax.hold(False)
             return
