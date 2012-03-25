@@ -7,7 +7,6 @@ import os
 from PyQt4 import QtGui, QtCore
 from TabA import TabA
 import GUIModule.RSSgui as RSSgui
-#from GUIModule.Tab import AbstractTab
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -29,6 +28,7 @@ class GuiMainWindow(object):
         self.tabs.setTabsClosable(True)
 
         #załadowanie List
+        os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 
         # inicjujemy model danych dla Index

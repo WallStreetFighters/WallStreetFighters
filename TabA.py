@@ -3,6 +3,8 @@ import sys
 from PyQt4 import QtGui,QtCore
 from GUIModule.Tab import *
 import datetime
+import os
+
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -18,6 +20,7 @@ class TabA(QtGui.QWidget):
         self.listName = listName
         QtGui.QWidget.__init__(self)
         self.initUi()
+        
         """tab A wskaźniki i oscylatory"""
     def initUi(self):
         
