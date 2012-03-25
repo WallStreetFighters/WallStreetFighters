@@ -65,11 +65,11 @@ class GuiMainWindow(object):
         Koniec tabC"""
         
         """ Rss tab"""
-        self.RSSTab = QtGui.QWidget()
-        self.tabs.addTab(self.RSSTab,"RSS")
-        self.rssWidget = RSSgui.RSSWidget(self.RSSTab)
-        self.verticalLayout2 = QtGui.QVBoxLayout(self.RSSTab)
-        self.verticalLayout2.addWidget(self.rssWidget)
+        #self.RSSTab = QtGui.QWidget()
+        #self.tabs.addTab(self.RSSTab,"RSS")
+        #self.rssWidget = RSSgui.RSSWidget(self.RSSTab)
+        #self.verticalLayout2 = QtGui.QVBoxLayout(self.RSSTab)
+        #self.verticalLayout2.addWidget(self.rssWidget)
     
 	""" koniec ustawiania Zakładek"""
 
