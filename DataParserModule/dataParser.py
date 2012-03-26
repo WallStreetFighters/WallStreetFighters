@@ -660,7 +660,7 @@ dataCsv.next()
 i = 0
 for row in dataCsv:
 	print row[0]+','+row[1]+',Yahoo,AMEX'
-"""
+""""
 """
 ### PRZYKŁADOWE UŻYCIE ###
 loadData() #Wczytuje dane do zmiennych globalnych
@@ -679,10 +679,22 @@ x = finObj.getIndex(datetime.date(2011,8,8),datetime.date(2012,2,17),'daily')
 print x
 print finObj.valuesDaily[x[0]][0]
 print finObj.valuesDaily[x[1]][0]
+<<<<<<< HEAD
+=======
+
+
+#x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+
+#print x['adv']
+>>>>>>> 963edd90fc64a54537c9f1c3be539fee050e6199
 """
 
 #x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
 
+<<<<<<< HEAD
 #print x['adv']end = datetime.datetime.now()
 
 
+=======
+#print x['adv']end = datetime.datetime.now()
+>>>>>>> 963edd90fc64a54537c9f1c3be539fee050e6199
