@@ -144,12 +144,12 @@ def tabUi(self,showLists=True):
         self.label = QtGui.QLabel('Range:',self.optionsFrame) 
         self.optionsLayout.addWidget(self.label,0,0,1,1)
         self.startDateEdit = QtGui.QDateEdit(self.optionsFrame)
-        self.startDateEdit.setDate(QtCore.QDate.currentDate().addDays(-8))
+        self.startDateEdit.setDate(QtCore.QDate.currentDate().addDays(-18))
         self.startDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
         self.optionsLayout.addWidget(self.startDateEdit,1,0,1,1)
 
         self.endDateEdit = QtGui.QDateEdit(self.optionsFrame)
-        self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-1))
+        self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-4))
         self.endDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
         self.optionsLayout.addWidget(self.endDateEdit,2,0,1,1)
         #koniec pola do wprowadzania okresu
