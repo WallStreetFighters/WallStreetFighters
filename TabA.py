@@ -70,9 +70,6 @@ class TabA(QtGui.QWidget):
         self.optionsLayout.addWidget(addChartButton(self),0,7,3,4)
 
         
-        self.indexListView.pressed.connect(self.selectRow)
-        self.stockListView.pressed.connect(self.selectRowStock)
-        self.forexListView.pressed.connect(self.selectRowForex)
         self.chartButton.clicked.connect(self.paintChart)
         
         self.startDateEdit.dateChanged.connect(self.checkDate)
@@ -101,13 +98,16 @@ class TabA(QtGui.QWidget):
             indicator = "EMA"
         #step
         step = self.stepComboBox.currentText()
-
         #chartType
         chartType = self.chartTypeComboBox.currentText()
         hideVolumen =self.volumenCheckBox.isChecked() 
         #painting
         painting = self.paintCheckBox.isChecked()
-        print pageIndex
+        #scale
+        if self.logRadioButton.isChecked():
+            scale = 'log'
+        else:
+            scale = 'linear'
        
         
         # Jeśli wybrano instrument Index
@@ -116,53 +116,32 @@ class TabA(QtGui.QWidget):
                 print "jestem w pierwszy raz chart Index"
                 indexes = self.indexListView.selectedIndexes()
                 index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],
-                                                                         dataParser.INDEX_LIST[index][0],
-                                                                         'index',dataParser.INDEX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
+                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
                 self.hasChart = True
                 self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
             elif self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
                 print "jestem w zmieniony chart Index"
-                self.chartsLayout.removeWidget(self.chart)
+                #self.chartsLayout.removeWidget(self.chart)
                 indexes = self.indexListView.selectedIndexes()
                 index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
                 self.currentChart =self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()    
         # Jeśli wybrano instrument Stock
         if pageIndex == 1:
             if self.hasChart == False:
                 print "jestem w pierwszy raz chart Stock"
-                indexes = self.stockListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-            
+                index= self.stockListView.currentIndex().row()
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
                 self.hasChart = True
                 self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
             elif self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
                 print "jestem w zmieniony chart Stock"
-                self.chartsLayout.removeWidget(self.chart)
-                indexes = self.stockListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-                
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
+                #self.chartsLayout.removeWidget(self.chart)
+                index= self.stockListView.currentIndex().row()
+                self.finObj = None
+                print self.finObj
+                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
+                print self.finObj
                 self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
 
         if pageIndex == 2:
@@ -170,35 +149,31 @@ class TabA(QtGui.QWidget):
                 print "jestem w pierwszy raz chart Forex"
                 indexes = self.forexListView.selectedIndexes()
                 index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-            
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
                 self.hasChart = True
                 self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
             elif self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
                 print "jestem w zmieniony chart Forex"
-                self.chartsLayout.removeWidget(self.chart)
+                #self.chartsLayout.removeWidget(self.chart)
                 indexes = self.forexListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
+                index= indexes[0].row()                
+                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
+                self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
 
         print "aktualizuje dane "
+        self.finObj.updateArchive(step)
+        self.chartsLayout.removeWidget(self.chart)
+        self.chart = Chart(self, self.finObj)
         self.chart.setOscPlot(indicator)
         self.chart.setDrawingMode(painting)
         self.chart.setData(self.finObj,start,end,step)
+        self.chart.setScaleType(scale)
         self.chart.setMainType(chartType)
         if hideVolumen:
             self.chart.rmVolumeBars()
+        self.chartsLayout.addWidget(self.chart)
+        self.chart.repaint()
             
-    def selectRow(self):
-        self.indexListView.selectRow(self.indexListView.currentIndex().row())
-    def selectRowStock(self):
-        self.stockListView.selectRow(self.stockListView.currentIndex().row())
-    def selectRowForex(self):
-        self.forexListView.selectRow(self.forexListView.currentIndex().row())
     def checkDate(self):
         if self.startDateEdit.date() >= self.endDateEdit.date():
             self.endDateEdit.setDate(self.startDateEdit.date())
@@ -224,7 +199,7 @@ class TabA(QtGui.QWidget):
                                                                      dataParser.FOREX_LIST[index][3])
             self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
 
-        self.finObj.updateArchive()
+        self.finObj.updateArchive(self.settings["step"])
         self.chart = Chart(self, self.finObj)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
@@ -232,9 +207,11 @@ class TabA(QtGui.QWidget):
         self.chart.setOscPlot(self.settings["indicator"])
         self.chart.setDrawingMode(self.settings["painting"])
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+        self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
+        
 
         #przywracamy odpowiednie ustawienia opcji w GUI
         #data

@@ -6,6 +6,7 @@ import operator
 import os
 from PyQt4 import QtGui, QtCore
 from TabA import TabA
+import cPickle
 import GUIModule.RSSgui as RSSgui
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
@@ -122,7 +123,11 @@ class GuiMainWindow(object):
             indicator = "EMA"
         #step
         step = self.tabA.stepComboBox.currentText()
-
+        #scale
+        if self.tabA.logRadioButton.isChecked():
+            scale = 'log'
+        else:
+            scale = 'linear'
         #chartType
         chartType = self.tabA.chartTypeComboBox.currentText()
         hideVolumen =self.tabA.volumenCheckBox.isChecked() 
@@ -130,7 +135,7 @@ class GuiMainWindow(object):
         painting = self.tabA.paintCheckBox.isChecked() 
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
-             "painting":painting}
+             "painting":painting,"scale":scale}
         return t
     def closeTab(self,i):
         self.tabs.removeTab(i)
@@ -141,7 +146,9 @@ class GuiMainWindow(object):
         def __init__(self,list, parent = None):
             QtCore.QAbstractTableModel.__init__(self, parent)
             self.list = list
-            self.headerdata = ['symbol', 'name', '']           
+            self.headerdata = ['symbol', 'name', '']
+        def mainIndex(self):
+            return 3
         
         def rowCount(self, parent):
             return len(self.list)
