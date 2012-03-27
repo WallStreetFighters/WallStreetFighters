@@ -47,6 +47,8 @@ class GuiMainWindow(object):
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
         self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
+
+        
         """koniec tab A """
         
         """ tab B
@@ -88,25 +90,26 @@ class GuiMainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        MainWindow.setStatusBar(self.statusbar)        
+        
 
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
     def newIndexTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"index",False)
         nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.addTab(self.tabA1,nameTab)
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
     def newStockTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"stock",False)
         nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.addTab(self.tabA1,nameTab)
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     def newForexTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"forex",False)
         nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.addTab(self.tabA1,nameTab)       
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA
@@ -115,13 +118,26 @@ class GuiMainWindow(object):
         
         dateEnd = self.tabA.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-        indicator = 'momentum'
-        if self.tabA.momentumCheckBox.isChecked():
-            indicator = "momentum"
-        elif self.tabA.smaCheckBox.isChecked():
+        indicator = 'SMA'
+        if self.tabA.smaCheckBox.isChecked():
             indicator = "SMA"
+        elif self.tabA.wmaCheckBox.isChecked():
+            indicator = "WMA"
         elif self.tabA.emaCheckBox.isChecked():
             indicator = "EMA"
+        elif self.tabA.bollingerCheckBox.isChecked():
+            indicator = "bollinger"
+        oscilator = 'momentum'
+        if self.tabA.momentumCheckBox.isChecked():
+            oscilator = "momentum"
+        elif self.tabA.cciCheckBox.isChecked():
+            oscilator = "CCI"
+        elif self.tabA.rocCheckBox.isChecked():
+            oscilator = "ROC"
+        elif self.tabA.rsiCheckBox.isChecked():
+            oscilator = "RSI"
+        elif self.tabA.williamsCheckBox.isChecked():
+            oscilator = "williams"
         #step
         step = self.tabA.stepComboBox.currentText()
         #scale
@@ -136,7 +152,7 @@ class GuiMainWindow(object):
         painting = self.tabA.paintCheckBox.isChecked() 
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
-             "painting":painting,"scale":scale}
+             "painting":painting,"scale":scale,"oscilator":oscilator}
         return t
     def closeTab(self,i):
         self.tabs.removeTab(i)

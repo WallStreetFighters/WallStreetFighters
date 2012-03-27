@@ -132,8 +132,8 @@ def tabUi(self,showLists=True):
 
         """Ramka przechowujaca opcje"""
         self.optionsFrame = QtGui.QFrame(self)
-        # ustawimy maksymalna wysokosc na 100
-        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 100))
+        # ustawimy maksymalna wysokosc na 120
+        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 120))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.optionsFrame.setLineWidth(3)
@@ -149,7 +149,7 @@ def tabUi(self,showLists=True):
         self.optionsLayout.addWidget(self.startDateEdit,1,0,1,1)
 
         self.endDateEdit = QtGui.QDateEdit(self.optionsFrame)
-        self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-4))
+        self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-5))
         self.endDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
         self.optionsLayout.addWidget(self.endDateEdit,2,0,1,1)
         #koniec pola do wprowadzania okresu
