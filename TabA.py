@@ -4,7 +4,6 @@ from PyQt4 import QtGui,QtCore
 from GUIModule.Tab import *
 import datetime
 import os
-
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -18,6 +17,10 @@ class TabA(QtGui.QWidget):
         self.settings = settings
         self.qModelIndex = qModelIndex
         self.listName = listName
+
+        self.oldStart = None
+        self.oldEnd = None
+        self.oldStep = None
         QtGui.QWidget.__init__(self)
         self.initUi()
         
@@ -112,67 +115,64 @@ class TabA(QtGui.QWidget):
         
         # Jeśli wybrano instrument Index
         if pageIndex == 0:
-            if self.hasChart == False:
-                print "jestem w pierwszy raz chart Index"
-                indexes = self.indexListView.selectedIndexes()
-                index= indexes[0].row()
+            if self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+                print 'tworze nowy wykres w  index'
+                self.chartsLayout.removeWidget(self.chart)
+                index= self.indexListView.currentIndex().row()     
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-                self.hasChart = True
+                self.finObj.updateArchive(step)
+                self.chart = Chart(self, self.finObj)
+                self.chart.setData(self.finObj,start,end,step)
                 self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-            elif self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
-                print "jestem w zmieniony chart Index"
-                #self.chartsLayout.removeWidget(self.chart)
-                indexes = self.indexListView.selectedIndexes()
-                index= indexes[0].row()
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-                self.currentChart =self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()    
+                
         # Jeśli wybrano instrument Stock
         if pageIndex == 1:
-            if self.hasChart == False:
-                print "jestem w pierwszy raz chart Stock"
-                index= self.stockListView.currentIndex().row()
+            if self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+                print 'tworze nowy wykres w  stock'
+                self.chartsLayout.removeWidget(self.chart)
+                index= self.stockListView.currentIndex().row()     
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
-                self.hasChart = True
+                self.finObj.updateArchive(step)
+                self.chart = Chart(self.chartsFrame, self.finObj)
+                self.chart.setData(self.finObj,start,end,step)
                 self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-            elif self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
-                print "jestem w zmieniony chart Stock"
-                #self.chartsLayout.removeWidget(self.chart)
-                index= self.stockListView.currentIndex().row()
-                self.finObj = None
-                print self.finObj
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
-                print self.finObj
-                self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+                
 
         if pageIndex == 2:
-            if self.hasChart == False:
-                print "jestem w pierwszy raz chart Forex"
-                indexes = self.forexListView.selectedIndexes()
-                index= indexes[0].row()
+            if self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+                print 'tworze nowy wykres w  forex'
+                self.chartsLayout.removeWidget(self.chart)
+                index= self.indexListView.currentIndex().row()     
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
-                self.hasChart = True
-                self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-            elif self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
-                print "jestem w zmieniony chart Forex"
-                #self.chartsLayout.removeWidget(self.chart)
-                indexes = self.forexListView.selectedIndexes()
-                index= indexes[0].row()                
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
+                self.finObj.updateArchive(step)
+                self.chart = Chart(self.chartsFrame, self.finObj)
+                self.chart.setData(self.finObj,start,end,step)
                 self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-
-        print "aktualizuje dane "
-        self.finObj.updateArchive(step)
-        self.chartsLayout.removeWidget(self.chart)
-        self.chart = Chart(self, self.finObj)
+                
+        if not self.chartsLayout.isEmpty():
+            self.chartsLayout.removeWidget(self.chart)
+        
         self.chart.setOscPlot(indicator)
         self.chart.setDrawingMode(painting)
-        self.chart.setData(self.finObj,start,end,step)
         self.chart.setScaleType(scale)
         self.chart.setMainType(chartType)
+        if (self.oldStep != step) or self.oldStart != start or self.oldEnd != end:
+            self.finObj.updateArchive(step)
+            self.chart.setData(self.finObj,start,end,step)
         if hideVolumen:
-            self.chart.rmVolumeBars()
+            self.chart.rmVolumeBars()        
         self.chartsLayout.addWidget(self.chart)
+        self.chartsFrame.repaint()
         self.chart.repaint()
+        self.chart.update()
+        #self.chart.emit(QtCore.SIGNAL("movido"))
+        m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+        m.resize(m.width() , m.height()-20)
+        m.resize(m.width() , m.height()+20)
+
+        self.oldStart = start
+        self.oldEnd = end
+        self.oldStep = step
             
     def checkDate(self):
         if self.startDateEdit.date() >= self.endDateEdit.date():
