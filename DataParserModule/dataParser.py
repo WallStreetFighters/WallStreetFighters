@@ -11,7 +11,7 @@ import cStringIO
 import cPickle
 
 #ZMIENNE GLOBALNE
-REMEMBER_COUNT = 2
+REMEMBER_COUNT = 5
 DATABASE_LAST_UPDATE = datetime.date(2012,1,1)
 INDEX_LIST = []
 STOCK_LIST = []
@@ -153,7 +153,7 @@ class FinancialObject(object):
 			if time == 'monthly':
 				for x in self.valuesMonthly:
 					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
-			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float),('volume',int)])
+			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float),('volume',float)])
 			
 	def getIndex(self, begin, end, time = 'daily'):
 		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
@@ -307,15 +307,15 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 
 	if timePeriod == 'daily':
 		for row in dataCsv:
-			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),int(row[5])]]
 			finObj.valuesDaily = finObj.valuesDaily + dataRow
 	elif timePeriod == 'weekly':	
 		for row in dataCsv:
-			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),int(row[5])]]
 			finObj.valuesWeekly = finObj.valuesWeekly + dataRow
 	elif timePeriod == 'monthly':
 		for row in dataCsv:
-			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
+			dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4]),int(row[5])]]
 			finObj.valuesMonthly = finObj.valuesMonthly + dataRow
 	if UPDATE_FLAG == False:
 		if len(HISTORY_LIST) == REMEMBER_COUNT:
@@ -488,14 +488,13 @@ def loadData():
 	dataCsv = csv.reader(csvFile)
 	for row in dataCsv:
 		NYSE_HIST += [[parserStringToDate(row[0][0:4:1]+'-'+row[0][4:6:1]+'-'+row[0][6:8:1]),row[1],row[2],row[3],row[4],row[5],row[6]]]
-	loadHistory()
+	#loadHistory()
 
 
 def getAdvDec(date):
 	"""Funkcja zwracająca listę krotek postaci(LICZBA_WZROSTÓW,LICZBA_SPADKÓW,LICZBA_BEZZMIAN) dla indeksów NYSE, AMEX, NASDAQ"""
 	list = []
 	url = 'http://unicorn.us.com/advdec/'+ str(date.year)+'/adU'+ parserDateToString(date) +'.txt'
-	print url
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.HTTPError, ex:
@@ -575,9 +574,10 @@ def loadHistory():
 #TAKIE MOJE TESTOWANIE#
 loadData()
 
+#x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
+#print x['advv']
 
-x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
-print x['advv']
+#saveHistory()
 """int 
 start = datetime.datetime.now()
 
@@ -588,11 +588,11 @@ print "Excecution_time1: %s" % x
 i = 0
 l = ""oin
 loadHistory()
-z = createWithArchivesFromYahoo('bmw','BM','forex','Yahoo','daily')
+z = createWithArchivesFromYahoo('bmw','ZBB','forex','Yahoo','daily')
 for x in HISTORY_LIST:
 	print x.name
 
-saveHistory()
+
 """
 
 """for x in US_INDICES:

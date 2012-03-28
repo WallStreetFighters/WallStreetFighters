@@ -4,7 +4,6 @@ from PyQt4 import QtGui,QtCore
 from GUIModule.Tab import *
 import datetime
 import os
-
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -18,6 +17,11 @@ class TabA(QtGui.QWidget):
         self.settings = settings
         self.qModelIndex = qModelIndex
         self.listName = listName
+
+        self.oldStart = None
+        self.oldEnd = None
+        self.oldStep = None
+        self.chart =None
         QtGui.QWidget.__init__(self)
         self.initUi()
         
@@ -43,37 +47,53 @@ class TabA(QtGui.QWidget):
         
         
         self.idicatorsLabel = QtGui.QLabel('Indicators:',self.optionsFrame)
-        self.optionsLayout.addWidget(self.idicatorsLabel,0,4,1,1)
-        #check box dla wskaźnika momentum
-        self.momentumCheckBox = QtGui.QCheckBox("Momentum",self.optionsFrame)
-        self.optionsLayout.addWidget(self.momentumCheckBox,1,6,1,1)
-        #check box dla ROC
-        self.rocCheckBox = QtGui.QCheckBox("ROC",self.optionsFrame)
-        self.optionsLayout.addWidget(self.rocCheckBox,1,4,1,1)
+        self.optionsLayout.addWidget(self.idicatorsLabel,0,1,1,1)
         #check box dla SMA
         self.smaCheckBox = QtGui.QCheckBox("SMA",self.optionsFrame)
-        self.optionsLayout.addWidget(self.smaCheckBox,2,4,1,1)
+        self.optionsLayout.addWidget(self.smaCheckBox,1,1,1,1)
+        #check box dla WMA
+        self.wmaCheckBox = QtGui.QCheckBox("WMA",self.optionsFrame)
+        self.optionsLayout.addWidget(self.wmaCheckBox,2,1,1,1)
         #check box dla EMA
         self.emaCheckBox = QtGui.QCheckBox("EMA",self.optionsFrame)
-        self.optionsLayout.addWidget(self.emaCheckBox,0,5,1,1)
+        self.optionsLayout.addWidget(self.emaCheckBox,3,1,1,1)
+        #check box dla bollinger
+        self.bollingerCheckBox = QtGui.QCheckBox("bollinger",self.optionsFrame)
+        self.optionsLayout.addWidget(self.bollingerCheckBox,0,2,1,1)
+
+        self.oscilatorsLabel = QtGui.QLabel('Oscilators:',self.optionsFrame)
+        self.optionsLayout.addWidget(self.oscilatorsLabel,1,2,1,1)
+        #check box dla wskaźnika momentum
+        self.momentumCheckBox = QtGui.QCheckBox("Momentum",self.optionsFrame)
+        self.optionsLayout.addWidget(self.momentumCheckBox,2,2,1,1)
         #check box dla CCI
         self.cciCheckBox = QtGui.QCheckBox("CCI",self.optionsFrame)
-        self.optionsLayout.addWidget(self.cciCheckBox,1,5,1,1)
+        self.optionsLayout.addWidget(self.cciCheckBox,3,2,1,1)
+        #check box dla ROC
+        self.rocCheckBox = QtGui.QCheckBox("ROC",self.optionsFrame)
+        self.optionsLayout.addWidget(self.rocCheckBox,0,3,1,1)
         #check box dla RSI
         self.rsiCheckBox = QtGui.QCheckBox("RSI",self.optionsFrame)
-        self.optionsLayout.addWidget(self.rsiCheckBox,2,5,1,1)
+        self.optionsLayout.addWidget(self.rsiCheckBox,1,3,1,1)
         #check box dla Williams Oscilator
-        self.williamsOscilatorCheckBox = QtGui.QCheckBox("Williams Oscilator",
+        self.williamsCheckBox = QtGui.QCheckBox("williams",
                                                          self.optionsFrame)
-        self.optionsLayout.addWidget(self.williamsOscilatorCheckBox,0,6,1,1)    
-        #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
-        self.optionsLayout.addWidget(addChartButton(self),0,7,3,4)
-
+        self.optionsLayout.addWidget(self.williamsCheckBox,2,3,1,1)
         
-        self.indexListView.pressed.connect(self.selectRow)
-        self.stockListView.pressed.connect(self.selectRowStock)
-        self.forexListView.pressed.connect(self.selectRowForex)
+
+        #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
+        self.optionsLayout.addWidget(addChartButton(self),0,4,4,4)
+
+        self.stockListView.clicked.connect(self.selectRowStock)
+        self.indexListView.clicked.connect(self.selectRowIndex)
+        self.forexListView.clicked.connect(self.selectRowForex)
         self.chartButton.clicked.connect(self.paintChart)
+
+        #self.stepComboBox.currentIndexChanged.connect(self.paintChart)
+        self.logRadioButton.toggled.connect(self.updateScale)
+        self.chartTypeComboBox.currentIndexChanged.connect(self.updateChartType)
+        self.volumenCheckBox.stateChanged.connect(self.updateHideVolumen)
+        self.paintCheckBox.stateChanged.connect(self.updateEnablePainting)
         
         self.startDateEdit.dateChanged.connect(self.checkDate)
         self.endDateEdit.dateChanged.connect(self.checkDate)
@@ -81,7 +101,12 @@ class TabA(QtGui.QWidget):
         if self.qModelIndex != None:
             self.paint2Chart()
             
-        
+    def selectRowStock(self,i):
+        self.stockListView.selectRow(i.row())
+    def selectRowIndex(self,i):
+        self.stockListView.selectRow(i.row())
+    def selectRowForex(self,i):
+        self.stockListView.selectRow(i.row()) 
 
     def paintChart(self):
         
@@ -92,113 +117,169 @@ class TabA(QtGui.QWidget):
         
         dateEnd = self.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-        indicator = 'momentum'
-        if self.momentumCheckBox.isChecked():
-            indicator = "momentum"
-        elif self.smaCheckBox.isChecked():
+        indicator = 'SMA'
+        if self.smaCheckBox.isChecked():
             indicator = "SMA"
+        elif self.wmaCheckBox.isChecked():
+            indicator = "WMA"
         elif self.emaCheckBox.isChecked():
             indicator = "EMA"
+        elif self.bollingerCheckBox.isChecked():
+            indicator = "bollinger"
+        oscilator = 'momentum'
+        if self.momentumCheckBox.isChecked():
+            oscilator = "momentum"
+        elif self.cciCheckBox.isChecked():
+            oscilator = "CCI"
+        elif self.rocCheckBox.isChecked():
+            oscilator = "ROC"
+        elif self.rsiCheckBox.isChecked():
+            oscilator = "rsi"
+        elif self.williamsCheckBox.isChecked():
+            oscilator = "williams"
         #step
         step = self.stepComboBox.currentText()
-
         #chartType
         chartType = self.chartTypeComboBox.currentText()
         hideVolumen =self.volumenCheckBox.isChecked() 
         #painting
         painting = self.paintCheckBox.isChecked()
-        print pageIndex
+        #scale
+        if self.logRadioButton.isChecked():
+            scale = 'log'
+        else:
+            scale = 'linear'
        
         
         # Jeśli wybrano instrument Index
         if pageIndex == 0:
-            if self.hasChart == False:
-                print "jestem w pierwszy raz chart Index"
-                indexes = self.indexListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],
-                                                                         dataParser.INDEX_LIST[index][0],
-                                                                         'index',dataParser.INDEX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
-                self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-            elif self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
-                print "jestem w zmieniony chart Index"
+            if self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+                print 'tworze nowy wykres w  index'
                 self.chartsLayout.removeWidget(self.chart)
-                indexes = self.indexListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
+                index= self.indexListView.currentIndex().row()     
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-                self.finObj.updateArchive()
+                self.finObj.updateArchive(step)
                 self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
-                self.currentChart =self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()    
+                self.chart.setData(self.finObj,start,end,step)
+                self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+                
         # Jeśli wybrano instrument Stock
         if pageIndex == 1:
-            if self.hasChart == False:
-                print "jestem w pierwszy raz chart Stock"
-                indexes = self.stockListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-            
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
-                self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-            elif self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
-                print "jestem w zmieniony chart Stock"
+            if self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+                print 'tworze nowy wykres w  stock'
                 self.chartsLayout.removeWidget(self.chart)
-                indexes = self.stockListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
+                index= self.stockListView.currentIndex().row()     
+                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
+                self.finObj.updateArchive(step)
+                self.chart = Chart(self.chartsFrame, self.finObj)
+                self.chart.setData(self.finObj,start,end,step)
+                self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
                 
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
-                self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
 
         if pageIndex == 2:
-            if self.hasChart == False:
-                print "jestem w pierwszy raz chart Forex"
-                indexes = self.forexListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-            
-                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
-                self.finObj.updateArchive()
-                self.chart = Chart(self, self.finObj)
-                self.chartsLayout.addWidget(self.chart)
-                self.hasChart = True
-                self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-            elif self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString(): 
-                print "jestem w zmieniony chart Forex"
+            if self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+                print 'tworze nowy wykres w  forex'
                 self.chartsLayout.removeWidget(self.chart)
-                indexes = self.forexListView.selectedIndexes()
-                index= indexes[0].row()
-                self.currnetChart = indexes[0].row()
-
-        print "aktualizuje dane "
-        self.chart.setOscPlot(indicator)
+                index= self.indexListView.currentIndex().row()     
+                self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
+                self.finObj.updateArchive(step)
+                self.chart = Chart(self.chartsFrame, self.finObj)
+                self.chart.setData(self.finObj,start,end,step)
+                self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+                
+        if not self.chartsLayout.isEmpty():
+            self.chartsLayout.removeWidget(self.chart)
+        
+        self.chart.setOscPlot(oscilator)
         self.chart.setDrawingMode(painting)
-        self.chart.setData(self.finObj,start,end,step)
+        self.chart.setMainIndicator(indicator)
+        self.chart.setScaleType(scale)
         self.chart.setMainType(chartType)
+        
+        if (self.oldStep != step) or self.oldStart != start or self.oldEnd != end:
+            self.finObj.updateArchive(step)
+            self.chart.setData(self.finObj,start,end,step)
         if hideVolumen:
             self.chart.rmVolumeBars()
+        self.chartsLayout.addWidget(self.chart)
+        self.chartsFrame.repaint()
+        self.chart.repaint()
+        self.chart.update()
+        #self.chart.emit(QtCore.SIGNAL("movido"))
+        m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+        m.resize(m.width() , m.height()-20)
+        m.resize(m.width() , m.height()+20)
+
+        self.oldStart = start
+        self.oldEnd = end
+        self.oldStep = step
             
-    def selectRow(self):
-        self.indexListView.selectRow(self.indexListView.currentIndex().row())
-    def selectRowStock(self):
-        self.stockListView.selectRow(self.stockListView.currentIndex().row())
-    def selectRowForex(self):
-        self.forexListView.selectRow(self.forexListView.currentIndex().row())
+    def updateScale(self):
+        if self.logRadioButton.isChecked():
+            scale = 'log'
+        else:
+            scale = 'linear'
+        
+        if self.chart !=None:
+            if not self.chartsLayout.isEmpty():
+                self.chartsLayout.removeWidget(self.chart)
+            self.chart.setScaleType(scale)
+
+            self.chartsLayout.addWidget(self.chart)
+            self.chart.repaint()
+            self.chart.update()
+            #self.chart.emit(QtCore.SIGNAL("movido"))
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+            
+    def updateChartType(self):
+        chartType = self.chartTypeComboBox.currentText()
+        if self.chart !=None:
+            if not self.chartsLayout.isEmpty():
+                self.chartsLayout.removeWidget(self.chart)
+            self.chart.setMainType(chartType)
+
+            self.chartsLayout.addWidget(self.chart)
+            self.chart.repaint()
+            self.chart.update()
+            #self.chart.emit(QtCore.SIGNAL("movido"))
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+
+    def updateHideVolumen(self):
+        hideVolumen =self.volumenCheckBox.isChecked()
+        if self.chart !=None:
+            if not self.chartsLayout.isEmpty():
+                self.chartsLayout.removeWidget(self.chart)
+            if hideVolumen:
+                self.chart.rmVolumeBars()
+            else:
+                self.chart.addVolumeBars()
+
+            self.chartsLayout.addWidget(self.chart)
+            self.chart.repaint()
+            self.chart.update()
+            #self.chart.emit(QtCore.SIGNAL("movido"))
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+    def updateEnablePainting(self):
+        painting =self.paintCheckBox.isChecked()
+        if self.chart !=None:
+            if not self.chartsLayout.isEmpty():
+                self.chartsLayout.removeWidget(self.chart)
+            self.chart.setDrawingMode(painting)
+            self.chartsLayout.addWidget(self.chart)
+            self.chart.repaint()
+            self.chart.update()
+            #self.chart.emit(QtCore.SIGNAL("movido"))
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+            
+            
     def checkDate(self):
         if self.startDateEdit.date() >= self.endDateEdit.date():
             self.endDateEdit.setDate(self.startDateEdit.date())
@@ -224,17 +305,20 @@ class TabA(QtGui.QWidget):
                                                                      dataParser.FOREX_LIST[index][3])
             self.currentChart = self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
 
-        self.finObj.updateArchive()
+        self.finObj.updateArchive(self.settings["step"])
         self.chart = Chart(self, self.finObj)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
         
-        self.chart.setOscPlot(self.settings["indicator"])
+        self.chart.setOscPlot(self.settings["oscilator"])
         self.chart.setDrawingMode(self.settings["painting"])
+        self.chart.setMainIndicator(self.settings["indicator"])
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+        self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
+        
 
         #przywracamy odpowiednie ustawienia opcji w GUI
         #data
@@ -244,12 +328,24 @@ class TabA(QtGui.QWidget):
         self.endDateEdit.setDate(QtCore.QDate(self.settings["end"].year,
                                  self.settings["end"].month,
                                  self.settings["end"].day))
-        if self.momentumCheckBox.isChecked():
-            indicator = "momentum"
-        elif self.smaCheckBox.isChecked():
-            indicator = "SMA"
-        elif self.emaCheckBox.isChecked():
-            indicator = "EMA"
+        if self.settings["indicator"] == "SMA":
+            self.smaCheckBox.setChecked(True)
+        elif self.settings["indicator"] == "WMA":
+            self.wmaCheckBox.setChecked(True)
+        elif self.settings["indicator"] == "EMA":
+            self.emaCheckBox.setChecked(True)
+        elif self.settings["indicator"] == "bollinger":
+            self.bollingerCheckBox.setChecked(True)
+        if self.settings["oscilator"] == "momentum":
+            self.momentumCheckBox.setChecked(True)
+        elif self.settings["oscilator"] == "CCI":
+            self.cciCheckBox.setChecked(True)
+        elif self.settings["oscilator"] == "ROC":
+            self.rocCheckBox.setChecked(True)
+        elif self.settings["oscilator"] == "RSI":
+            self.rsiCheckBox.setChecked(True)
+        elif self.settings["oscilator"] == "williams":
+            self.williamsCheckBox.setChecked(True)
         #step
         if self.settings["step"] == "daily":
             self.stepComboBox.setCurrentIndex(0)
