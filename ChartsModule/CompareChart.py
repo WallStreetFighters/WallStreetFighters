@@ -10,11 +10,10 @@ from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 
 class CompareChart(FigureCanvas):
-    """To będzie klasa reprezentująca wykres porównujący dwa instrumenty. Jest to
-    dość okrojona wersja zwykłego Chart-a (nie mamy wolumenu, wskaźników, oscylatorów,
+    """To będzie klasa reprezentująca wykres porównujący kilka instrumentów na jednym
+    wykresie. Jest to dość okrojona wersja zwykłego Chart-a (nie mamy wolumenu, wskaźników, oscylatorów,
     jedyny typ do wyboru to liniowy)."""
-    data1 = None #obiekt klasy ChartData przechowujący dane pierwszego instrumentu    
-    data2 = None #obiekt klasy ChartData przechowujący dane drugiego instrumentu   
+    data = [] #lista obiektów klasy ChartData   
     
     fig = None #rysowany wykres (tzn. obiekt klasy Figure)
     mainPlot = None #główny wykres (punktowy, liniowy, świecowy)            
@@ -29,12 +28,15 @@ class CompareChart(FigureCanvas):
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.1, 0.8     
-    #wysokość wolumenu i wykresu oscylatora            
+    #kolorki!
+    lineColors=['b-','k-','r-','g-','m-']
     
-    def __init__(self, parent, finObj1, finObj2, width=8, height=6, dpi=100):
+    def __init__(self, parent, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
-        dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
-        self.setData(finObj1, finObj2)               
+        dla podanych danych. Domyślny rozmiar to 800x600 pixli. W przeciwieństwie do zwykłego
+        Charta tutej nie podajemy w konstruktorze danych (trzeba wywołać setData żeby cokolwiek
+        się narysowało). Wynika to z tego że dane muszą mieć dokładnie tę samą długość, a domyślnie
+        pobieram je od początku do końca."""                                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -43,32 +45,48 @@ class CompareChart(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)                 
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
-        self.mainPlot=self.fig.add_axes(bounds)                        
-        self.updatePlot()
+        self.mainPlot=self.fig.add_axes(bounds)                                
         self.mpl_connect('button_press_event', self.onClick)
     
-    def setData(self, finObj1, finObj2, start=None, end=None, step='monthly'):
-        """Ustawiamy model danych, który ma reprezentować wykres. Następnie
-        konieczne jest jego ponowne odrysowanie"""        
-        self.data1=ChartData(finObj1, start, end, step,True)        
-        self.data2=ChartData(finObj2, start, end, step,True)                    
+    def setData(self, data, start=None, end=None, step='monthly'):
+        """Ustawiamy model danych, który ma reprezentować wykres. (przekazujemy 
+        tablicę FinancialObjectów). Następnie konieczne jest jego ponowne odrysowanie."""        
+        self.data=[]        
+        for finObj in data:
+            #sprawdzmy czy wszystkie dane są poprawne i tej samej długości
+            newData=ChartData(finObj, start, end, step,True)
+            if(self.data==[]):
+                length=len(newData.date)
+            newlength=len(newData.date)
+            if newData.corrupted or length!=newlength:
+                self.data=[]
+                break;
+            else:
+                self.data.append(newData)
+            
         if(self.mainPlot!=None):
             self.updatePlot()
     
     def updatePlot(self):
-        if(self.mainPlot==None or self.data1.corrupted or self.data2.corrupted
-                                or len(self.data1.date)!=len(self.data2.date)):            
+        """Odrysowuje główny wykres (czyli w zasadzie wszystko)"""
+        if(self.mainPlot==None or self.data==[]):            
             return
         ax=self.mainPlot                
         ax.clear()  
-        x=range(len(self.data1.percentChng))        
-        ax.plot(x,self.data1.percentChng,'b-',label=self.data1.name)                
-        ax.plot(x,self.data2.percentChng,'k-',label=self.data2.name)        
+        x=range(len(self.data[0].percentChng))     
+        minVal=maxVal=None
+        #rysujemy wykresy
+        for i, data in enumerate(self.data):
+            ax.plot(x,data.percentChng,self.lineColors[i%len(self.lineColors)],label=data.name)                        
+            if(minVal==None or min(data.percentChng)<minVal):
+                minVal=min(data.percentChng)
+            if(maxVal==None or max(data.percentChng)>maxVal):
+                maxVal=max(data.percentChng)            
+        #skalujemy osie
         ax.set_xlim(x[0],x[-1])
-        ax.set_yscale(self.scaleType)
-        minVal=min(self.data1.percentChng+self.data2.percentChng)
-        maxVal=max(self.data1.percentChng+self.data2.percentChng)
+        ax.set_yscale(self.scaleType)        
         ax.set_ylim(minVal-0.1*abs(minVal),maxVal+0.1*abs(maxVal))
+        #przy skali logarytmicznej ustawiamy etykietki żeby były gęściej niż przy 10^k
         if(self.scaleType=='log'):            
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
@@ -87,8 +105,12 @@ class CompareChart(FigureCanvas):
         self.updatePlot()
     
     def formatDateAxis(self,ax):
-        """Formatuje etykiety osi czasu."""
-        length=len(self.data1.date)
+        """Formatuje etykiety osi czasu. Ponieważ nie chcemy mieć dni, w których nie było notowań,
+        a jednocześnie nie chcemy mieć "dziur" na osi x musiałem zrezygnować z traktowania
+        wartości x jak dat. Zamiast tego indeksuje je kolejnymi liczbami naturalnymi, dopiero
+        w momencie etykietowania osi sprawdzam jaka data odpowiada danej liczbie. Oprócz tego funkcja
+        odpowiada za ilość etykiet rozmiar ich fonta, i wyrównanie (do środka)"""
+        length=len(self.data[0].date)
         if(length>self.num_ticks):
             step=length/self.num_ticks        
         else:
@@ -100,10 +122,10 @@ class CompareChart(FigureCanvas):
         for i, label in enumerate(ax.get_xticklabels()):
             label.set_size(7)                       
             index=int(ticks[i])            
-            if(index>=len(self.data1.date)):
+            if(index>=len(self.data[0].date)):
                 labels.append('')
             else:
-                labels.append(self.data1.date[index].strftime("%Y-%m-%d"))            
+                labels.append(self.data[0].date[index].strftime("%Y-%m-%d"))            
             label.set_horizontalalignment('center')                                    
         ax.xaxis.set_major_formatter(FixedFormatter(labels))
     
