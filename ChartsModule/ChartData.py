@@ -54,8 +54,7 @@ class ChartData:
                 close=self.close[i]
                 high=self.high[i]
                 low=self.low[i]
-                self.quotes.append((time, open, close, high, low))
-            self.advDecArray=getAdvDecInPeriodOfTime(start.date(),end.date(),self.name)            
+                self.quotes.append((time, open, close, high, low))                    
         else:
             self.percentChng=[]
             firstValue=self.close[0]
