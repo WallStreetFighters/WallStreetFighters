@@ -59,7 +59,7 @@ class ChartData:
             self.percentChng=[]
             firstValue=self.close[0]
             for value in self.close:                
-                change=(value-firstValue)*100.0/firstValue                                
+                change=100+(value-firstValue)*100.0/firstValue                                
                 self.percentChng.append(change)
             if(len(self.date)!=len(self.percentChng)):
                 self.corrupted=True
@@ -118,28 +118,40 @@ class ChartData:
         closes=np.array(self.getEarlierValues(duration,'close'))        
         return indicators.williamsOscilator(highs,lows,closes,duration)
     
-    def SMA(self, duration=20):        
-        array=self.getEarlierValues(len(self.close))        
-        return indicators.movingAverage(np.array(array),duration,1)
+    def movingAverage(self, type, duration=20):
+        if type=='SMA':
+            type=1
+        elif type=='WMA':
+            type=2
+        elif type=='EMA':
+            type=3
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.movingAverage(np.array(array),duration,type)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.movingAverage(np.array(array),duration,type)[(duration+1)-length/2:]                            
     
-    def WMA(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        return indicators.movingAverage(np.array(array),duration,2)
+    def bollinger(self, type, duration=20):
+        if type=='upper':
+            type=1
+        elif type=='lower':
+            type=2        
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.bollingerBands(np.array(array),duration,type,2)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
     
-    def EMA(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        return indicators.movingAverage(np.array(array),duration,3)
-    
-    def bollingerUpper(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        print len(array)
-        print len(indicators.bollingerBands(np.array(array),duration,2,2))
-        return indicators.bollingerBands(np.array(array),duration,1,2)
-    
-    def bollingerLower(self, duration=20):
-        array=self.getEarlierValues(len(self.close))        
-        return indicators.bollingerBands(np.array(array),duration,2,2)    
-
+    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
+    """
     def TRIN(self):
         advances=self.advDecArray['adv']
         declines=self.advDecArray['dec']
@@ -156,3 +168,5 @@ class ChartData:
         advances=self.advDecArray['adv']
         declines=self.advDecArray['dec']
         return indicators.adLine(advances,declines)
+    """
+    

@@ -193,18 +193,20 @@ class Chart(FigureCanvas):
         ax.hold(True) #hold on 
         x=range(len(self.data.close))
         if type=='SMA':
-            indicValues=self.data.SMA()        
+            indicValues=self.data.movingAverage('SMA')        
         elif type=='WMA':
-            indicValues=self.data.WMA()        
+            indicValues=self.data.movingAverage('WMA')
         elif type=='EMA':
-            indicValues=self.data.EMA()        
+            indicValues=self.data.movingAverage('EMA')
         elif type=='bollinger':            
-            ax.plot(x,self.data.bollingerUpper(),'r-',label=type)
-            indicValues=self.data.bollingerLower()
+            if self.data.bollinger('upper')!=None:
+                ax.plot(x,self.data.bollinger('upper'),'r-',label=type)
+            indicValues=self.data.bollinger('lower')
         else:
             ax.hold(False)
             return
-        ax.plot(x,indicValues,'r-',label=type)
+        if indicValues!=None:
+            ax.plot(x,indicValues,'r-',label=type)
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
@@ -249,18 +251,18 @@ class Chart(FigureCanvas):
             oscData=self.data.mcClellan()
         elif type == 'adLine':
             oscData=self.data.adLine()
-        else:
-            ax.hold(False)
+        else:            
             return
-        x=range(len(self.data.close))
-        ax.plot(x,oscData,'g-',label=type)
-        ax.set_xlim(x[0],x[-1])
-        #legenda
-        leg = ax.legend(loc='best', fancybox=True)
-        leg.get_frame().set_alpha(0.5)
-        self.formatDateAxis(self.oscPlot)
-        self.fixOscLabels()
-        self.fixTimeLabels()
+        if oscData!=None:
+            x=range(len(self.data.close))        
+            ax.plot(x,oscData,'g-',label=type)
+            ax.set_xlim(x[0],x[-1])
+            #legenda
+            leg = ax.legend(loc='best', fancybox=True)
+            leg.get_frame().set_alpha(0.5)
+            self.formatDateAxis(self.oscPlot)
+            self.fixOscLabels()
+            self.fixTimeLabels()
     
     def fixOscLabels(self):
         """Metoda ustawia zakres osi poprawny dla danego oscylatora. Ponadto przenosi

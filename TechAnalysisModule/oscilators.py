@@ -65,6 +65,8 @@ def standardDeviation(array):
 # mode - 1: Gorna wstega Bollingera, 2: Dolna wstega Bollingera
 # D - stala uzywana do odchylania wsteg, domyslnie 2
 def bollingerBands(array,duration,mode,D):
+        if(duration>array.size/2):
+            return None
 	values = zeros(array.size/2)
 	size = array.size
 	j = 0
@@ -81,8 +83,10 @@ def bollingerBands(array,duration,mode,D):
 # Zwraca tablice jednowymiarowa z wartosciami sredniej krokowej dla przedzialu [size/2,size-1], aby obliczyc wartosci tablica wejsciowa musi byc 2x wieksza od zakresu(duration)
 # modes : 1-SMA(simple moving average), 2-WMA(weighted moving average), 3-EMA(expotential moving average) 
 def movingAverage(array,duration,mode):
-        values = zeros(array.size/2)
-        size = array.size
+        if(duration>array.size/2):
+            return None
+        values = zeros(array.size/2)        
+        size = array.size        
         j = 0
         for i in range(size/2,size):
                 tempTable = array[i-duration+1:i+1]

@@ -34,6 +34,7 @@ class ApplicationWindow(QtGui.QMainWindow):
         chart = CompareChart(self.main_widget)                
         chart.setData([finObj1, finObj2, finObj3, finObj4],
                     datetime.datetime(2011,8,1),datetime.datetime(2012,3,1),'daily')
+        chart.setScaleType('log')
         l.addWidget(chart)                        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)                
