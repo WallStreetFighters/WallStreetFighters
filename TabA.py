@@ -153,39 +153,39 @@ class TabA(QtGui.QWidget):
         
         # Jeśli wybrano instrument Index
         if pageIndex == 0:
-            if self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+            if self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]:
                 print 'tworze nowy wykres w  index'
                 self.chartsLayout.removeWidget(self.chart)
-                index= self.indexListView.currentIndex().row()     
+                index= int(self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[-1])     
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
                 self.finObj.updateArchive(step)
                 self.chart = Chart(self, self.finObj)
                 self.chart.setData(self.finObj,start,end,step)
-                self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+                self.currentChart = self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
                 
         # Jeśli wybrano instrument Stock
         if pageIndex == 1:
-            if self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+            if self.currentChart != self.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]:
                 print 'tworze nowy wykres w  stock'
                 self.chartsLayout.removeWidget(self.chart)
-                index= self.stockListView.currentIndex().row()     
+                index= int(self.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[-1])  
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
                 self.finObj.updateArchive(step)
                 self.chart = Chart(self.chartsFrame, self.finObj)
                 self.chart.setData(self.finObj,start,end,step)
-                self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+                self.currentChart = self.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
                 
 
         if pageIndex == 2:
-            if self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString():
+            if self.currentChart != self.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]:
                 print 'tworze nowy wykres w  forex'
                 self.chartsLayout.removeWidget(self.chart)
-                index= self.indexListView.currentIndex().row()     
+                index= int(self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[-1])  
                 self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3])
                 self.finObj.updateArchive(step)
                 self.chart = Chart(self.chartsFrame, self.finObj)
                 self.chart.setData(self.finObj,start,end,step)
-                self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
+                self.currentChart =self.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
                 
         if not self.chartsLayout.isEmpty():
             self.chartsLayout.removeWidget(self.chart)
@@ -285,7 +285,7 @@ class TabA(QtGui.QWidget):
             self.endDateEdit.setDate(self.startDateEdit.date())
 
     def paint2Chart(self):
-        index = self.qModelIndex.row()
+        index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
 
         if self.listName == "index":
             self.finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],
