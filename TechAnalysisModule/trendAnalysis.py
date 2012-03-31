@@ -1,51 +1,68 @@
 from numpy import *
+from itertools import *
 import matplotlib.dates as mdates
 import math
 
 trendVul = 5
 rectVul = 0.03
+div = 8
 
-def regresion(values,numDates):
-        #numDates = mdates.date2num(dates)
-        A = vstack([numDates, ones(len(numDates))]).T
-        a,b = linalg.lstsq(A,values)[0]
-        return a,b
-
+def regression(values):
+    """Wyznaczamy prosta ktora najlepiej przybliza wykres - y = ax + b"""
+    A = vstack([arange(len(values)), ones(len(values))]).T
+    a,b = linalg.lstsq(A,values)[0]
+    return a,b
 
 def trend(a):
-        angle = arctan(a)
-        angle = angle*(180.0/pi)
-        if (angle > -trendVul and angle < trendVul):
-                return 0 # horyzontalny
-        if (angle > trendVul and angle < 90):
-                return 1 # rosnacy
-        if (angle <-trendVul and angle > -90):
-                return -1 # malejacy
+    """Na podstawie wskaznika kierunkowego prostej wyznaczamy trend"""
+    angle = arctan(a)
+    angle = angle*(180.0/pi)
+    if (angle > -trendVul and angle < trendVul):
+            return 0 # horyzontalny
+    if (angle > trendVul and angle < 90):
+            return 1 # rosnacy
+    if (angle <-trendVul and angle > -90):
+            return -1 # malejacy
 
 def aInRect(array):
-        a = (array[1]-array[0])*1.0
-        b = array[0]
-        for i in range(2,array.size):
-                y = a*i+b
-                if y > (1+rectVul)*array[i] or y < (1-rectVul)*array[i]:
-                        return 0
-        return 1       
+    """Sprawdzamy czy punkty w tablicy naleza do prostej +/- rectVul"""
+    if array.size < 2:
+        return 0
+    a = (array[1]-array[0])*1.0
+    b = array[0]
+    for i in range(2,array.size):
+            y = a*i+b
+            if y > (1+rectVul)*array[i] or y < (1-rectVul)*array[i]:
+                    return 0
+    return 1       
 
-def findMaxMin(array):
-        size = array.size
-        a1 = array[0:size/5]
-        a2 = array[size/5:2*size/5]
-        a3 = array[2*size/5:3*size/5]
-        a4 = array[3*size/5:4*size/5]
-        a5 = array[4*size/5:size]
-        min1 = a1.min()
-        min2 = a2.min()
-        min3 = a3.min()
-        min4 = a4.min()
-        min5 = a5.min()
-        max1 = a1.max()
-        max2 = a2.max()
-        max3 = a3.max()
-        max4 = a4.max()
-        max5 = a5.max()
+def divideArray(array, factor):
+    """Dzielimy tablice na #factor tablic, kazda podtablica ma tyle samo elem oprocz ostatniej"""
+    factor = factor
+    length = ceil(len(array)*1.0/factor)
+    res = []
+    for i in range(factor - 1):
+        res = res + list([array[i*length:(i+1)*length]])
+    return asarray(res + list([array[length*(factor - 1):]]))
         
+def findMaxMin(array):
+    """Znajdujemy linie wsparcia i oporu"""
+    z = divideArray(array, div)
+    x = asarray(map(lambda x: min(x), z))
+    x2 = asarray(map(lambda x: max(x), z))
+    print x
+    for i in reversed(range(x.size)):
+        print i
+        y = asarray(list(combinations(x, i+1)))
+        z = map(aInRect, y)
+        if max(z) == 1:
+            sup = y[z.index(max(z))]
+            break
+    for i in reversed(range(x.size)):
+        print i
+        y = asarray(list(combinations(x2, i+1)))
+        z = map(aInRect, y)
+        if max(z) == 1:
+            res = y[z.index(max(z))]
+            break
+    return sup, res    
