@@ -2,7 +2,9 @@
 from PyQt4 import QtGui, QtCore
 from Chart import Chart
 from CompareChart import CompareChart
+from LightweightChart import LightweightChart
 import WallStreetFighters.DataParserModule.dataParser as parser
+import TechAnalysisModule.oscilators as indicators
 import sys
 import os
 import datetime
@@ -38,14 +40,39 @@ class ApplicationWindow(QtGui.QMainWindow):
         l.addWidget(chart)                        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)                
+
+class ApplicationWindow1(QtGui.QMainWindow):
+    """Klasa demonstrująca jak przykładowo można osadzić wykres w Qt."""
+    def __init__(self):
+        QtGui.QMainWindow.__init__(self)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setWindowTitle("application main window")
+
+        self.main_widget = QtGui.QWidget(self)
+
+        l = QtGui.QVBoxLayout(self.main_widget)
+        parser.loadData()         
+        zajebisteDane=parser.getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+        dates=zajebisteDane['date']
+        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
+        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
+        zajebistyWykres = LightweightChart(self.main_widget,dates,values,'A/D line')                        
+        l.addWidget(zajebistyWykres)                        
+        self.main_widget.setFocus()
+        self.setCentralWidget(self.main_widget)                
         
 qApp = QtGui.QApplication(sys.argv)
-print os.getcwd()
+
 os.chdir("..") #zmieniamy katalog roboczy żeby pliki .wsf się ładowały
 
 aw = ApplicationWindow()
-aw.setWindowTitle("Wykresik")
+aw.setWindowTitle("Wykresik Porównawczy")
 aw.show()
+
+aw1 = ApplicationWindow1()
+aw1.setWindowTitle("Wykresik Lekki")
+aw1.show()
 sys.exit(qApp.exec_())
 
 

@@ -150,23 +150,3 @@ class ChartData:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
     
-    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
-    """
-    def TRIN(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        advVol=self.advDecArray['advv']
-        decVol=self.advDecArray['decv']
-        return indicators.TRIN(advances, declines, advVol, decVol)
-    
-    def mcClellan(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        return indicators.mcClellanOscillator(advances,declines)
-    
-    def adLine(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        return indicators.adLine(advances,declines)
-    """
-    
