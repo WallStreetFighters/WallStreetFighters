@@ -40,7 +40,8 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.setWindowTitle("Wykresik")
         self.show()
         for formation in form1+form2:
-            chart.drawLine(formation[1],1.,formation[2],1.)                        
+            chart.drawLine(formation[1],chart.data.low[formation[1]],
+                            formation[2],chart.data.low[formation[1]])                        
         
 qApp = QtGui.QApplication(sys.argv)
 print os.getcwd()
