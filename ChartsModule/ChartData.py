@@ -6,15 +6,19 @@ import datetime
 import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
+import DataParserModule.dataParser as parser
 
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
-    co daje mi FinancialObject Marcina"""     
+    co daje mi FinancialObject Marcina. Czwarty parametr określa czy obliczamy dane
+    do wykresu zwykłego, czy do porównującego. Wersja porównująca wykresy potrzebuje
+    znacznie mniej danych (jedynie procentowa zmiana kursów jednego i drugiego instrumentu
+    w czasie), podczas gdy zwykły chart pobiera OHLC + te dane z unicorna"""     
     
-    def __init__(self, finObj, start=None, end=None, step='monthly'):
+    def __init__(self, finObj, start=None, end=None, step='monthly',compare=False):
         if start>=end:
             self.corrupted=True
-            return
+            return        
         self.step=(step)
         #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
@@ -22,30 +26,44 @@ class ChartData:
         if(end==None):
             end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        #potrzebujemy też pełnej tabeli do obliczania wskaźników
-        self.fullArray=finObj.getArray(step)[::-1]
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]
-        if(len(self.fullArray)==0 or len(dataArray)==0):
+        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+        if(len(dataArray)==0):
             self.corrupted=True
             return
         self.name=finObj.name
-        self.open=dataArray['open'].tolist()
+        self.date = []
         self.close=dataArray['close'].tolist()
-        self.low=dataArray['low'].tolist()
-        self.high=dataArray['high'].tolist()
-        self.volume=dataArray['open'].tolist()        
-        self.date = []                    
         for date in dataArray['date']:
-            self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))        
-        #dane w formacie dla candlesticka
-        self.quotes=[]
-        for i in range(len(dataArray)):
-            time=float(i)
-            open=self.open[i]
-            close=self.close[i]
-            high=self.high[i]
-            low=self.low[i]
-            self.quotes.append((time, open, close, high, low))
+            self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
+        if(compare==False):                        
+            #potrzebujemy pełnej tabeli do obliczania wskaźników
+            self.fullArray=finObj.getArray(step)[::-1]                        
+            self.open=dataArray['open'].tolist()            
+            self.low=dataArray['low'].tolist()
+            self.high=dataArray['high'].tolist()
+            self.volume=dataArray['open'].tolist()   
+            if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
+                    ==len(self.volume)==len(self.date))):
+                self.corrupted=True
+                return
+            #dane w formacie dla candlesticka
+            self.quotes=[]
+            for i in range(len(dataArray)):
+                time=float(i)
+                open=self.open[i]
+                close=self.close[i]
+                high=self.high[i]
+                low=self.low[i]
+                self.quotes.append((time, open, close, high, low))                    
+        else:
+            self.percentChng=[]
+            firstValue=self.close[0]
+            for value in self.close:                
+                change=100+(value-firstValue)*100.0/firstValue                                
+                self.percentChng.append(change)
+            if(len(self.date)!=len(self.percentChng)):
+                self.corrupted=True
+                return
         self.corrupted=False
     
     def getEarlierValues(self, length, type='close'):
@@ -100,25 +118,54 @@ class ChartData:
         closes=np.array(self.getEarlierValues(duration,'close'))        
         return indicators.williamsOscilator(highs,lows,closes,duration)
     
-    def SMA(self, duration=20):        
-        array=self.getEarlierValues(len(self.close))        
-        return indicators.movingAverage(np.array(array),duration,1)
+    def movingAverage(self, type, duration=20):
+        if type=='SMA':
+            type=1
+        elif type=='WMA':
+            type=2
+        elif type=='EMA':
+            type=3
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.movingAverage(np.array(array),duration,type)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.movingAverage(np.array(array),duration,type)[(duration+1)-length/2:]                            
     
-    def WMA(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        return indicators.movingAverage(np.array(array),duration,2)
+    def bollinger(self, type, duration=20):
+        if type=='upper':
+            type=1
+        elif type=='lower':
+            type=2        
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.bollingerBands(np.array(array),duration,type,2)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
     
-    def EMA(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        return indicators.movingAverage(np.array(array),duration,3)
+    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
+    """
+    def TRIN(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        advVol=self.advDecArray['advv']
+        decVol=self.advDecArray['decv']
+        return indicators.TRIN(advances, declines, advVol, decVol)
     
-    def bollingerUpper(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        print len(array)
-        print len(indicators.bollingerBands(np.array(array),duration,2,2))
-        return indicators.bollingerBands(np.array(array),duration,1,2)
+    def mcClellan(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.mcClellanOscillator(advances,declines)
     
-    def bollingerLower(self, duration=20):
-        array=self.getEarlierValues(len(self.close))        
-        return indicators.bollingerBands(np.array(array),duration,2,2)    
-
+    def adLine(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.adLine(advances,declines)
+    """

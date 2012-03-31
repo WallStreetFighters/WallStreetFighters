@@ -18,7 +18,6 @@ class GuiMainWindow(object):
         """ustawianie komponetów GUI"""
         MainWindow.setObjectName("WallStreetFighters")
         MainWindow.resize(1000,700)
-
         self.centralWidget = QtGui.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
 
@@ -202,14 +201,3 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
-            
-           
-
-        
-            
-            
-
-        
-       
-
-        

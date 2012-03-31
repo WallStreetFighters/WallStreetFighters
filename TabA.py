@@ -114,7 +114,6 @@ class TabA(QtGui.QWidget):
         dateStart = self.startDateEdit.date()  # początek daty
         start = datetime.datetime(dateStart.year(),dateStart.month(),
                                   dateStart.day())
-        
         dateEnd = self.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
         indicator = 'SMA'
@@ -150,8 +149,7 @@ class TabA(QtGui.QWidget):
         else:
             scale = 'linear'
        
-        
-        # Jeśli wybrano instrument Index
+         # Jeśli wybrano instrument Index
         if pageIndex == 0:
             if self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]:
                 print 'tworze nowy wykres w  index'
@@ -316,6 +314,10 @@ class TabA(QtGui.QWidget):
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
+        
+        print "Bede rysowal wykres"
+        self.chart.drawTrend()
+        
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
         
