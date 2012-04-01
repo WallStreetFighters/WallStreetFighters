@@ -2,7 +2,7 @@
 ccopy_reg
 _reconstructor
 p2
-(c__main__
+(cDataParserModule.dataParser
 FinancialObject
 p3
 c__builtin__
