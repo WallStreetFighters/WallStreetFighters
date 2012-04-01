@@ -38,7 +38,7 @@ def aInRect(array):
 
 def divideArray(array, factor):
     """Dzielimy tablice na #factor tablic, kazda podtablica ma tyle samo elem oprocz ostatniej"""
-    factor = factor
+    factor = min(factor, len(array))
     length = ceil(len(array)*1.0/factor)
     res = []
     for i in range(factor - 1):
