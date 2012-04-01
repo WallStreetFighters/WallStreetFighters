@@ -159,7 +159,7 @@ class TabA(QtGui.QWidget):
             if self.currentChart != self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]:
                 print 'tworze nowy wykres w  index'
                 self.chartsLayout.removeWidget(self.chart)
-                index= int(self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[-1])     
+                index= int(self.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
 		if dataParser.INDEX_LIST[index][2] == 'Yahoo':     
             	    self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],step)
 		else:

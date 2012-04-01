@@ -20,12 +20,13 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
+	self.fullArray=finObj.getArray(step)
         if(start==None):
-            start=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")
+            start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
-            end=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")        
+            end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=finObj.getArray(step)[indexes[0]:indexes[1]:1]        
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -35,8 +36,7 @@ class ChartData:
         for date in dataArray['date']:
             self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
         if(compare==False):                        
-            #potrzebujemy pełnej tabeli do obliczania wskaźników
-            self.fullArray=finObj.getArray(step)                      
+            #potrzebujemy pełnej tabeli do obliczania wskaźników                      
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
@@ -47,13 +47,14 @@ class ChartData:
                 return
             #dane w formacie dla candlesticka
             self.quotes=[]
+	    a = datetime.datetime.now()
             for i in range(len(dataArray)):
                 time=float(i)
-                open=self.open[i]
+                open=self.open[i] 
                 close=self.close[i]
                 high=self.high[i]
                 low=self.low[i]
-                self.quotes.append((time, open, close, high, low))                    
+                self.quotes.append((time, open, close, high, low))               
         else:
             self.percentChng=[]
             firstValue=self.close[0]

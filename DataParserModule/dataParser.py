@@ -146,25 +146,25 @@ class FinancialObject(object):
 			tmplist = []
 			if time == 'daily':
 				for x in self.valuesDaily:
-					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4])]
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
 			if time == 'weekly':
 				for x in self.valuesWeekly:
-					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4])]
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
 			if time == 'monthly':
 				for x in self.valuesMonthly:
-					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4])]
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
 			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float)])
 		else:
 			tmplist = []
 			if time == 'daily':
 				for x in self.valuesDaily:
-					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],x[5]))
 			if time == 'weekly':
 				for x in self.valuesWeekly:
-					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],x[5]))
 			if time == 'monthly':
 				for x in self.valuesMonthly:
-					tmplist = tmplist + [(str(x[0]),x[1],x[2],x[3],x[4],x[5])]
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],x[5]))
 			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float),('volume',float)])
 			
 	def getIndex(self, begin, end, time = 'daily'):
