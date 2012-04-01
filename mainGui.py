@@ -118,15 +118,15 @@ class GuiMainWindow(object):
         
         dateEnd = self.tabA.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-        indicator = 'SMA'
+        indicator = []
         if self.tabA.smaCheckBox.isChecked():
-            indicator = "SMA"
-        elif self.tabA.wmaCheckBox.isChecked():
-            indicator = "WMA"
-        elif self.tabA.emaCheckBox.isChecked():
-            indicator = "EMA"
-        elif self.tabA.bollingerCheckBox.isChecked():
-            indicator = "bollinger"
+            indicator.append("SMA")
+        if self.tabA.wmaCheckBox.isChecked():
+            indicator.append("WMA")
+        if self.tabA.emaCheckBox.isChecked():
+            indicator.append("EMA")
+        if self.tabA.bollingerCheckBox.isChecked():
+            indicator.append("bollinger")
         oscilator = 'momentum'
         if self.tabA.momentumCheckBox.isChecked():
             oscilator = "momentum"
@@ -157,8 +157,7 @@ class GuiMainWindow(object):
     def closeTab(self,i):
         if i != 0:
             self.tabs.removeTab(i)
-      
-
+            
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
     class ListModel(QtCore.QAbstractTableModel):
         def __init__(self,list, parent = None):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from PyQt4 import QtGui,QtCore
+from Calendar import Calendar
 
 def tabUi(self,showLists=True):
         self.horizontalLayout = QtGui.QHBoxLayout(self)
@@ -144,19 +145,25 @@ def tabUi(self,showLists=True):
         self.label = QtGui.QLabel('Range:',self.optionsFrame) 
         self.optionsLayout.addWidget(self.label,0,0,1,1)
         self.startDateEdit = QtGui.QDateEdit(self.optionsFrame)
+        self.startDateEdit.setCalendarPopup(True)
+        self.startDateEdit.setCalendarWidget(Calendar())
         self.startDateEdit.setDate(QtCore.QDate.currentDate().addDays(-18))
         self.startDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
         self.optionsLayout.addWidget(self.startDateEdit,1,0,1,1)
-
         self.endDateEdit = QtGui.QDateEdit(self.optionsFrame)
+        self.endDateEdit.setCalendarPopup(True)
+        self.endDateEdit.setCalendarWidget(Calendar())
         self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-5))
         self.endDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
+
         self.optionsLayout.addWidget(self.endDateEdit,2,0,1,1)
         #koniec pola do wprowadzania okresu
 	self.verticalLayout.addWidget(self.optionsFrame)
-
+        
         #dodajemy ramke zawierajaca wykres i opcje do tab
         self.horizontalLayout.addWidget(self.optionsAndChartsFrame)
+
+        
 
 def addChartButton(self):
         self.frame = QtGui.QFrame(self)
@@ -187,6 +194,7 @@ def addChartButton(self):
         self.gridLayout.addWidget(self.scaleTypeLabel,0,2,1,1)
         self.linearRadioButton = QtGui.QRadioButton('linear',self.optionsFrame)
         self.gridLayout.addWidget(self.linearRadioButton,1,2,1,1)
+        self.linearRadioButton.setChecked(True)
         self.logRadioButton = QtGui.QRadioButton('log',self.optionsFrame)
         self.gridLayout.addWidget(self.logRadioButton,2,2,1,1)
         #wyłaczenie voluminu
@@ -222,6 +230,8 @@ def tableStyle(self,table):
         # enable sorting
         table.setSortingEnabled(True)
 
+
+        
 
         
                 
