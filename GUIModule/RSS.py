@@ -15,9 +15,10 @@ class RSSReader:
 	def __init__(self,RSSUrl):
 		"""Initialize the class"""
 		self.RSSUrl = RSSUrl;
-		self.xmldoc = self.GetXMLDocument(RSSUrl)
-		if (not self.xmldoc):
-			print "Error Getting XML Document!"
+		try:
+                        self.xmldoc = self.GetXMLDocument(RSSUrl)
+                except  (IOError, OSError):
+                        self.xmldoc = None
 		
 	def GetXMLDocument(self,RSSUrl):
 		"""This function reads in a RSS URL and then returns the XML documentn on success"""
@@ -27,6 +28,7 @@ class RSSReader:
 			xmldoc = minidom.parse(urlInfo)
 		else:
 			print "Error Getting URL"
+		
 		return xmldoc
 	
 	def GetItemText(self,xmlNode):
@@ -49,6 +51,7 @@ class RSSReader:
 		return ""
 	
 	def CreateRSSItem(self,itemNode):
+
 		"""Create an RSS item and return it"""
 		title = self.GetChildText(itemNode,"title")
 		description = self.GetChildText(itemNode,"description")
@@ -57,7 +60,8 @@ class RSSReader:
 	
 	def GetItems(self):
 		"""Generator to get items"""
-		for itemNode in self.xmldoc.documentElement.childNodes:
+                if not self.xmldoc == None:
+                        for itemNode in self.xmldoc.documentElement.childNodes:
 				if (itemNode.nodeName == "item"):
 					"""Allright we have an item"""
 					rssItem = self.CreateRSSItem(itemNode)

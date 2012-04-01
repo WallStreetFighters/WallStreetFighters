@@ -3,10 +3,12 @@
 import sys
 import datetime
 import operator
+
 import os
 from PyQt4 import QtGui, QtCore
+from TabA import TabA
+import cPickle
 import GUIModule.RSSgui as RSSgui
-from GUIModule.Tab import AbstractTab
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -16,103 +18,66 @@ class GuiMainWindow(object):
         """ustawianie komponetów GUI"""
         MainWindow.setObjectName("WallStreetFighters")
         MainWindow.resize(1000,700)
-
         self.centralWidget = QtGui.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
 
-	"""Każde okno zakłaki tworzymy poprzez stworzenie obiektu klasy
-	AbstractTab z modułu Tab w której zdefiniowane są wspólne komponenty
-	dla każdej zakładki.
-	AbstractTab.optionsFrame
-            AbstractTab.optionsFrame.chartButton
-	"""
         #tabs - przechowywanie zakładek
 	self.verticalLayout = QtGui.QVBoxLayout(self.centralWidget)
         self.tabs = QtGui.QTabWidget(self.centralWidget)
         self.tabs.setGeometry(QtCore.QRect(10, 10, 980, 640))
         self.tabs.setObjectName("Tabs")
+        self.tabs.setTabsClosable(True)
 
         #załadowanie List
+        os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 
         # inicjujemy model danych dla Index
-        indexModel = self.ListModel(list=dataParser.INDEX_LIST)
+        self.indexModel = self.ListModel(list=dataParser.INDEX_LIST)
         # inicjujemy model danych dla Stock
-        stockModel = self.ListModel(list=dataParser.STOCK_LIST)
+        self.stockModel = self.ListModel(list=dataParser.STOCK_LIST)
         # inicjujemy model danych dla Forex
-        forexModel = self.ListModel(list=dataParser.FOREX_LIST)
+        self.forexModel = self.ListModel(list=dataParser.FOREX_LIST)
 
         """tab A wskaźniki i oscylatory"""
-        
-	self.tabA = AbstractTab()
-        self.tabA.setObjectName("tabA")
-
-        #ustawiamy modele danych 
-        self.tabA.indexListView.setModel(indexModel)
-        self.tabA.stockListView.setModel(stockModel)
-        self.tabA.forexListView.setModel(forexModel)
-        
-        
-        self.idicatorsLabel = QtGui.QLabel('Indicators:',self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.idicatorsLabel)
-        #check box dla wskaźnika momentum
-        self.tabA.momentumCheckBox = QtGui.QCheckBox("Momentum",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.momentumCheckBox)
-        #check box dla ROC
-        self.tabA.rocCheckBox = QtGui.QCheckBox("ROC",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.rocCheckBox)
-        #check box dla SMA
-        self.tabA.smaCheckBox = QtGui.QCheckBox("SMA",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.smaCheckBox)
-        #check box dla EMA
-        self.tabA.emaCheckBox = QtGui.QCheckBox("EMA",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.emaCheckBox)
-        #check box dla CCI
-        self.tabA.cciCheckBox = QtGui.QCheckBox("CCI",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.cciCheckBox)
-        #check box dla RSI
-        self.tabA.rsiCheckBox = QtGui.QCheckBox("RSI",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.rsiCheckBox)
-        #check box dla Williams Oscilator
-        self.tabA.williamsOscilatorCheckBox = QtGui.QCheckBox("Williams Oscilator",self.tabA.optionsFrame)
-        self.tabA.optionsLayout.addWidget(self.tabA.williamsOscilatorCheckBox)    
-        #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
-        self.tabA.addChartButton()
-        self.tabA.chartButton.clicked.connect(self.paintChart)
+	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel)
         self.tabs.addTab(self.tabA,"tabA")
+        
+        self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
+        self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
+        self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
+
+        
         """koniec tab A """
         
-        """ tab B"""
+        """ tab B
         self.tabB = AbstractTab()
         self.tabB.setObjectName("tabB")
 
         #przycisk wyswietlanie wykresu (przyciski dodajemy na sam koniec okna)
-        self.tabB.addChartButton()
-        
-        
+        self.tabB.optionsLayout.addWidget(self.tabB.addChartButton(),0,4,3,4)
         self.tabs.addTab(self.tabB,"tabB")
-        
-        self.tabs.addTab(self.tabB,"tabB")
-        """ koniec tab B"""
+        koniec tab B"""
 
-        """" tabC """
+        """ tabC
         self.tabC = AbstractTab()
         self.tabC.setObjectName("tabC")
         self.tabs.addTab(self.tabC,"tabC")
-        self.tabC.addChartButton()
+        self.tabC.optionsLayout.addWidget(self.tabC.addChartButton(),0,7,3,4)
         self.tabs.addTab(self.tabC,"tabC")
         
-        """Koniec tabC"""
+        Koniec tabC"""
+        
         """ Rss tab"""
         self.RSSTab = QtGui.QWidget()
         self.tabs.addTab(self.RSSTab,"RSS")
         self.rssWidget = RSSgui.RSSWidget(self.RSSTab)
-        self.tabB.chartsLayout.addWidget(self.rssWidget)
         self.verticalLayout2 = QtGui.QVBoxLayout(self.RSSTab)
         self.verticalLayout2.addWidget(self.rssWidget)
     
 	""" koniec ustawiania Zakładek"""
 
+	self.tabs.tabCloseRequested.connect(self.closeTab)
 	
         self.verticalLayout.addWidget(self.tabs)
         MainWindow.setCentralWidget(self.centralWidget)
@@ -124,8 +89,73 @@ class GuiMainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        MainWindow.setStatusBar(self.statusbar)        
+        
 
+    #metody otwierajace nowe zakladki po podwójnym kliknięciu
+    def newIndexTab(self,qModelIndex):
+        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
+                          qModelIndex,self.settings(),"index",False)
+        nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
+
+    def newStockTab(self,qModelIndex):
+        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
+                          qModelIndex,self.settings(),"stock",False)
+        tupleStock = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,tupleStock[0]))
+    def newForexTab(self,qModelIndex):
+        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
+                          qModelIndex,self.settings(),"forex",False)
+        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStrigList()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
+
+    def settings(self):
+        #funkcja pobiera aktualnie zaznaczone opcje z tabA
+        dateStart = self.tabA.startDateEdit.date()  # początek daty
+        start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
+        
+        dateEnd = self.tabA.endDateEdit.date()     # koniec daty
+        end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
+        indicator = 'SMA'
+        if self.tabA.smaCheckBox.isChecked():
+            indicator = "SMA"
+        elif self.tabA.wmaCheckBox.isChecked():
+            indicator = "WMA"
+        elif self.tabA.emaCheckBox.isChecked():
+            indicator = "EMA"
+        elif self.tabA.bollingerCheckBox.isChecked():
+            indicator = "bollinger"
+        oscilator = 'momentum'
+        if self.tabA.momentumCheckBox.isChecked():
+            oscilator = "momentum"
+        elif self.tabA.cciCheckBox.isChecked():
+            oscilator = "CCI"
+        elif self.tabA.rocCheckBox.isChecked():
+            oscilator = "ROC"
+        elif self.tabA.rsiCheckBox.isChecked():
+            oscilator = "RSI"
+        elif self.tabA.williamsCheckBox.isChecked():
+            oscilator = "williams"
+        #step
+        step = self.tabA.stepComboBox.currentText()
+        #scale
+        if self.tabA.logRadioButton.isChecked():
+            scale = 'log'
+        else:
+            scale = 'linear'
+        #chartType
+        chartType = self.tabA.chartTypeComboBox.currentText()
+        hideVolumen =self.tabA.volumenCheckBox.isChecked() 
+        #painting
+        painting = self.tabA.paintCheckBox.isChecked() 
+        t = {"start":start,"end":end,"indicator":indicator,"step":step,
+             "chartType":chartType,"hideVolumen":hideVolumen,
+             "painting":painting,"scale":scale,"oscilator":oscilator}
+        return t
+    def closeTab(self,i):
+        if i != 0:
+            self.tabs.removeTab(i)
       
 
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
@@ -133,9 +163,14 @@ class GuiMainWindow(object):
         def __init__(self,list, parent = None):
             QtCore.QAbstractTableModel.__init__(self, parent)
             self.list = list
+            k = 0 
+            for li in list:
+                li.append(k)
+                k+=1
             self.headerdata = ['symbol', 'name', '']
-            print len(self.list)
-            print len(self.list[0])            
+        def mainIndex(self):
+            return 3
+
         
         def rowCount(self, parent):
             return len(self.list)
@@ -149,9 +184,14 @@ class GuiMainWindow(object):
         def data(self, index, role):
             if not index.isValid():
                 return QtCore.QVariant()
+            elif role == QtCore.Qt.WhatsThisRole:
+                return self.list[index.row()]
             elif role != QtCore.Qt.DisplayRole:
                 return QtCore.QVariant()
-            return QtCore.QVariant(self.list[index.row()][index.column()])
+            if index.column() == 2:
+                return QtCore.QVariant(self.list[index.row()][index.column()+2])
+            else:
+                return QtCore.QVariant(self.list[index.row()][index.column()])
         
         def sort(self, Ncol, order):
             """Sort table by given column number.
@@ -161,71 +201,3 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
-        
-
-    def paintChart(self):
-        pageIndex = self.tabA.listsToolBox.currentIndex() #sprawdzamy z jakiej listy korzystamy
-        dateStart = self.tabA.startDateEdit.date()  # początek daty
-        start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
-        
-        dateEnd = self.tabA.endDateEdit.date()     # koniec daty
-        end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-        indicator = 'momentum'
-        if self.tabA.momentumCheckBox.isChecked():
-            indicator = "momentum"
-        elif self.tabA.smaCheckBox.isChecked():
-            indicator = "SMA"
-        elif self.tabA.emaCheckBox.isChecked():
-            indicator = "EMA"
-        #step
-        step = self.tabA.stepComboBox.currentText()
-
-        #chartType
-        chartType = self.tabA.chartTypeComboBox.currentText()
-        hideVolumen =self.tabA.volumenCheckBox.isChecked() 
-        #painting
-        painting = self.tabA.paintCheckBox.isChecked()
-        
-        
-        # Jeśli wybrano instrument Index
-        if pageIndex == 0:
-            indexes = self.tabA.indexListView.selectedIndexes()
-            index= indexes[0].row()
-            finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3])
-            finObj.updateArchive()
-            chart = Chart(self.tabA, finObj)
-            self.tabA.chartsLayout.addWidget(chart)
-            chart.setOscPlot('momentum')
-            chart.setDrawingMode(True)
-            chart.setData(finObj,dateStart,dateEnd,'weekly')
-            chart.setMainType('candlestick')        
-            chart.setData(finObj)
-            chart.setMainIndicator('SMA')
-            chart.rmVolumeBars()
-            chart.setData(finObj,datetime.datetime(2003,7,10),datetime.datetime(2004,2,2),'daily')
-            chart.setMainIndicator('EMA')
-        # Jeśli wybrano instrument Stock
-        if pageIndex == 1:
-            indexes = self.tabA.stockListView.selectedIndexes()
-            index= indexes[0].row()
-            finObj = dataParser.createWithCurrentValueFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3])
-            finObj.updateArchive()
-            chart = Chart(self.tabA, finObj)
-            self.tabA.chartsLayout.addWidget(chart)
-            chart.setOscPlot('momentum')
-            chart.setMainIndicator('SMA')
-            chart.setDrawingMode(painting)
-            chart.setData(finObj,start,end,step)
-            chart.setMainType(chartType)
-            chart.rmVolumeBars()
-            
-       
-
-        
-            
-            
-
-        
-       
-
-        
