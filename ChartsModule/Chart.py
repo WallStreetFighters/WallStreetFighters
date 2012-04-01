@@ -2,15 +2,15 @@
 __author__="Andrzej Smoliński"
 __date__ ="$2012-02-23 19:00:48$"
 
-import matplotlib.dates as mdates
 from ChartData import ChartData
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.ticker import *
+from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
-
+import TechAnalysisModule.trendAnalysis as trend
     
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -57,10 +57,10 @@ class Chart(FigureCanvas):
         self.addVolumeBars()                                        
         self.mpl_connect('button_press_event', self.onClick)        
            
-    def setData(self, finObj, start=None, end=None, step='monthly'):
+    def setData(self, finObj, start=None, end=None, step='daily'):
         """Ustawiamy model danych, który ma reprezentować wykres. Następnie
         konieczne jest jego ponowne odrysowanie"""        
-        self.data=ChartData(finObj, start, end, step)        
+        self.data=ChartData(finObj, start, end, step)
         if(self.mainPlot!=None):
             self.updatePlot()
         
@@ -73,8 +73,8 @@ class Chart(FigureCanvas):
         """Odświeża wszystkie wykresy"""
         self.updateMainPlot()
         self.updateVolumeBars()
-        self.updateOscPlot()        
-        pass
+        self.updateOscPlot()
+        self.draw()        
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -135,8 +135,7 @@ class Chart(FigureCanvas):
         self.fixTimeLabels()
     
     def setScaleType(self,type):    
-        """Ustawia skalę liniową lub logarytmiczną na głównym wykresie.
-        TODO dobrać podstawę logarytmu"""
+        """Ustawia skalę liniową lub logarytmiczną na głównym wykresie."""
         if(type) not in ['linear','log']:
             return        
         self.scaleType=type
@@ -195,18 +194,20 @@ class Chart(FigureCanvas):
         ax.hold(True) #hold on 
         x=range(len(self.data.close))
         if type=='SMA':
-            indicValues=self.data.SMA()        
+            indicValues=self.data.movingAverage('SMA')        
         elif type=='WMA':
-            indicValues=self.data.WMA()        
+            indicValues=self.data.movingAverage('WMA')
         elif type=='EMA':
-            indicValues=self.data.EMA()        
+            indicValues=self.data.movingAverage('EMA')
         elif type=='bollinger':            
-            ax.plot(x,self.data.bollingerUpper(),'r-',label=type)
-            indicValues=self.data.bollingerLower()
+            if self.data.bollinger('upper')!=None:
+                ax.plot(x,self.data.bollinger('upper'),'r-',label=type)
+            indicValues=self.data.bollinger('lower')
         else:
             ax.hold(False)
             return
-        ax.plot(x,indicValues,'r-',label=type)
+        if indicValues!=None:
+            ax.plot(x,indicValues,'r-',label=type)
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
@@ -244,19 +245,25 @@ class Chart(FigureCanvas):
         elif type == 'RSI':
             oscData=self.data.RSI()
         elif type == 'williams':
-            oscData=self.data.williams()        
-        else:
-            ax.hold(False)
+            oscData=self.data.williams()
+        elif type == 'TRIN':
+            oscData=self.data.TRIN()
+        elif type == 'mcClellan':
+            oscData=self.data.mcClellan()
+        elif type == 'adLine':
+            oscData=self.data.adLine()
+        else:            
             return
-        x=range(len(self.data.close))
-        ax.plot(x,oscData,'g-',label=type)
-        ax.set_xlim(x[0],x[-1])
-        #legenda
-        leg = ax.legend(loc='best', fancybox=True)
-        leg.get_frame().set_alpha(0.5)
-        self.formatDateAxis(self.oscPlot)
-        self.fixOscLabels()
-        self.fixTimeLabels()
+        if oscData!=None:
+            x=range(len(self.data.close))        
+            ax.plot(x,oscData,'g-',label=type)
+            ax.set_xlim(x[0],x[-1])
+            #legenda
+            leg = ax.legend(loc='best', fancybox=True)
+            leg.get_frame().set_alpha(0.5)
+            self.formatDateAxis(self.oscPlot)
+            self.fixOscLabels()
+            self.fixTimeLabels()
     
     def fixOscLabels(self):
         """Metoda ustawia zakres osi poprawny dla danego oscylatora. Ponadto przenosi
@@ -376,6 +383,25 @@ class Chart(FigureCanvas):
                 x1, y1 = event.xdata, event.ydata        
                 self.drawLine(self.x0,self.y0,x1,y1)                
                 self.x0, self.y0 = None,None
+                
+    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0):
+          """Rysuje linie trendu opcja wyboru koloru i grubosci linii """
+          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle='--', color=colour)                
+          self.mainPlot.add_line(newLine)
+          self.additionalLines.append(newLine)
+          newLine.figure.draw_artist(newLine)                                        
+          self.blit(self.mainPlot.bbox)    #blit to taki redraw       
+             
+    def drawTrend(self):
+        """Wylicza """
+        a, b = trend.regression(self.data.close)
+        self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
+        x = trend.trend(a)
+        print x
+        y = asarray(self.data.close)
+        sup, res = trend.findMaxMin(y[3*y.size/4:])
+        self.drawTrendLine(self.data.close.index(sup[0]), sup[0], self.data.close.index(sup[len(sup)-1]), sup[len(sup)-1], 'g')
+        self.drawTrendLine(self.data.close.index(res[0]), res[0], self.data.close.index(res[len(res)-1]), res[len(res)-1], 'r')
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
