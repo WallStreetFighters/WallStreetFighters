@@ -44,7 +44,7 @@ def aInRect(array):
 
 def divideArray(array, factor):
     """Dzielimy tablice na #factor tablic, kazda podtablica ma tyle samo elem oprocz ostatniej"""
-    factor = factor
+    factor = min(factor, len(array))
     length = ceil(len(array)*1.0/factor)
     res = []
     for i in range(factor - 1):
@@ -72,56 +72,108 @@ def findMaxMin(array):
             res = y[z.index(max(z))]
             break
     return sup, res    
-
     
-def headAndShoulders(values, volumine):
-    if values.size != 3 or volumine.size != 3:
-        return
-    leftArmVal = values[0]
-    headVal = values[1]
-    rightArmVal = values[2]
-    leftArmVol = volumine[0]
-    headVol = volumine[1]
-    rightArmVol = volumine[2]
+def headAndShoulders(values, volumine, maxVal, maxVol):
+    print len(values), len(volumine)
+    if len(values) != 3 or len(volumine) != 3:
+        return 0
+    leftArmVal = list(values[0])
+    headVal = list(values[1])
+    rightArmVal = list(values[2])
+    leftArmVol = list(volumine[0])
+    headVol = list(volumine[1])
+    rightArmVol = list(volumine[2])
     maxLeftArmVal = max(leftArmVal)
     maxLeftArmVol = max(leftArmVol)
     maxHeadVal = max(headVal)
     maxHeadVol = max(headVol)
     maxRightArmVol = max(rightArmVol)
     maxRightArmVal = max(rightArmVal)
-
+    print 'A'
     #Wartosc lewego ramienia < glowy i wartosc wolumenu lewego ramienia ma byc najwieksza
     if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal or maxLeftArmVol < maxHeadVol or maxLeftArmVol < maxRightArmVol:
         return 0
-
+    print 'B'
     #wartosc prawego ramienia nie moze zbyt odbiegac od wartosci lewego
-    if maxRightArmVal > 1.1 * maxLeftArmVal or maxRightArmVal < 0.9*maxLeftArmVal:
+    if maxRightArmVal > 1.2 * maxLeftArmVal or maxRightArmVal < 0.8*maxLeftArmVal:
         return 0
-
+    print 'C'
     #wolumin na formacji ma byc malejacy
-    if (trend(regression(list(leftArmVol)+list(headVol)+list(rightArmVol))) > -1):
+    a, b = regression(leftArmVol+headVol + rightArmVol)
+    if (trend(a) > -1):
         return 0
-    
+    print 'D'
     #wykreslamy linie szyi
     minLeftArmVal = min(leftArmVal[leftArmVal.index(maxLeftArmVal):]) #min z prawej strony max lewego ramienia
     minHeadVal = min(headVal[headVal.index(maxHeadVal):])
-    return 1    
+    return (1.0*maxHeadVal/maxVal + 1.0*maxLeftArmVol/maxVol)/2    
 
 def lookForHeadAndShoulders(values, volumine):
     """Szukamy formacji glowy i ramion"""
+    maxVal = max(values)
+    maxVol = max(volumine)
     val = asarray(list(combinations(divideArray(values, div), 3)))
     vol = asarray(list(combinations(divideArray(volumine, div), 3)))
-    map(headAndShoulders)
+    z = map(lambda x, y: headAndShoulders(val, vol, maxVal, maxVol), val, vol)
+    if max(z) > 0:
+        return val[z.index(max(z))], vol[z.index(max(z))]
+    print "nie znaleziono"
+    return 0
     
-def headAndShouldersReversed(array):
+def reversedHeadAndShoulders(values, volumine, maxVal, maxVol):
+    print len(values), len(volumine)
+    if len(values) != 3 or len(volumine) != 3:
+        return 0
+    leftArmVal = list(values[0])
+    headVal = list(values[1])
+    rightArmVal = list(values[2])
+    leftArmVol = list(volumine[0])
+    headVol = list(volumine[1])
+    rightArmVol = list(volumine[2])
+    minLeftArmVal = min(leftArmVal)
+    maxLeftArmVol = max(leftArmVol)
+    minHeadVal = min(headVal)
+    maxHeadVol = max(headVol)
+    maxRightArmVol = max(rightArmVol)
+    minRightArmVal = min(rightArmVal)
+    print 'A'
+    #Wartosc lewego ramienia > glowy i wartosc wolumenu lewego ramienia ma byc najwieksza
+    if minLeftArmVal < minHeadVal  or minRightArmVal < minHeadVal or maxLeftArmVol < maxHeadVol or maxLeftArmVol < maxRightArmVol:
+        return 0
+    print 'B'
+    #wartosc prawego ramienia nie moze zbyt odbiegac od wartosci lewego
+    if minRightArmVal > 1.2 * minLeftArmVal or minRightArmVal < 0.8*minLeftArmVal:
+        return 0
+    print 'C'
+    #wolumin na formacji ma byc rosnacy
+    a, b = regression(leftArmVol+headVol + rightArmVol)
+    if (trend(a) < 1):
+        return 0
+    print 'D'
+    #wykreslamy linie szyi
+    maxLeftArmVal = max(leftArmVal[leftArmVal.index(minLeftArmVal):]) #min z prawej strony max lewego ramienia
+    maxHeadVal = max(headVal[headVal.index(minHeadVal):])
+    #to nie dokonca prawda wolumin w prawym ramieniu moze byc najwiekszy globalnie bo tam juz moze dojsc do wybicia z linii szyi
+    return (1.0*minHeadVal/minVal + 1.0*maxLeftArmVol/maxVol)/2
+
+def lookForReversedHeadAndShoulders(values, volumine):
     """Szukamy odwroconej formacji glowy i ramion"""
-    return
+    minVal = min(values)
+    maxVol = max(volumine)
+    val = asarray(list(combinations(divideArray(values, div), 3)))
+    vol = asarray(list(combinations(divideArray(volumine, div), 3)))
+    z = map(lambda x, y: reversedHeadAndShoulders(val, vol, minVal, maxVol), val, vol)
+    if max(z) > 0:
+      return val[z.index(max(z))], vol[z.index(max(z))]
+    print "nie znaleziono"
+    return 0
     
-    
-values = [1, 2, 10, 1, 2, 20, 1, 2, 12]
+values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 values = asarray(values)
-volumin = [1, 2, 10, 1, 1, 1, 1, 1, 1]
+volumin = [[1, 2, 10], [1, 1, 1], [1, 1, 1]]
 volumin = asarray(volumin)
 print values
 print volumin
-print lookForHeadAndShoulders(values, volumin)
+print headAndShoulders(values, volumin, 21, 10)
+lookForHeadAndShoulders(arange(10), arange(10))
+lookForReversedHeadAndShoulders(arange(10), arange(10))
