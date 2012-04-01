@@ -20,13 +20,12 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
-        #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
         if(start==None):
-            start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
+            start=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
-            end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
+            end=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")        
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+        dataArray=finObj.getArray(step)[indexes[0]:indexes[1]:1]        
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -37,7 +36,7 @@ class ChartData:
             self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
         if(compare==False):                        
             #potrzebujemy pełnej tabeli do obliczania wskaźników
-            self.fullArray=finObj.getArray(step)[::-1]                        
+            self.fullArray=finObj.getArray(step)                      
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
