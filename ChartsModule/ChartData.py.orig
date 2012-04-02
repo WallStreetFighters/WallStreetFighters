@@ -134,6 +134,7 @@ class ChartData:
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.movingAverage(np.array(array),duration,type)[(duration+1)-length/2:]                            
+<<<<<<< HEAD
     
     def bollinger(self, type, duration=20):
         if type=='upper':
@@ -150,3 +151,40 @@ class ChartData:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
     
+    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
+    """
+    def TRIN(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        advVol=self.advDecArray['advv']
+        decVol=self.advDecArray['decv']
+        return indicators.TRIN(advances, declines, advVol, decVol)
+    
+    def mcClellan(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.mcClellanOscillator(advances,declines)
+    
+    def adLine(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.adLine(advances,declines)
+    """
+=======
+    
+    def bollinger(self, type, duration=20):
+        if type=='upper':
+            type=1
+        elif type=='lower':
+            type=2        
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.bollingerBands(np.array(array),duration,type,2)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
+    
+>>>>>>> chart

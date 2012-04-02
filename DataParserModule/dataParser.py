@@ -572,7 +572,7 @@ def loadHistory():
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
 ########################################################################################################
 #TAKIE MOJE TESTOWANIE#
-loadData()
+#loadData()
 
 #x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
 #print x['advv']
