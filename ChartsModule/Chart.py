@@ -397,9 +397,10 @@ class Chart(FigureCanvas):
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
-        sup, res = trend.getChannelLines(self.data.close)
-        self.drawTrendLine(self.data.close.index(sup[0]), sup[0], self.data.close.index(sup[len(sup)-1]), sup[len(sup)-1], 'g')
-        self.drawTrendLine(self.data.close.index(res[0]), res[0], self.data.close.index(res[len(res)-1]), res[len(res)-1], 'r')
+        dataPart, sup, res = trend.getChannelLines(self.data.close)
+        diff = len(self.data.close) - len(dataPart)
+        self.drawTrendLine(dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1], 'g')
+        self.drawTrendLine(dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1], 'r')
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
