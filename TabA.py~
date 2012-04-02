@@ -206,6 +206,7 @@ class TabA(QtGui.QWidget):
         if (self.oldStep != step) or self.oldStart != start or self.oldEnd != end:
             self.finObj.updateArchive(step)
             self.chart.setData(self.finObj,start,end,step)
+	    print "Ustawiam 2 raz"
         if hideVolumen:
             self.chart.rmVolumeBars()
         self.chartsLayout.addWidget(self.chart)
