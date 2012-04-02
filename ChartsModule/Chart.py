@@ -393,13 +393,9 @@ class Chart(FigureCanvas):
           self.blit(self.mainPlot.bbox)    #blit to taki redraw       
              
     def drawTrend(self):
-        """Wylicza """
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
-        x = trend.trend(a)
-        print x
-        y = asarray(self.data.close)
-        sup, res = trend.findMaxMin(y[3*y.size/4:])
+        sup, res = trend.getChannelLines(self.data.close)
         self.drawTrendLine(self.data.close.index(sup[0]), sup[0], self.data.close.index(sup[len(sup)-1]), sup[len(sup)-1], 'g')
         self.drawTrendLine(self.data.close.index(res[0]), res[0], self.data.close.index(res[len(res)-1]), res[len(res)-1], 'r')
             

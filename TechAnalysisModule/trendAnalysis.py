@@ -23,6 +23,11 @@ def trend(a):
             return 1 # rosnacy
     if (angle <-trendVul and angle > -90):
             return -1 # malejacy
+            
+def getChannelLines(array):
+    """Wylicza """
+    y = asarray(array)
+    return findMaxMin(y[3*y.size/4:])
 
 def linearFun(array):
     if array.size < 2:
