@@ -182,7 +182,7 @@ class FinancialObject(object):
 					start += 1
 			
 			if end > self.valuesDaily[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesDaily[finish][0]):
