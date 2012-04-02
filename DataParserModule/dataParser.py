@@ -196,9 +196,9 @@ class FinancialObject(object):
 				start = 0
 				while (begin > self.valuesWeekly[start][0]):
 					start += 1
-			
+		
 			if end > self.valuesWeekly[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesWeekly[finish][0]):
@@ -214,7 +214,7 @@ class FinancialObject(object):
 					start += 1
 			
 			if end > self.valuesMonthly[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesMonthly[finish][0]):

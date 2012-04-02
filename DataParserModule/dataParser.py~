@@ -397,7 +397,6 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 	if timePeriod == 'daily':
 		for row in dataCsv:
 			try:
-				print row
 				if financialType == 'forex':
 					dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 				else:
