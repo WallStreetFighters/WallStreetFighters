@@ -18,7 +18,6 @@ class GuiMainWindow(object):
         """ustawianie komponetów GUI"""
         MainWindow.setObjectName("WallStreetFighters")
         MainWindow.resize(1000,700)
-
         self.centralWidget = QtGui.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
 
@@ -97,19 +96,19 @@ class GuiMainWindow(object):
     def newIndexTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"index",False)
-        nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+        nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
 
     def newStockTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"stock",False)
-        nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+        tupleStock = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,tupleStock[0]))
     def newForexTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"forex",False)
-        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.DisplayRole).toString()
-        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
 
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA
@@ -118,15 +117,15 @@ class GuiMainWindow(object):
         
         dateEnd = self.tabA.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-        indicator = 'SMA'
+        indicator = []
         if self.tabA.smaCheckBox.isChecked():
-            indicator = "SMA"
-        elif self.tabA.wmaCheckBox.isChecked():
-            indicator = "WMA"
-        elif self.tabA.emaCheckBox.isChecked():
-            indicator = "EMA"
-        elif self.tabA.bollingerCheckBox.isChecked():
-            indicator = "bollinger"
+            indicator.append("SMA")
+        if self.tabA.wmaCheckBox.isChecked():
+            indicator.append("WMA")
+        if self.tabA.emaCheckBox.isChecked():
+            indicator.append("EMA")
+        if self.tabA.bollingerCheckBox.isChecked():
+            indicator.append("bollinger")
         oscilator = 'momentum'
         if self.tabA.momentumCheckBox.isChecked():
             oscilator = "momentum"
@@ -155,17 +154,22 @@ class GuiMainWindow(object):
              "painting":painting,"scale":scale,"oscilator":oscilator}
         return t
     def closeTab(self,i):
-        self.tabs.removeTab(i)
-      
-
+        if i != 0:
+            self.tabs.removeTab(i)
+            
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
     class ListModel(QtCore.QAbstractTableModel):
         def __init__(self,list, parent = None):
             QtCore.QAbstractTableModel.__init__(self, parent)
             self.list = list
+            k = 0 
+            for li in list:
+                li.append(k)
+                k+=1
             self.headerdata = ['symbol', 'name', '']
         def mainIndex(self):
             return 3
+
         
         def rowCount(self, parent):
             return len(self.list)
@@ -179,9 +183,14 @@ class GuiMainWindow(object):
         def data(self, index, role):
             if not index.isValid():
                 return QtCore.QVariant()
+            elif role == QtCore.Qt.WhatsThisRole:
+                return self.list[index.row()]
             elif role != QtCore.Qt.DisplayRole:
                 return QtCore.QVariant()
-            return QtCore.QVariant(self.list[index.row()][index.column()])
+            if index.column() == 2:
+                return QtCore.QVariant(self.list[index.row()][index.column()+2])
+            else:
+                return QtCore.QVariant(self.list[index.row()][index.column()])
         
         def sort(self, Ncol, order):
             """Sort table by given column number.
@@ -191,14 +200,3 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
-            
-           
-
-        
-            
-            
-
-        
-       
-
-        
