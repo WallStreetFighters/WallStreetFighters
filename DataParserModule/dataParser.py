@@ -169,11 +169,13 @@ class FinancialObject(object):
 			
 	def getIndex(self, begin, end, time = 'daily'):
 		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
-		
 		if begin > end:
 			return
 		if time == 'daily':
+			if end < self.valuesDaily[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			size = len(self.valuesDaily)
+			
 			if begin < self.valuesDaily[0][0]:
 				start = 1
 			else:
@@ -190,6 +192,8 @@ class FinancialObject(object):
 			return [start-1,finish+1]
 		if time == 'weekly':
 			size = len(self.valuesWeekly)
+			if end < self.valuesWeekly[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			if begin < self.valuesWeekly[0][0]:
 				start = 1
 			else:
@@ -206,6 +210,8 @@ class FinancialObject(object):
 			return [start-1,finish+1]
 		if time == 'monthly':
 			size = len(self.valuesMonthly)
+			if end < self.valuesMonthly[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			if begin < self.valuesMonthly[0][0]:
 				start = 1
 			else:
@@ -221,6 +227,12 @@ class FinancialObject(object):
 					finish += 1
 			return [start-1,finish+1]
 #koniec definicji klasy
+
+class DataAPIException(Exception):
+	def __init__(self,value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
 
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""

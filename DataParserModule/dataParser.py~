@@ -169,11 +169,13 @@ class FinancialObject(object):
 			
 	def getIndex(self, begin, end, time = 'daily'):
 		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
-		
 		if begin > end:
 			return
 		if time == 'daily':
+			if end < self.valuesDaily[0][0]:
+				raise Exception('')
 			size = len(self.valuesDaily)
+			
 			if begin < self.valuesDaily[0][0]:
 				start = 1
 			else:
@@ -196,9 +198,9 @@ class FinancialObject(object):
 				start = 0
 				while (begin > self.valuesWeekly[start][0]):
 					start += 1
-			
+		
 			if end > self.valuesWeekly[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesWeekly[finish][0]):
@@ -214,7 +216,7 @@ class FinancialObject(object):
 					start += 1
 			
 			if end > self.valuesMonthly[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesMonthly[finish][0]):
