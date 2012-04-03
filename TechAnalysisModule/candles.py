@@ -162,67 +162,56 @@ def findBear3(O,H,L,C):
         return ('bear3',i-4,i)
     return None    
 
-"""luki i wyspy traktuję jako osobną rzecz od formacji świecowych 
+"""luki traktuję jako osobną rzecz od formacji świecowych 
 (podobnie zresztą jak literatura)
 po pierwsze nie wymagają świec (wystarczy zwykły wykres słupkowy), 
 po drugie kształtują się przez dłuższy czas, więc są IMO ważniejsze"""
 
 def findGaps(H,L,trend):
-    """Znajduje na danym wykresie (lub jego wycinku) lukę startową, ucieczki i wyczerpania lub wyspę. 
+    """Znajduje na danym wykresie (lub jego wycinku) lukę startową, ucieczki i wyczerpania. 
     Używać najlepiej na możliwie krótkim okresie, np po wybiciu z formacji. 
     Interpretacja: Luka startowa - sygnał rozpoczęcia trendu, 
     luka ucieczki - potwierdzenie siły trendu + orientacyjne określenie jego zasięgu (zazwyczaj jest w połowie)
-    luka wyczerpania - sygnał że trend się wkrótce skończy
-    wyspa - odwrócenie trendu
+    luka wyczerpania - sygnał że trend się wkrótce skończy    
     Uwaga na wartości zwracane przez funkcję, dostajemy None, lub parę składającą się
     ze stringa (po stringu poznamy co jest drugim argumentem) i krotki 3 lub 2 elementowej 
     lub pojedynczego elementu"""
     if(len(H)!=len(L)):
         return None
-    gaps=[]
-    result=[]
-    breakawayGap=None
-    continuationGap=None
-    exhaustionGap=None    
+    gaps=[] 
     if(trend>0):
-        #szukamy wszystkich luk na wykresie
-        for i in range (len(H)-1,0):
+        #szukamy wszystkich luk na wykresie (uwaga - w kolejności od najnowszej do najstarszej)
+        for i in range (len(H)-1,0,-1):
             if(H[i-1]<L[i]):
-                gaps.append( (i,(L[i]-H[i-1])/2.) )
+                gaps.append( (i,H[i-1]+(L[i]-H[i-1])/2.) )
         if len(gaps)>=3:
             #szukamy luki startowej, ucieczki i wyczerpania
             #3 luki ułożone w mniej więcej równych odstępach
             for gap1,gap2,gap3 in list(combinations(gaps,3)):                                       
-                if 0.8*(gap2[1]-gap1[1]) < (gap3[1]-gap2[1]) < 1.2*(gap2[1]-gap1[1]):
-                    return ('3gaps',(gap1,gap2,gap3))
+                if 0.8*(gap1[1]-gap2[1]) < (gap2[1]-gap3[1]) < 1.2*(gap1[1]-gap2[1]):
+                    return ('3gaps',(gap3,gap2,gap1))
         if len(gaps)>=2:            
             for gap1,gap2 in list(combinations(gaps,2)):                                       
                 #jeśli znajdziemy dwie luki rosnąco na różnych wysokościach to traktujemy
                 #je jako lukę startową i ucieczki
-                if gap2[1]>1.05*gap1[1]:
-                    return ('2gaps',(gap1,gap2))
-                #jeśli znajdziemy dwie luki na tym samym poziomie to traktujemy
-                #je jako wyspę
-                elif 0.97*gap1[1] <= gap2[1] <= 1.03*gap1[1]:
-                    return ('island',(gap1,gap2))            
+                if gap1[1]>1.05*gap2[1]:
+                    return ('2gaps',(gap2,gap1))                
     #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
     elif(trend<0):                
-        for i in range (len(H)-1,0):
-            if(H[i-1]>L[i]):
-                gaps.append( (i,(H[i-1]-L[i])/2.) )
+        for i in range (len(H)-1,0,-1):
+            if(L[i-1]>H[i]):
+                gaps.append( (i,L[i]+(H[i-1]-L[i])/2.) )
         if len(gaps)>=3:            
             for gap1,gap2,gap3 in list(combinations(gaps,3)):                                       
-                if 0.8*(gap1[1]-gap2[1]) < (gap2[1]-gap3[1]) < 1.2*(gap1[1]-gap2[1]):
-                    return ('3gaps',(gap1,gap2,gap3))
+                if 0.8*(gap2[1]-gap1[1]) < (gap3[1]-gap2[1]) < 1.2*(gap2[1]-gap1[1]):
+                    return ('3gaps',(gap3,gap2,gap1))
         if len(gaps)>=2:            
             for gap1,gap2 in list(combinations(gaps,2)):                                                       
-                if gap1[1]>1.05*gap2[1]:
-                    return ('2gaps',(gap1,gap2))                
-                elif 0.97*gap1[1] <= gap2[1] <= 1.03*gap1[1]:
-                    return ('island',(gap1,gap2))
+                if gap1[1]<1.05*gap2[1]:
+                    return ('2gaps',(gap2,gap1))                                
     if len(gaps)>=1:
         #jeśli nie mamy nic ciekawego to zwracamy po prostu ostatnią lukę
         #traktujemy ją jako lukę startową
-        return ('1gap',gaps[-1][1])
+        return ('1gap',gaps[0])
     else: 
         return None                        
