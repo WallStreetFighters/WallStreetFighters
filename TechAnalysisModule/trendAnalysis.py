@@ -26,8 +26,7 @@ def trend(a):
             
 def getChannelLines(array):
     """Wylicza """
-    y = asarray(array)
-    return findMaxMin(y[3*y.size/4:])
+    return findMaxMin(array[3*len(array)/4:])
 
 def linearFun(array):
     if array.size < 2:
@@ -58,7 +57,7 @@ def divideArray(array, factor):
         
 def findMaxMin(array):
     """Znajdujemy linie wsparcia i oporu"""
-    z = divideArray(array, div)
+    z = divideArray(asarray(array), div)
     x = asarray(map(lambda x: min(x), z))
     x2 = asarray(map(lambda x: max(x), z))
     print x
@@ -76,7 +75,7 @@ def findMaxMin(array):
         if max(z) == 1:
             res = y[z.index(max(z))]
             break
-    return sup, res    
+    return array, sup, res    
     
 def headAndShoulders(values, volumine, maxVal, maxVol):
     print len(values), len(volumine)
