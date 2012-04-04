@@ -36,6 +36,12 @@ def linearFun(array):
     b = array[0]
     return a,b
 
+def lineFrom2Points(x1,y1,x2,y2):
+    """Zwraca współczynniki a,b prostej przechodzącej przez 2 dane punkty"""
+    a=(y2-y1)/(x2-x1)
+    b=y1-a*x1
+    return (a,b)
+
 def aInRect(array):
     """Sprawdzamy czy punkty w tablicy naleza do prostej +/- rectVul"""
     a, b = linearFun(array)
@@ -178,9 +184,24 @@ def findWedge(values):
     tylko sprawdzamy czy linie kanału są zbieżne.
     Interpretacja: 
     klin zwyżkujący zapowiada odwrócenie trendu wzrostowego lub kontynuację spadkowego
-    klin zniżkujący -  na odwrót"""
-    trend = regression(values)
-    lines = getChannelLines(values)
+    klin zniżkujący -  na odwrót"""    
+    sup, res = getChannelLines(values)
+    supx0,supy0,supx1,supy1 = values.index(sup[0]), sup[0], values.index(sup[len(sup)-1]), sup[len(sup)-1]
+    resx0,resy0,resx1,resy1 = values.index(res[0]), res[0], values.index(res[len(res)-1]), res[len(res)-1]
+    supLine=lineFrom2Points(supx0,supy0,supx1,supy1)
+    resLine=lineFrom2Points(resx0,resy0,resx1,resy1)
+    supAngle = arctan(supLine[0])*(180.0/pi)
+    resAngle = arctan(resLine[0])*(180.0/pi)
+    #klin zwyżkujący
+    if supAngle>trendVul and resAngle>supAngle:
+        return ('rising_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
+    #klin zniżkujący
+    elif resAngle<-trendVul and supAngle<resAngle:
+        return ('falling_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
+    return None
+    
+    
+    
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)
