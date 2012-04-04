@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from numpy import *
 from itertools import *
 import matplotlib.dates as mdates
