@@ -172,6 +172,15 @@ def lookForReversedHeadAndShoulders(values, volumine):
       return val[z.index(max(z))], vol[z.index(max(z))]
     print "nie znaleziono"
     return 0
+
+def findWedge(values):  
+    """Znajdujemy formację klina. Generalnie sprowadza się to do tego samego co trend,
+    tylko sprawdzamy czy linie kanału są zbieżne.
+    Interpretacja: 
+    klin zwyżkujący zapowiada odwrócenie trendu wzrostowego lub kontynuację spadkowego
+    klin zniżkujący -  na odwrót"""
+    trend = regression(values)
+    lines = getChannelLines(values)
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)
