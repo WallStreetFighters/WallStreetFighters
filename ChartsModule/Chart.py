@@ -154,6 +154,7 @@ class Chart(FigureCanvas):
         for label in self.volumeBars.get_yticklabels():
             label.set_visible(False)
         ax.set_xlim(x[0],x[-1])
+        ax.set_ylim(0,1.1*max(self.data.volume))
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
