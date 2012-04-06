@@ -232,6 +232,10 @@ def findMaxLine(array):
     return array([-1]),array([-1]) #Glupi sposob ale musze jakos sprawdzic w nizszej funkcji czy w ogole jest formacja
 
 
+# Co jest jeszcze do zrobienia :
+# - Zwiekszenie ilosci punktow wsparcia i oporu, bo narazie znajduje przy 2
+# - Jaka wrazliwosc na odchylenia punkow bo jest poki co zerowa
+# - Chyba powinien szukac formacji na kilku zbiorach
 def findRectFormation(array):
     resMin,indMin = findMinLine(array)
     resMax,indMax = findMaxLine(array)
