@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from numpy import *
 from itertools import *
 import matplotlib.dates as mdates
@@ -175,8 +176,89 @@ def lookForReversedHeadAndShoulders(values, volumine):
       return val[z.index(max(z))], vol[z.index(max(z))]
     print "nie znaleziono"
     return 0
-    
-print findMaxMin(arange(1000))
+
+# Tutaj zaczalem pisac formacje prostokatna
+
+# Przekazujemy tablice z wartosciami i teraz poczynajac od najmniejszej,
+# funkcja szuka linii wsparcia, minimalnie 3 wartosci
+def findMinLine(array):
+    size = array.size
+    arraySorted = sort(a)
+    sizeSorted = arraySorted.size
+    numberOfSimilarValues = 0
+    for i in range(0,sizeSorted):
+        temp = arraySorted[i]
+        for j in range(0,size):
+            if array[j] == temp:
+                numberOfSimilarValues +=1
+        if numberOfSimilarValues <2:
+            numberOfSimilarValues = 0
+        else:
+            z = 0
+            resultTable = zeros(numberOfSimilarValues)
+            indexTable = zeros(numberOfSimilarValues)
+            for k in range(0,size):
+                if array[k] == temp:
+                    resultTable[z] = temp
+                    indexTable[z] = k
+                    z += 1
+            return resultTable,indexTable
+    return 0
+
+# Jak wyzej tylko szuka linii oporu
+def findMaxLine(array):
+    size = array.size
+    arraySorted = sort(a)
+    arraySorted = arraySorted[ : :-1]
+    sizeSorted = arraySorted.size
+    numberOfSimilarValues = 0
+    for i in range(0,sizeSorted):
+        temp = arraySorted[i]
+        for j in range(0,size):
+            if array[j] == temp:
+                numberOfSimilarValues +=1
+        if numberOfSimilarValues <2:
+            numberOfSimilarValues = 0
+        else:
+            z = 0
+            resultTable = zeros(numberOfSimilarValues)
+            indexTable = zeros(numberOfSimilarValues)
+            for k in range(0,size):
+                if array[k] == temp:
+                    resultTable[z] = temp
+                    indexTable[z] = k
+                    z += 1
+            return resultTable,indexTable
+    return array([-1]),array([-1]) #Glupi sposob ale musze jakos sprawdzic w nizszej funkcji czy w ogole jest formacja
+
+
+def findRectFormation(array):
+    resMin,indMin = findMinLine(array)
+    resMax,indMax = findMaxLine(array)
+    if (resMin[0] == -1 or indMin[0] == -1) or (resMax[0] == -1 or indMax[0] == -1):
+        print "Nie odnalazlem formacji prostokata"
+        return 0
+    if indMin.min() > indMax.min():
+        # Wtedy sprawdzamy czy kontynuacja trendu spadkowego
+        globalMin = indMax.min()
+        globalMax = indMin.max()
+        if array[globalMin-1] > array[globalMin] and array[globalMax] > array[globalMax+1]:
+            print "Wykrylem formacje prostokatna trendu spadkowego na indeksach ktore zwracam :"
+            return globalMin,globalMax
+        else:
+            print "Formacja prostokata nie wskazuje na kontynuacje trendu spadkowego"
+            return 0
+    else:
+        # Sprawdzamy czy kontynuacja trendu wzrostowego
+        globalMin = indMin.min()
+        globalMax = indMax.max()
+        if array[globalMin] > array[globalMin-1] and array[globalMax+1] > array[globalMax]:
+            print "Wykrylem formacje prostokatna trendu wzrostowego na indeksach ktore zwracam :"
+            return globalMin,globalMax
+        else:
+            print "Formacja prostokata nie wskazuje na kontynuacje trendu wzrostowego"
+            return 0
+        
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)
