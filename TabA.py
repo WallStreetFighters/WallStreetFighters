@@ -18,6 +18,9 @@ class TabA(QtGui.QWidget):
         self.settings = settings
         self.qModelIndex = qModelIndex
         self.listName = listName
+        self.indicatorList = []
+        self.indicatorCheckBoxList = []
+        self.oscilatorCheckBoxList = []
 
         self.oldStart = None
         self.oldEnd = None
@@ -26,7 +29,6 @@ class TabA(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.initUi()
         
-        """tab A wskaźniki i oscylatory"""
     def initUi(self):
         
         
@@ -53,35 +55,44 @@ class TabA(QtGui.QWidget):
         self.smaCheckBox = QtGui.QCheckBox("SMA",self.optionsFrame)
         self.optionsLayout.addWidget(self.smaCheckBox,1,2,1,1)
         self.smaCheckBox.setChecked(True)
+        self.indicatorCheckBoxList.append(self.smaCheckBox)
         #check box dla WMA
         self.wmaCheckBox = QtGui.QCheckBox("WMA",self.optionsFrame)
         self.optionsLayout.addWidget(self.wmaCheckBox,2,2,1,1)
+        self.indicatorCheckBoxList.append(self.wmaCheckBox)
         #check box dla EMA
         self.emaCheckBox = QtGui.QCheckBox("EMA",self.optionsFrame)
         self.optionsLayout.addWidget(self.emaCheckBox,3,2,1,1)
+        self.indicatorCheckBoxList.append(self.emaCheckBox)
         #check box dla bollinger
         self.bollingerCheckBox = QtGui.QCheckBox("bollinger",self.optionsFrame)
         self.optionsLayout.addWidget(self.bollingerCheckBox,0,3,1,1)
+        self.indicatorCheckBoxList.append(self.bollingerCheckBox)
 
         self.oscilatorsLabel = QtGui.QLabel('Oscilators:',self.optionsFrame)
         self.optionsLayout.addWidget(self.oscilatorsLabel,1,3,1,1)
         #check box dla wskaźnika momentum
-        self.momentumCheckBox = QtGui.QCheckBox("Momentum",self.optionsFrame)
+        self.momentumCheckBox = QtGui.QRadioButton("momentum",self.optionsFrame)
         self.optionsLayout.addWidget(self.momentumCheckBox,2,3,1,1)
         self.momentumCheckBox.setChecked(True)
+        self.oscilatorCheckBoxList.append(self.momentumCheckBox)
         #check box dla CCI
-        self.cciCheckBox = QtGui.QCheckBox("CCI",self.optionsFrame)
+        self.cciCheckBox = QtGui.QRadioButton("CCI",self.optionsFrame)
         self.optionsLayout.addWidget(self.cciCheckBox,3,3,1,1)
+        self.oscilatorCheckBoxList.append(self.cciCheckBox)
         #check box dla ROC
-        self.rocCheckBox = QtGui.QCheckBox("ROC",self.optionsFrame)
+        self.rocCheckBox = QtGui.QRadioButton("ROC",self.optionsFrame)
         self.optionsLayout.addWidget(self.rocCheckBox,0,4,1,1)
+        self.oscilatorCheckBoxList.append(self.rocCheckBox)
         #check box dla RSI
-        self.rsiCheckBox = QtGui.QCheckBox("RSI",self.optionsFrame)
+        self.rsiCheckBox = QtGui.QRadioButton("RSI",self.optionsFrame)
         self.optionsLayout.addWidget(self.rsiCheckBox,1,4,1,1)
+        self.oscilatorCheckBoxList.append(self.rsiCheckBox)
         #check box dla Williams Oscilator
-        self.williamsCheckBox = QtGui.QCheckBox("williams",
+        self.williamsCheckBox = QtGui.QRadioButton("williams",
                                                          self.optionsFrame)
         self.optionsLayout.addWidget(self.williamsCheckBox,2,4,1,1)
+        self.oscilatorCheckBoxList.append(self.williamsCheckBox)
         
 
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
@@ -90,19 +101,26 @@ class TabA(QtGui.QWidget):
         self.stockListView.clicked.connect(self.selectRowStock)
         self.indexListView.clicked.connect(self.selectRowIndex)
         self.forexListView.clicked.connect(self.selectRowForex)
-        self.chartButton.clicked.connect(self.paintChart)
+        
 
         if self.qModelIndex != None:
             self.paint2Chart()
-        #self.stepComboBox.currentIndexChanged.connect(self.paintChart)
+        self.dateButton.clicked.connect(self.updateDate)
+        self.stepComboBox.currentIndexChanged.connect(self.updateStep)
         self.logRadioButton.toggled.connect(self.updateScale)
         self.chartTypeComboBox.currentIndexChanged.connect(self.updateChartType)
         self.volumenCheckBox.stateChanged.connect(self.updateHideVolumen)
         self.paintCheckBox.stateChanged.connect(self.updateEnablePainting)
-        
+        for box in self.oscilatorCheckBoxList:
+            box.clicked.connect(self.updateOscilator)
+        self.smaCheckBox.stateChanged.connect(self.smaChanged)
+        self.emaCheckBox.stateChanged.connect(self.emaChanged)
+        self.wmaCheckBox.stateChanged.connect(self.wmaChanged)
+        self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
         self.startDateEdit.dateChanged.connect(self.checkDate)
         self.endDateEdit.dateChanged.connect(self.checkDate)
 
+    
         
             
     def selectRowStock(self,i):
@@ -111,9 +129,9 @@ class TabA(QtGui.QWidget):
         self.stockListView.selectRow(i.row())
     def selectRowForex(self,i):
         self.stockListView.selectRow(i.row()) 
-
+    
     def paintChart(self):
-        
+        # update current charty
         pageIndex = self.listsToolBox.currentIndex() #sprawdzamy z jakiej listy korzystamy
         if self.listName != None:
             pageIndex = -1
@@ -122,7 +140,7 @@ class TabA(QtGui.QWidget):
                                   dateStart.day())
         dateEnd = self.endDateEdit.date()     # koniec daty
         end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
-        indicator = []
+        
         if self.smaCheckBox.isChecked():
             indicator.append( "SMA")
         if self.wmaCheckBox.isChecked():
@@ -222,6 +240,7 @@ class TabA(QtGui.QWidget):
         self.oldStart = start
         self.oldEnd = end
         self.oldStep = step
+    
             
     def updateScale(self):
         if self.logRadioButton.isChecked():
@@ -245,17 +264,54 @@ class TabA(QtGui.QWidget):
     def updateChartType(self):
         chartType = self.chartTypeComboBox.currentText()
         if self.chart !=None:
-            if not self.chartsLayout.isEmpty():
-                self.chartsLayout.removeWidget(self.chart)
             self.chart.setMainType(chartType)
+            self.chart.repaint()
+            self.chart.update()
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+    def updateStep(self):
+        if self.chart !=None:
+            dateStart = self.startDateEdit.date()
+            start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
+            dateEnd = self.endDateEdit.date()
+            end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
 
-            self.chartsLayout.addWidget(self.chart)
+            step = self.stepComboBox.currentText()
+            self.finObj.updateArchive(step)
+            self.chart.setData(self.finObj,start,end,step)
+            self.chart.repaint()
+            self.chart.update()
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+    def updateDate(self):
+        if self.chart !=None:
+            dateStart = self.startDateEdit.date()
+            start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
+            dateEnd = self.endDateEdit.date()
+            end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
+            step = self.stepComboBox.currentText()
+            
+            #self.finObj.updateArchive(step)
+            self.chart.setData(self.finObj,start,end,step)
+            self.chart.repaint()
+            self.chart.update()
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+    def updateOscilator(self):
+        if self.chart !=None:
+            for box in self.oscilatorCheckBoxList:
+                if box.isChecked():
+                    self.chart.setOscPlot(str(box.text()))
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
+
 
     def updateHideVolumen(self):
         hideVolumen =self.volumenCheckBox.isChecked()
@@ -274,6 +330,7 @@ class TabA(QtGui.QWidget):
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
+            
     def updateEnablePainting(self):
         painting =self.paintCheckBox.isChecked()
         if self.chart !=None:
@@ -287,6 +344,51 @@ class TabA(QtGui.QWidget):
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
+    def smaChanged(self,state):
+        print state
+        if state == 0:
+            self.indicatorList.remove('SMA')
+        if state == 2:
+            self.indicatorList.append('SMA')
+        if self.indicatorList:
+            self.updateIndicator()
+    def emaChanged(self,state):
+        if state == 0:
+            self.indicatorList.remove('EMA')
+        if state == 2:
+            self.indicatorList.append('EMA')
+        if self.indicatorList:
+            self.updateIndicator()
+    def wmaChanged(self,state):
+        if state == 0:
+            self.indicatorList.remove('WMA')
+        if state == 2:
+            self.indicatorList.append('WMA')
+        if self.indicatorList:
+            self.updateIndicator()
+    def bollingerChanged(self,state):
+        if state == 0:
+            self.indicatorList.remove('bollinger')
+        if state == 2:
+            self.indicatorList.append('bollinger')
+        if self.indicatorList:
+            self.updateIndicator()
+    def updateIndicator(self):
+        if self.chart !=None:
+            self.chart.setMainIndicator(self.indicatorList[-1])
+            self.chart.repaint()
+            self.chart.update()
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+        font = QtGui.QFont()
+        font.setBold(False)
+        for box in self.indicatorCheckBoxList:
+            box.setFont(font)
+        font.setBold(True)
+        #font.setWeight(75)
+        name = self.indicatorList[-1].lower()
+        eval ('self.'+name+'CheckBox.setFont(font)')
             
             
     def checkDate(self):
@@ -320,7 +422,8 @@ class TabA(QtGui.QWidget):
     
         self.chart.setOscPlot(self.settings["oscilator"])
         self.chart.setDrawingMode(self.settings["painting"])
-        self.chart.setMainIndicator(self.settings["indicator"][0])
+        self.chart.setMainIndicator(self.settings["indicator"][-1])
+        
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
@@ -342,12 +445,22 @@ class TabA(QtGui.QWidget):
                                  self.settings["end"].day))
         if "SMA" in self.settings["indicator"]:
             self.smaCheckBox.setChecked(True)
+            self.indicatorList.append('SMA')
         if 'WMA' in self.settings["indicator"]:
             self.wmaCheckBox.setChecked(True)
+            self.indicatorList.append('WMA')
         if 'EMA' in self.settings["indicator"]:
             self.emaCheckBox.setChecked(True)
+            self.indicatorList.append('EMA')
         if 'bollinger' in self.settings["indicator"]:
             self.bollingerCheckBox.setChecked(True)
+            self.indicatorList.append('boolinger')
+
+        font = QtGui.QFont()
+        font.setBold(True)
+        #font.setWeight(75)
+        name = self.settings["indicator"][-1].lower()
+        eval ('self.'+name+'CheckBox.setFont(font)')
             
         if self.settings["oscilator"] == "momentum":
             self.momentumCheckBox.setChecked(True)
