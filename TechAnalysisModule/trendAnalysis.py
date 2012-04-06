@@ -176,6 +176,8 @@ def lookForReversedHeadAndShoulders(values, volumine):
     print "nie znaleziono"
     return 0
     
+print findMaxMin(arange(10))
+    
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)
 #volumin = [[1, 2, 10], [1, 1, 1], [1, 1, 1]]
