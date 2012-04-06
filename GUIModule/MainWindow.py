@@ -1,5 +1,4 @@
 import sys
-import os
 from PyQt4 import QtGui
 from mainGui import GuiMainWindow
 
@@ -20,9 +19,4 @@ if __name__ == '__main__':
     ex = MainWindow()
     ex.show()
     sys.exit(app.exec_())
-    print "ddd"
-    while True:
-        app.processEvents()
-    
-    
     
