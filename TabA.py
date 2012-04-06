@@ -202,8 +202,6 @@ class TabA(QtGui.QWidget):
         self.chart.setMainIndicator(indicator[0])
         self.chart.setScaleType(scale)
         self.chart.setMainType(chartType)
-        print "Bede rysowal wykres"
-        self.chart.drawTrend()
         
         if (self.oldStep != step) or self.oldStart != start or self.oldEnd != end:
             self.finObj.updateArchive(step)
@@ -325,7 +323,7 @@ class TabA(QtGui.QWidget):
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         
-        print "Bede rysowal wykres"
+        print "Bede rysowal wykres1"
         self.chart.drawTrend()
         
         if self.settings["hideVolumen"]:

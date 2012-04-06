@@ -114,6 +114,7 @@ class Chart(FigureCanvas):
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)        
         self.fixTimeLabels()
+
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
@@ -181,7 +182,7 @@ class Chart(FigureCanvas):
         for line in lines:                        
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})        
+            rect.update({'edgecolor':'k','linewidth':0.5})     
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -398,10 +399,23 @@ class Chart(FigureCanvas):
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
-        dataPart, sup, res = trend.getChannelLines(self.data.close)
-        diff = len(self.data.close) - len(dataPart)
-        self.drawTrendLine(dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1], 'g')
-        self.drawTrendLine(dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1], 'r')
+        sup, res = trend.getChannelLines(self.data.close)
+        self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
+        self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
+        trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
+        trend.smartLookForHeadAndShoulders(self.data.close, self.data.volume)
+        
+       # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
+        
+     #   min, mindex = trend.findMinLine(asarray(self.data.close))
+     #   self.drawTrendLine(mindex[0], min[0], mindex[len(min)-1], min[len(sup)-1], 'b', 1.0)
+     #   max, mindex = trend.findMaxLine(asarray(self.data.close))
+     #   self.drawTrendLine(mindex[0], max[0], mindex[len(min)-1], max[len(sup)-1], 'b', 1.0)
+        if len(self.data.close) > 30:
+            sup, res = trend.getChannelLines(self.data.close, 1, 2)
+            self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
+            self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
+        
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,

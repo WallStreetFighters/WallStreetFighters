@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from numpy import *
 from itertools import *
 import matplotlib.dates as mdates
@@ -13,24 +14,17 @@ def regression(values):
     a,b = linalg.lstsq(A,values)[0]
     return a,b
 
-def trend(a):
+def trend(a, trendVuln = trendVul):
     """Na podstawie wskaznika kierunkowego prostej wyznaczamy trend"""
     angle = arctan(a)
     angle = angle*(180.0/pi)
-    if (angle > -trendVul and angle < trendVul):
+    if (angle > -trendVuln and angle < trendVuln):
             return 0 # horyzontalny
-    if (angle > trendVul and angle < 90):
+    if (angle > trendVuln and angle < 90):
             return 1 # rosnacy
-    if (angle <-trendVul and angle > -90):
+    if (angle <-trendVuln and angle > -90):
             return -1 # malejacy
             
-def getChannelLines(array):
-    """Wylicza """
-    if len(array) < 9:
-        return findMaxMin(array, 4)
-    else:
-        return findMaxMin(array[3*len(array)/4:])
-
 def linearFun(array):
     if array.size < 2:
         return 0, 0
@@ -40,6 +34,7 @@ def linearFun(array):
 
 def aInRect(array):
     """Sprawdzamy czy punkty w tablicy naleza do prostej +/- rectVul"""
+    array = asarray(map(lambda x: x[0], array))
     a, b = linearFun(array)
     if a == 0:
         return 0
@@ -58,31 +53,55 @@ def divideArray(array, factor):
         res = res + list([array[i*length:(i+1)*length]])
     return list(res + list([array[length*(factor - 1):]]))
         
+def myMin(array):
+    min = [array[0][0], array[0][1]]
+    for i in range(len(array)):
+        if array[i][0] < min[0]:
+            min = [array[i][0], array[i][1]]
+    return min
+
+def myMax(array):
+    max = [array[0][0], array[0][1]]
+    for i in range(len(array)):
+        if array[i][0] > max[0]:
+            max = [array[i][0], array[i][1]]
+    return max
+
 def findMaxMin(array, factor=div):
     """Znajdujemy linie wsparcia i oporu"""
     z = divideArray(asarray(array), factor)
-    print "tablica podtablic ", z
-    x = asarray(map(lambda x: min(x), z))
-    x2 = asarray(map(lambda x: max(x), z))
-    print x
-    for i in reversed(range(x.size)):
-        print i
+    x = asarray(map(myMin, z))
+    x2 = asarray(map(myMax, z))
+    for i in reversed(range(len(x))):
+#        print i
         y = asarray(list(combinations(x, i+1)))
         z = map(aInRect, y)
         if max(z) == 1:
-            sup = y[z.index(max(z))]
+            sup = y[z.index(1)]
             break
-    for i in reversed(range(x.size)):
-        print i
+    for i in reversed(range(len(x2))):
+#        print i
         y = asarray(list(combinations(x2, i+1)))
         z = map(aInRect, y)
         if max(z) == 1:
-            res = y[z.index(max(z))]
+            res = y[z.index(1)]
             break
-    return array, sup, res    
+    return sup, res    
     
-def headAndShoulders(values, volumine, maxVal, maxVol):
-    print len(values), len(volumine)
+def getChannelLines(array, a = 3, b = 4):
+    """Wylicza """
+    q = map(lambda x, y: [x, y], array, range(len(array)))
+    size = len(array)
+    if size < 9:
+        return findMaxMin(q, 4)
+    else:
+        return findMaxMin(q[a*size/b:])
+
+#a = [random.randint(0, 100) for i in range(160)]
+#print a
+#a = arange(40)
+#print getChannelLines(a)
+def convertValuesToHeadAndShoulders(values, volumine, maxVal, maxVol):
     if len(values) != 3 or len(volumine) != 3:
         return 0
     leftArmVal = list(values[0])
@@ -97,9 +116,31 @@ def headAndShoulders(values, volumine, maxVal, maxVol):
     maxHeadVol = max(headVol)
     maxRightArmVol = max(rightArmVol)
     maxRightArmVal = max(rightArmVal)
+    return headAndShoulders(leftArmVal, headVal, rightArmVal,
+    leftArmVol, headVol, rightArmVol, maxLeftArmVal, maxLeftArmVol, maxHeadVal,
+    maxHeadVol, maxRightArmVol, maxRightArmVal, maxVal, maxVol)
+    
+def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, rightArmVol, maxLeftArmVal, maxLeftArmVol, maxHeadVal,
+    maxHeadVol, maxRightArmVol, maxRightArmVal, maxVal, maxVol):
+    # print "leftArmVal", leftArmVal
+    #   print "headVal", headVal
+    #   print "rightArmVal", rightArmVal
+    #   print "leftArmVol", leftArmVol
+    #   print  "headVol", headVol
+    #   print "rightArmVol", rightArmVol
+    #   print "max left arm val",  maxLeftArmVal
+    #   print "max head val", maxHeadVal
+    #   print "max right arm val", maxRightArmVal
+    #   print "max left arm vol", maxLeftArmVol
+    #   print "max head vol", maxHeadVol
+    #   print "max right arm vol", maxRightArmVol
+    #   print "max val", maxVal
+    #   print "max vol", maxVol
+#    print values, volumine, maxVal, maxVol
     print 'A'
     #Wartosc lewego ramienia < glowy i wartosc wolumenu lewego ramienia ma byc najwieksza
-    if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal or maxLeftArmVol < maxHeadVol or maxLeftArmVol < maxRightArmVol:
+#    if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal or maxLeftArmVol < maxHeadVol or maxLeftArmVol < maxRightArmVol:
+    if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal:
         return 0
     print 'B'
     #wartosc prawego ramienia nie moze zbyt odbiegac od wartosci lewego
@@ -108,28 +149,66 @@ def headAndShoulders(values, volumine, maxVal, maxVol):
     print 'C'
     #wolumin na formacji ma byc malejacy
     a, b = regression(leftArmVol+headVol + rightArmVol)
-    if (trend(a) > -1):
+#    if (trend(a) > -1):
+    if (trend(a) > 0):
         return 0
     print 'D'
     #wykreslamy linie szyi
-    minLeftArmVal = min(leftArmVal[leftArmVal.index(maxLeftArmVal):]) #min z prawej strony max lewego ramienia
-    minHeadVal = min(headVal[headVal.index(maxHeadVal):])
+    minLeftArmVal = min(leftArmVal[list(leftArmVal).index(maxLeftArmVal):]) #min z prawej strony max lewego ramienia
+    minHeadVal = min(headVal[list(headVal).index(maxHeadVal):])
     return (1.0*maxHeadVal/maxVal + 1.0*maxLeftArmVol/maxVol)/2    
 
-def lookForHeadAndShoulders(values, volumine):
+def smartLookForHeadAndShoulders(values, volumine):
     """Szukamy formacji glowy i ramion"""
+    values = asarray(values)
+    volumine = asarray(volumine)
     maxVal = max(values)
     maxVol = max(volumine)
-    val = asarray(list(combinations(divideArray(values, div), 3)))
-    vol = asarray(list(combinations(divideArray(volumine, div), 3)))
-    z = map(lambda x, y: headAndShoulders(val, vol, maxVal, maxVol), val, vol)
+    val = asarray(list(combinations(divideArray(values, 5), 3)))
+    vol = asarray(list(combinations(divideArray(volumine, 5), 3)))
+    z = map(lambda x, y: convertValuesToHeadAndShoulders(val, vol, maxVal, maxVol), val, vol)
     if max(z) > 0:
         return val[z.index(max(z))], vol[z.index(max(z))]
     print "nie znaleziono"
     return 0
+
+def lookForHeadAndShoulders(values, volumine):
+    """Szukamy formacji glowy i ramion"""
+    values = asarray(values)
+    volumine = asarray(volumine)
+    maxVal = max(values)
+    maxVol = max(volumine)
+    val = asarray(divideArray(values, 5))
+    vol = asarray(divideArray(volumine, 5))
+    z = [0 for i in (range(len(val) - 1))]
+    for i in range(len(val) - 3):
+        leftArmVal = val[i]
+        leftArmVol = vol[i]
+        headVal = val[i+1]
+        headVol = vol[i+1]
+        rightArmVal = val[i+2]
+        rightArmVol = vol[i+2]
+        maxLeftArmVal = max(leftArmVal)
+        maxLeftArmVol = max(leftArmVol)
+        maxHeadVal = max(headVal)
+        maxHeadVol = max(headVol)
+        maxRightArmVol = max(rightArmVol)
+        maxRightArmVal = max(rightArmVal)
+        z[i] = headAndShoulders(leftArmVal, headVal, rightArmVal,
+        leftArmVol, headVol, rightArmVol,
+        maxLeftArmVal, maxLeftArmVol, maxHeadVal,
+        maxHeadVol, maxRightArmVol, maxRightArmVal, maxVal, maxVol)
+    
+    if max(z) > 0:
+        print "znaleziono", z
+        return val[z.index(max(z))], vol[z.index(max(z))]
+    print "nie znaleziono"
+    return 0
+
+
     
 def reversedHeadAndShoulders(values, volumine, maxVal, maxVol):
-    print len(values), len(volumine)
+#    print len(values), len(volumine)
     if len(values) != 3 or len(volumine) != 3:
         return 0
     leftArmVal = list(values[0])
@@ -166,6 +245,8 @@ def reversedHeadAndShoulders(values, volumine, maxVal, maxVol):
 
 def lookForReversedHeadAndShoulders(values, volumine):
     """Szukamy odwroconej formacji glowy i ramion"""
+    values = asarray(values)
+    volumine = asarray(volumine)
     minVal = min(values)
     maxVol = max(volumine)
     val = asarray(list(combinations(divideArray(values, div), 3)))
@@ -175,8 +256,101 @@ def lookForReversedHeadAndShoulders(values, volumine):
       return val[z.index(max(z))], vol[z.index(max(z))]
     print "nie znaleziono"
     return 0
+
+
     
 #print findMaxMin(arange(1000))
+
+# Tutaj zaczalem pisac formacje prostokatna
+
+# Przekazujemy tablice z wartosciami i teraz poczynajac od najmniejszej,
+# funkcja szuka linii wsparcia, minimalnie 3 wartosci
+def findMinLine(array):
+    size = array.size
+    arraySorted = sort(array)
+    sizeSorted = arraySorted.size
+    numberOfSimilarValues = 0
+    for i in range(0,sizeSorted):
+        temp = arraySorted[i]
+        for j in range(0,size):
+            if array[j] == temp:
+                numberOfSimilarValues +=1
+        if numberOfSimilarValues <2:
+            numberOfSimilarValues = 0
+        else:
+            z = 0
+            resultTable = zeros(numberOfSimilarValues)
+            indexTable = zeros(numberOfSimilarValues)
+            for k in range(0,size):
+                if array[k] == temp:
+                    resultTable[z] = temp
+                    indexTable[z] = k
+                    z += 1
+            return resultTable,indexTable
+    return 0
+
+# Jak wyzej tylko szuka linii oporu
+def findMaxLine(array):
+    size = array.size
+    arraySorted = sort(a)
+    arraySorted = arraySorted[ : :-1]
+    sizeSorted = arraySorted.size
+    numberOfSimilarValues = 0
+    for i in range(0,sizeSorted):
+        temp = arraySorted[i]
+        for j in range(0,size):
+            if array[j] == temp:
+                numberOfSimilarValues +=1
+        if numberOfSimilarValues <2:
+            numberOfSimilarValues = 0
+        else:
+            z = 0
+            resultTable = zeros(numberOfSimilarValues)
+            indexTable = zeros(numberOfSimilarValues)
+            for k in range(0,size):
+                if array[k] == temp:
+                    resultTable[z] = temp
+                    indexTable[z] = k
+                    z += 1
+            return resultTable,indexTable
+    return array([-1]),array([-1]) 
+    
+    
+    
+    #Glupi sposob ale musze jakos sprawdzic w nizszej funkcji czy w ogole jest formacja
+
+
+# Co jest jeszcze do zrobienia :
+# - Zwiekszenie ilosci punktow wsparcia i oporu, bo narazie znajduje przy 2
+# - Jaka wrazliwosc na odchylenia punkow bo jest poki co zerowa
+# - Chyba powinien szukac formacji na kilku zbiorach
+def findRectFormation(array):
+    resMin,indMin = findMinLine(array)
+    resMax,indMax = findMaxLine(array)
+    if (resMin[0] == -1 or indMin[0] == -1) or (resMax[0] == -1 or indMax[0] == -1):
+        print "Nie odnalazlem formacji prostokata"
+        return 0
+    if indMin.min() > indMax.min():
+        # Wtedy sprawdzamy czy kontynuacja trendu spadkowego
+        globalMin = indMax.min()
+        globalMax = indMin.max()
+        if array[globalMin-1] > array[globalMin] and array[globalMax] > array[globalMax+1]:
+            print "Wykrylem formacje prostokatna trendu spadkowego na indeksach ktore zwracam :"
+            return globalMin,globalMax
+        else:
+            print "Formacja prostokata nie wskazuje na kontynuacje trendu spadkowego"
+            return 0
+    else:
+        # Sprawdzamy czy kontynuacja trendu wzrostowego
+        globalMin = indMin.min()
+        globalMax = indMax.max()
+        if array[globalMin] > array[globalMin-1] and array[globalMax+1] > array[globalMax]:
+            print "Wykrylem formacje prostokatna trendu wzrostowego na indeksach ktore zwracam :"
+            return globalMin,globalMax
+        else:
+            print "Formacja prostokata nie wskazuje na kontynuacje trendu wzrostowego"
+            return 0
+        
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)
