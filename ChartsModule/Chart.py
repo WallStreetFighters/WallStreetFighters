@@ -77,6 +77,7 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.updateOscPlot()        
         self.draw()
+        self.drawTrend()
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
