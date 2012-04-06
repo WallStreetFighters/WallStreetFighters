@@ -41,7 +41,7 @@ class Chart(FigureCanvas):
     #wysokość wolumenu i wykresu oscylatora
     volHeight, oscHeight = 0.1, 0.15        
     
-    def __init__(self, parent, finObj=None, width=8, height=6, dpi=100):
+    def __init__(self, parent, finObj, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
         dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
         self.setData(finObj)
@@ -59,9 +59,7 @@ class Chart(FigureCanvas):
            
     def setData(self, finObj, start=None, end=None, step='daily'):
         """Ustawiamy model danych, który ma reprezentować wykres. Następnie
-        konieczne jest jego ponowne odrysowanie"""
-        if(finObj==None):
-            return;
+        konieczne jest jego ponowne odrysowanie"""        
         self.data=ChartData(finObj, start, end, step)
         if(self.mainPlot!=None):
             self.updatePlot()
@@ -75,8 +73,13 @@ class Chart(FigureCanvas):
         """Odświeża wszystkie wykresy"""
         self.updateMainPlot()
         self.updateVolumeBars()
+<<<<<<< HEAD
+        self.updateOscPlot()
+        self.draw()        
+=======
         self.updateOscPlot()        
         self.draw()
+>>>>>>> chart
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -85,7 +88,7 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
     
     def updateMainPlot(self):
-        if(self.mainPlot==None or self.data==None or self.data.corrupted):
+        if(self.mainPlot==None or self.data.corrupted):
             return
         ax=self.mainPlot                
         ax.clear()  
@@ -145,7 +148,7 @@ class Chart(FigureCanvas):
         
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""                
-        if self.data==None or self.data.corrupted:
+        if self.data.corrupted:
             return
         ax=self.volumeBars
         ax.clear()
@@ -164,7 +167,7 @@ class Chart(FigureCanvas):
         time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
-        if self.data==None or self.data.corrupted:
+        if self.data.corrupted:
             return                        
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7,colorup='w',colordown='k')                
@@ -189,7 +192,7 @@ class Chart(FigureCanvas):
     
     def updateMainIndicator(self):
         """Odrysowuje wskaźnik na głównym wykresie"""
-        if self.data==None or self.data.corrupted:
+        if self.data.corrupted:
             return
         ax=self.mainPlot
         type=self.mainIndicator
@@ -397,10 +400,9 @@ class Chart(FigureCanvas):
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
-        dataPart, sup, res = trend.getChannelLines(self.data.close)
-        diff = len(self.data.close) - len(dataPart)
-        self.drawTrendLine(dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1], 'g')
-        self.drawTrendLine(dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1], 'r')
+        sup, res = trend.getChannelLines(self.data.close)
+        self.drawTrendLine(self.data.close.index(sup[0]), sup[0], self.data.close.index(sup[len(sup)-1]), sup[len(sup)-1], 'g')
+        self.drawTrendLine(self.data.close.index(res[0]), res[0], self.data.close.index(res[len(res)-1]), res[len(res)-1], 'r')
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,

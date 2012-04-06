@@ -107,7 +107,7 @@ class GuiMainWindow(object):
     def newForexTab(self,qModelIndex):
         self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
                           qModelIndex,self.settings(),"forex",False)
-        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStrigList()
+        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
 
     def settings(self):
