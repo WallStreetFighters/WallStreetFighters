@@ -56,7 +56,7 @@ def divideArray(array, factor):
     res = []
     for i in range(factor - 1):
         res = res + list([array[i*length:(i+1)*length]])
-    return asarray(res + list([array[length*(factor - 1):]]))
+    return list(res + list([array[length*(factor - 1):]]))
         
 def findMaxMin(array, factor=div):
     """Znajdujemy linie wsparcia i oporu"""
