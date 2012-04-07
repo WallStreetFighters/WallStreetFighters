@@ -630,4 +630,17 @@ def loadHistory():
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
 ########################################################################################################
 
+url = "http://finance.yahoo.com/actives?e=us"
+try:
+	site = urllib2.urlopen(url)
+except urllib2.URLError, ex:
+	print "Something wrong happend! Check your internet connection!"
+pageSource = site.read()
+pattern = '[A-Z]+">([A-Z]+)</a></b>.*>([0-9,]+)</span></td>'
+pattern = re.compile(pattern)
+for m in re.finditer(pattern,pageSource):
+	print m.group(1)+' '+m.group(2)
+
+
+
 
