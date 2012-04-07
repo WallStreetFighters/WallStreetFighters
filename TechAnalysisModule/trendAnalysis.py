@@ -24,14 +24,12 @@ def trend(a):
     if (angle <-trendVul and angle > -90):
             return -1 # malejacy
             
-def getChannelLines(y):
+def getChannelLines(array):
     """Wylicza """
-    size = len(y)
-    z = y[3*size/4:]
-    if size >= 8:
-        return findMaxMin(z)
+    if len(array) < 9:
+        return findMaxMin(array, 4)
     else:
-        return findMaxMin(y, 3)
+        return findMaxMin(array[3*len(array)/4:])
 
 def linearFun(array):
     if array.size < 2:
@@ -63,7 +61,7 @@ def divideArray(array, factor):
 def findMaxMin(array, factor=div):
     """Znajdujemy linie wsparcia i oporu"""
     z = divideArray(asarray(array), factor)
-    print z
+    print "tablica podtablic ", z
     x = asarray(map(lambda x: min(x), z))
     x2 = asarray(map(lambda x: max(x), z))
     print x
@@ -177,9 +175,7 @@ def lookForReversedHeadAndShoulders(values, volumine):
       return val[z.index(max(z))], vol[z.index(max(z))]
     print "nie znaleziono"
     return 0
-
-#a,b,c = getChannelLines(arange(100))    
-#print a, b, c
+    
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)
 #volumin = [[1, 2, 10], [1, 1, 1], [1, 1, 1]]

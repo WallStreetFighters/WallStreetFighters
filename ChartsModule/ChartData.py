@@ -20,13 +20,13 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
-        #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
+	self.fullArray=finObj.getArray(step)
         if(start==None):
-            start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
+            start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
-            end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
+            end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -36,8 +36,7 @@ class ChartData:
         for date in dataArray['date']:
             self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
         if(compare==False):                        
-            #potrzebujemy pełnej tabeli do obliczania wskaźników
-            self.fullArray=finObj.getArray(step)[::-1]                        
+            #potrzebujemy pełnej tabeli do obliczania wskaźników                      
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
@@ -48,13 +47,14 @@ class ChartData:
                 return
             #dane w formacie dla candlesticka
             self.quotes=[]
+	    a = datetime.datetime.now()
             for i in range(len(dataArray)):
                 time=float(i)
-                open=self.open[i]
+                open=self.open[i] 
                 close=self.close[i]
                 high=self.high[i]
                 low=self.low[i]
-                self.quotes.append((time, open, close, high, low))                    
+                self.quotes.append((time, open, close, high, low))               
         else:
             self.percentChng=[]
             firstValue=self.close[0]
@@ -150,3 +150,22 @@ class ChartData:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
     
+    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
+    """
+    def TRIN(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        advVol=self.advDecArray['advv']
+        decVol=self.advDecArray['decv']
+        return indicators.TRIN(advances, declines, advVol, decVol)
+    
+    def mcClellan(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.mcClellanOscillator(advances,declines)
+    
+    def adLine(self):
+        advances=self.advDecArray['adv']
+        declines=self.advDecArray['dec']
+        return indicators.adLine(advances,declines)
+    """
