@@ -24,13 +24,19 @@ def trend(a, trendVuln = trendVul):
             return 1 # rosnacy
     if (angle <-trendVuln and angle > -90):
             return -1 # malejacy
-            
+
+def linearFun(x1, y1, x2, y2):
+    a = (y2 - y1)*1.0/(x2 - x1)
+    b = y1 - a*x1
+    return a,b
+
+def evalueteFun(a, b, x):
+    return a*x + b
+
 def linearFun(array):
     if array.size < 2:
         return 0, 0
-    a = (array[1]-array[0])*1.0
-    b = array[0]
-    return a,b
+    return linearFun(0, array[0], 1, array[1])
 
 def aInRect(array):
     """Sprawdzamy czy punkty w tablicy naleza do prostej +/- rectVul"""
@@ -140,22 +146,41 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
     print 'A'
     #Wartosc lewego ramienia < glowy i wartosc wolumenu lewego ramienia ma byc najwieksza
 #    if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal or maxLeftArmVol < maxHeadVol or maxLeftArmVol < maxRightArmVol:
-    if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal:
+    if maxLeftArmVal > maxHeadVal  or maxRightArmVal > maxHeadVal or maxHeadVol > maxLeftArmVol or maxHeadVol > maxRightArmVol:
         return 0
     print 'B'
     #wartosc prawego ramienia nie moze zbyt odbiegac od wartosci lewego
     if maxRightArmVal > 1.2 * maxLeftArmVal or maxRightArmVal < 0.8*maxLeftArmVal:
         return 0
     print 'C'
-    #wolumin na formacji ma byc malejacy
+    #wolumin na formacji ma byc malejacy, a conajmniej nie rosnacy
     a, b = regression(leftArmVol+headVol + rightArmVol)
 #    if (trend(a) > -1):
+    trend = trend(a)
     if (trend(a) > 0):
         return 0
+    result = (1.0*maxHeadVal/maxVal + 1.0*maxLeftArmVol/maxVol)/2.0
+    if trend > -1:
+        result = result * 0.8
     print 'D'
     #wykreslamy linie szyi
-    minLeftArmVal = min(leftArmVal[list(leftArmVal).index(maxLeftArmVal):]) #min z prawej strony max lewego ramienia
-    minHeadVal = min(headVal[list(headVal).index(maxHeadVal):])
+    leftArmVal = list(leftArmVal)
+    rightArmVal = list(rightArmVal)
+    minLeftArmVal = min(leftArmVal[leftArmVal.index(maxLeftArmVal):]) #min z prawej strony max lewego ramienia
+    rightArmPeek = rightArmVal.index(maxRightArmVal)
+    minRightArmVal = min(rightArmVal[0:rightArmPeek])                       #min z lewej strony max prawego ramienia
+    maxRightArmVol = max(rightArmVal[rightArmPeek:])                        #max wolumin z prawej strony max wartosci ramienia
+    #sprawdzamy czy linia szyi zostala przelamana przy wyzszym wolumenie
+    rightArmValMin = min(rightArmVal[rightArmPeek:])
+    print 'E'
+    if rightArmValMin > minRightArmVal:
+        return 0
+    a, b = linearFun(leftArmVal.index(minLeftArmVal), minLeftArmVal,
+            rightArmVal.index(minRightArmVal) + len(headVal), minRightArmVal)
+    average = sum(rightArmVol)
+    if (rightArmValMin >= evaluateFun(a, b, leftArmVal.index(rightArmValMin)) and ):
+        return 0
+    
     return (1.0*maxHeadVal/maxVal + 1.0*maxLeftArmVol/maxVol)/2    
 
 def smartLookForHeadAndShoulders(values, volumine):
