@@ -155,8 +155,9 @@ def tabUi(self,showLists=True):
         self.endDateEdit.setCalendarWidget(Calendar())
         self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-5))
         self.endDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
-
         self.optionsLayout.addWidget(self.endDateEdit,2,0,1,1)
+        self.dateButton = QtGui.QPushButton('Ok',self.optionsFrame)
+        self.optionsLayout.addWidget(self.dateButton,3,0,1,1)
         #koniec pola do wprowadzania okresu
 	self.verticalLayout.addWidget(self.optionsFrame)
         

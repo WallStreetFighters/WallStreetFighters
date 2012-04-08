@@ -126,7 +126,7 @@ class GuiMainWindow(object):
             indicator.append("EMA")
         if self.tabA.bollingerCheckBox.isChecked():
             indicator.append("bollinger")
-        oscilator = 'momentum'
+        oscilator = ''
         if self.tabA.momentumCheckBox.isChecked():
             oscilator = "momentum"
         elif self.tabA.cciCheckBox.isChecked():
