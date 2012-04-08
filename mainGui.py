@@ -55,7 +55,8 @@ class GuiMainWindow(object):
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
         self.tabA.bondListView.doubleClicked.connect(self.newBondTab)
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
-        
+        self.rssWidget = RSSgui.RSSWidget(self.tabA)
+        self.tabA.chartsLayout.addWidget(self.rssWidget)
         self.tabA.compareButton.clicked.connect(self.compare)
 
         
@@ -79,12 +80,6 @@ class GuiMainWindow(object):
         
         Koniec tabC"""
         
-        """ Rss tab"""
-        self.RSSTab = QtGui.QWidget()
-        self.tabs.addTab(self.RSSTab,"RSS")
-        self.rssWidget = RSSgui.RSSWidget(self.RSSTab)
-        self.verticalLayout2 = QtGui.QVBoxLayout(self.RSSTab)
-        self.verticalLayout2.addWidget(self.rssWidget)
     
 	""" koniec ustawiania Zakładek"""
 
