@@ -19,7 +19,9 @@ FOREX_LIST = []
 RESOURCE_LIST = []
 BOND_LIST = []
 HISTORY_LIST = []
-
+TOP_VOLUME = []
+TOP_GAINERS = []
+TOP_LOSERS = []
 AMEX_HIST = []
 NYSE_HIST = []
 NASDAQ_HIST = []
@@ -628,18 +630,65 @@ def loadHistory():
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
-########################################################################################################
 
-url = "http://finance.yahoo.com/actives?e=us"
-try:
-	site = urllib2.urlopen(url)
-except urllib2.URLError, ex:
-	print "Something wrong happend! Check your internet connection!"
-pageSource = site.read()
-pattern = '[A-Z]+">([A-Z]+)</a></b>.*>([0-9,]+)</span></td>'
-pattern = re.compile(pattern)
-for m in re.finditer(pattern,pageSource):
-	print m.group(1)+' '+m.group(2)
+def top5Volume():
+	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
+	global TOP_VOLUME
+	TOP_VOLUME = []
+	url = "http://finance.yahoo.com/actives?e=us"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
+	pattern = re.compile(pattern)
+	i = 0
+	for m in re.finditer(pattern,pageSource):
+		if i < 5:
+			TOP_VOLUME.append([m.group(1),m.group(2)])
+			i += 1
+
+def top5Gainers():
+	"""Funkcja zwracajaca listę 5 spółek o najwiekszym wzroscie"""
+	global TOP_GAINERS
+	TOP_GAINERS = []
+	url = "http://finance.yahoo.com/gainers?e=us"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> \(([0-9.]*)%\)</b>'
+	pattern = re.compile(pattern)
+	i = 0
+	for m in re.finditer(pattern,pageSource):
+		if i < 5:
+			TOP_GAINERS.append([m.group(1),m.group(2)])
+			i += 1
+
+
+def top5Losers():
+	"""Funkcja zwracajaca listę 5 spółek o najwiekszym spadku"""
+	global TOP_LOSERS
+	TOP_LOSERS = []
+	url = "http://finance.yahoo.com/losers?e=us"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> \(([0-9.-]*)%\)</b>'
+	pattern = re.compile(pattern)
+	i = 0
+	for m in re.finditer(pattern,pageSource):
+		if i < 5:
+			TOP_LOSERS.append([m.group(1),m.group(2)])
+			i += 1
+
+
+
+########################################################################################################
 
 
 
