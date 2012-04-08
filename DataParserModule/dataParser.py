@@ -411,7 +411,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 	if timePeriod == 'daily':
 		for row in dataCsv:
 			try:
-				if financialType == 'forex':
+				if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
 					dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 				else:
 					date = parserStringToDate(row[0])
@@ -421,7 +421,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 				pass
 	elif timePeriod == 'weekly':
 		for row in dataCsv:
-			if financialType == 'forex':
+			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
 				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 			else:
 				date = parserStringToDate(row[0])
@@ -429,7 +429,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 			finObj.valuesWeekly = finObj.valuesWeekly + dataRow
 	elif timePeriod == 'monthly':
 		for row in dataCsv:	
-			if financialType == 'forex':
+			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
 				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 			else:
 				date = parserStringToDate(row[0])
@@ -686,6 +686,11 @@ def top5Losers():
 			TOP_LOSERS.append([m.group(1),m.group(2)])
 			i += 1
 
+def loadStats():
+	"""Funkcja zwracajaca pobierajaca do globalnych tabel statystyki (5 najwiekszych spadkow/wzrostow/wolumenow)"""
+	top5Losers()
+	top5Volume()
+	top5Gainers()
 
 
 ########################################################################################################
