@@ -228,23 +228,23 @@ class Chart(FigureCanvas):
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
-        """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
-        self.oscType=type                
-        if self.oscPlot==None:
-            oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
-            self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
-        self.updateOscPlot()
-        self.oscPlot.set_visible(True)
-        self.fixPositions()
-        self.fixTimeLabels()
-    
-    def rmOscPlot(self):
-        """Ukrywa wykres oscylatora"""
-        if self.oscPlot==None:
-            return
-        self.oscPlot.set_visible(False)        
-        self.fixPositions()                            
-        self.fixTimeLabels()
+        """Dodaje pod głównym wykresem wykres oscylatora danego typu lub ukrywa"""
+        if type not in ['momentum','CCI','RSI','ROC','williams']:
+            """Ukrywa wykres oscylatora"""
+            if self.oscPlot==None:
+                return
+            self.oscPlot.set_visible(False)        
+            self.fixPositions()                            
+            self.fixTimeLabels()
+        else:
+            self.oscType=type                
+            if self.oscPlot==None:
+                oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
+                self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
+            self.updateOscPlot()
+            self.oscPlot.set_visible(True)
+            self.fixPositions()
+            self.fixTimeLabels()                
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
