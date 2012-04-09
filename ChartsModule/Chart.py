@@ -33,6 +33,7 @@ class Chart(FigureCanvas):
     drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
     
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
+    grid = True #czy rysujemy grida
     
     num_ticks = 8 #tyle jest etykiet pod wykresem
     
@@ -65,7 +66,12 @@ class Chart(FigureCanvas):
         self.data=ChartData(finObj, start, end, step)
         if(self.mainPlot!=None):
             self.updatePlot()
-        
+    
+    def setGrid(self, grid):
+        """Włącza (True) lub wyłącza (False) rysowanie grida"""
+        self.grid=grid
+        self.updateMainPlot()
+            
     def setMainType(self, type):
         """Ustawiamy typ głównego wykresu ('point','line','candlestick','none')"""
         self.mainType=type
@@ -103,10 +109,14 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.9*min(self.data.low),1.1*max(self.data.high))
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))
         if(self.scaleType=='log'):            
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label2On=True
+            if(self.grid):
+                tick.gridOn=True        
         for label in (ax.get_yticklabels() + ax.get_yminorticklabels()):
             label.set_size(8)
         #legenda
@@ -114,7 +124,10 @@ class Chart(FigureCanvas):
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)        
         self.fixTimeLabels()
-
+        if(self.grid):
+            for tick in ax.xaxis.get_major_ticks():
+                # print tick.get_loc()
+                tick.gridOn=True
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
@@ -148,14 +161,15 @@ class Chart(FigureCanvas):
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""                
         if self.data==None or self.data.corrupted:
-            return
+            return        
         ax=self.volumeBars
         ax.clear()
         x=range(len(self.data.close))
         ax.vlines(x,0,self.data.volume)
         for label in self.volumeBars.get_yticklabels():
-            label.set_visible(False)
+            label.set_visible(False)            
         ax.set_xlim(x[0],x[-1])
+        ax.set_ylim(0,1.2*max(self.data.volume))
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -388,9 +402,9 @@ class Chart(FigureCanvas):
                 self.drawLine(self.x0,self.y0,x1,y1)                
                 self.x0, self.y0 = None,None
                 
-    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0):
+    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0, lstyle = '--'):
           """Rysuje linie trendu opcja wyboru koloru i grubosci linii """
-          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle='--', color=colour)                
+          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=colour)                
           self.mainPlot.add_line(newLine)
           self.additionalLines.append(newLine)
           newLine.figure.draw_artist(newLine)                                        
@@ -402,8 +416,13 @@ class Chart(FigureCanvas):
         sup, res = trend.getChannelLines(self.data.close)
         self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
         self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
-        trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
-        trend.smartLookForHeadAndShoulders(self.data.close, self.data.volume)
+        neckLine = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
+        
+        neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
         
        # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         
