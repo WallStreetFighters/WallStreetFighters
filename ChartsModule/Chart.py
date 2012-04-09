@@ -79,6 +79,7 @@ class Chart(FigureCanvas):
         
     def updatePlot(self):
         """Odświeża wszystkie wykresy"""
+        print 'szerokość: ', self.fig.get_figwidth()*self.fig.get_dpi()*self.maxSize
         self.updateMainPlot()
         self.updateVolumeBars()
         self.updateOscPlot()        
