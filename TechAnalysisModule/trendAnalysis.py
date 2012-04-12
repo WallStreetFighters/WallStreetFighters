@@ -28,8 +28,10 @@ def trend(a):
             
 def getChannelLines(array):
     """Wylicza """
-    y = asarray(array)
-    return findMaxMin(y[3*y.size/4:])
+    if len(array) < 9:
+        return findMaxMin(array, 4)
+    else:
+        return findMaxMin(array[3*len(array)/4:])
 
 def linearFun(array):
     if array.size < 2:
@@ -58,15 +60,16 @@ def aInRect(array):
 def divideArray(array, factor):
     """Dzielimy tablice na #factor tablic, kazda podtablica ma tyle samo elem oprocz ostatniej"""
     factor = min(factor, len(array))
-    length = ceil(len(array)*1.0/factor)
+    length = floor(len(array)*1.0/factor)
     res = []
     for i in range(factor - 1):
         res = res + list([array[i*length:(i+1)*length]])
-    return asarray(res + list([array[length*(factor - 1):]]))
+    return list(res + list([array[length*(factor - 1):]]))
         
-def findMaxMin(array):
+def findMaxMin(array, factor=div):
     """Znajdujemy linie wsparcia i oporu"""
-    z = divideArray(array, div)
+    z = divideArray(asarray(array), factor)
+    print "tablica podtablic ", z
     x = asarray(map(lambda x: min(x), z))
     x2 = asarray(map(lambda x: max(x), z))
     print x
@@ -84,7 +87,7 @@ def findMaxMin(array):
         if max(z) == 1:
             res = y[z.index(max(z))]
             break
-    return sup, res    
+    return array, sup, res    
     
 def headAndShoulders(values, volumine, maxVal, maxVol):
     print len(values), len(volumine)
@@ -204,6 +207,8 @@ def findWedge(values):
     
     
     
+    
+print findMaxMin(arange(10))
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)

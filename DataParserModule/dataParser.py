@@ -169,11 +169,13 @@ class FinancialObject(object):
 			
 	def getIndex(self, begin, end, time = 'daily'):
 		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
-		
 		if begin > end:
 			return
 		if time == 'daily':
+			if end < self.valuesDaily[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			size = len(self.valuesDaily)
+			
 			if begin < self.valuesDaily[0][0]:
 				start = 1
 			else:
@@ -182,7 +184,7 @@ class FinancialObject(object):
 					start += 1
 			
 			if end > self.valuesDaily[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesDaily[finish][0]):
@@ -190,15 +192,17 @@ class FinancialObject(object):
 			return [start-1,finish+1]
 		if time == 'weekly':
 			size = len(self.valuesWeekly)
+			if end < self.valuesWeekly[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			if begin < self.valuesWeekly[0][0]:
 				start = 1
 			else:
 				start = 0
 				while (begin > self.valuesWeekly[start][0]):
 					start += 1
-			
+		
 			if end > self.valuesWeekly[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesWeekly[finish][0]):
@@ -206,6 +210,8 @@ class FinancialObject(object):
 			return [start-1,finish+1]
 		if time == 'monthly':
 			size = len(self.valuesMonthly)
+			if end < self.valuesMonthly[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			if begin < self.valuesMonthly[0][0]:
 				start = 1
 			else:
@@ -214,13 +220,19 @@ class FinancialObject(object):
 					start += 1
 			
 			if end > self.valuesMonthly[size-1][0]:
-				end = size-2
+				finish = size-2
 			else:
 				finish = start
 				while (end > self.valuesMonthly[finish][0]):
 					finish += 1
 			return [start-1,finish+1]
 #koniec definicji klasy
+
+class DataAPIException(Exception):
+	def __init__(self,value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
 
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
@@ -397,7 +409,6 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 	if timePeriod == 'daily':
 		for row in dataCsv:
 			try:
-				print row
 				if financialType == 'forex':
 					dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 				else:

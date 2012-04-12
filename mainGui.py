@@ -38,14 +38,25 @@ class GuiMainWindow(object):
         self.stockModel = self.ListModel(list=dataParser.STOCK_LIST)
         # inicjujemy model danych dla Forex
         self.forexModel = self.ListModel(list=dataParser.FOREX_LIST)
+        # inicjujemy model danych dla Resources
+        self.resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
+        # inicjujemy model danych dla Bond
+        self.bondModel = self.ListModel(list=dataParser.BOND_LIST)
+        
+
+
 
         """tab A wskaźniki i oscylatory"""
-	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel)
+	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,)
         self.tabs.addTab(self.tabA,"tabA")
         
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
         self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
+        self.tabA.bondListView.doubleClicked.connect(self.newBondTab)
+        self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
+        
+        self.tabA.compareButton.clicked.connect(self.compare)
 
         
         """koniec tab A """
@@ -91,24 +102,58 @@ class GuiMainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)        
         
-
+    def compare(self):
+        pageIndex = self.tabA.listsToolBox.currentIndex()
+        if pageIndex == 0:
+            qModelIndex = self.tabA.indexListView.selectedIndexes()
+            qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
+            self.newIndexTab(qModelIndex,"Indices' comparison")
+        if pageIndex == 1:
+            qModelIndex = self.tabA.stockListView.selectedIndexes()
+            qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
+            self.newStockTab(qModelIndex,"Stocks' comparison")
+        if pageIndex == 2:
+            qModelIndex = self.tabA.forexListView.selectedIndexes()
+            qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
+            self.newForexTab(qModelIndex,"Forex comparison")
+        if pageIndex == 3:
+            qModelIndex = self.tabA.bondListView.selectedIndexes()
+            qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
+            self.newBondTab(qModelIndex,"Bonds' comparison")
+        if pageIndex == 4:
+            qModelIndex = self.tabA.resourceListView.selectedIndexes()
+            qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
+            self.newResourceTab(qModelIndex,"Resources' comparison")
+        
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
-    def newIndexTab(self,qModelIndex):
-        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
-                          qModelIndex,self.settings(),"index",False)
-        nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
-        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
+    def newIndexTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "index",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newStockTab(self,qModelIndex):
-        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
-                          qModelIndex,self.settings(),"stock",False)
-        tupleStock = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
-        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,tupleStock[0]))
-    def newForexTab(self,qModelIndex):
-        self.tabA1 = TabA(self.indexModel,self.stockModel,self.forexModel,
-                          qModelIndex,self.settings(),"forex",False)
-        nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()
-        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab[0]))
+    def newStockTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "stock",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+    def newForexTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "forex",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+
+    def newBondTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "bond",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.bondListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+
+    def newResourceTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "resource",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA
@@ -126,7 +171,7 @@ class GuiMainWindow(object):
             indicator.append("EMA")
         if self.tabA.bollingerCheckBox.isChecked():
             indicator.append("bollinger")
-        oscilator = 'momentum'
+        oscilator = ''
         if self.tabA.momentumCheckBox.isChecked():
             oscilator = "momentum"
         elif self.tabA.cciCheckBox.isChecked():

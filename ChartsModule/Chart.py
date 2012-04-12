@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.ticker import *
+from matplotlib.textpath import TextPath
 from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
@@ -33,8 +34,7 @@ class Chart(FigureCanvas):
     drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
     
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
-    
-    num_ticks = 8 #tyle jest etykiet pod wykresem
+    grid = True #czy rysujemy grida        
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.1, 0.8     
@@ -65,14 +65,19 @@ class Chart(FigureCanvas):
         self.data=ChartData(finObj, start, end, step)
         if(self.mainPlot!=None):
             self.updatePlot()
-        
+    
+    def setGrid(self, grid):
+        """Włącza (True) lub wyłącza (False) rysowanie grida"""
+        self.grid=grid
+        self.updateMainPlot()
+            
     def setMainType(self, type):
         """Ustawiamy typ głównego wykresu ('point','line','candlestick','none')"""
         self.mainType=type
         self.updateMainPlot()
         
     def updatePlot(self):
-        """Odświeża wszystkie wykresy"""
+        """Odświeża wszystkie wykresy"""        
         self.updateMainPlot()
         self.updateVolumeBars()
         self.updateOscPlot()        
@@ -102,10 +107,14 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.9*min(self.data.low),1.1*max(self.data.high))
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))
         if(self.scaleType=='log'):            
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label2On=True
+            if(self.grid):
+                tick.gridOn=True        
         for label in (ax.get_yticklabels() + ax.get_yminorticklabels()):
             label.set_size(8)
         #legenda
@@ -113,6 +122,10 @@ class Chart(FigureCanvas):
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)        
         self.fixTimeLabels()
+        if(self.grid):
+            for tick in ax.xaxis.get_major_ticks():
+                print tick.get_loc()
+                tick.gridOn=True
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
@@ -146,14 +159,15 @@ class Chart(FigureCanvas):
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""                
         if self.data==None or self.data.corrupted:
-            return
+            return        
         ax=self.volumeBars
         ax.clear()
         x=range(len(self.data.close))
         ax.vlines(x,0,self.data.volume)
         for label in self.volumeBars.get_yticklabels():
-            label.set_visible(False)
+            label.set_visible(False)            
         ax.set_xlim(x[0],x[-1])
+        ax.set_ylim(0,1.2*max(self.data.volume))
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -213,23 +227,23 @@ class Chart(FigureCanvas):
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
-        """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
-        self.oscType=type                
-        if self.oscPlot==None:
-            oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
-            self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
-        self.updateOscPlot()
-        self.oscPlot.set_visible(True)
-        self.fixPositions()
-        self.fixTimeLabels()
-    
-    def rmOscPlot(self):
-        """Ukrywa wykres oscylatora"""
-        if self.oscPlot==None:
-            return
-        self.oscPlot.set_visible(False)        
-        self.fixPositions()                            
-        self.fixTimeLabels()
+        """Dodaje pod głównym wykresem wykres oscylatora danego typu lub ukrywa"""
+        if type not in ['momentum','CCI','RSI','ROC','williams']:
+            """Ukrywa wykres oscylatora"""
+            if self.oscPlot==None:
+                return
+            self.oscPlot.set_visible(False)        
+            self.fixPositions()                            
+            self.fixTimeLabels()
+        else:
+            self.oscType=type                
+            if self.oscPlot==None:
+                oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
+                self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
+            self.updateOscPlot()
+            self.oscPlot.set_visible(True)
+            self.fixPositions()
+            self.fixTimeLabels()                
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
@@ -286,9 +300,14 @@ class Chart(FigureCanvas):
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu."""
+        chartWidth=int(self.fig.get_figwidth()*self.fig.get_dpi()*self.maxSize)        
+        t = TextPath((0,0), '9999-99-99', size=7)
+        labelWidth = int(t.get_extents().width)    
+        num_ticks=chartWidth/labelWidth/2  
+        print chartWidth, labelWidth, num_ticks
         length=len(self.data.date)
-        if(length>self.num_ticks):
-            step=length/self.num_ticks        
+        if(length>num_ticks):
+            step=length/num_ticks        
         else:
             step=1
         x=range(0,length,step)
@@ -397,9 +416,10 @@ class Chart(FigureCanvas):
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
-        sup, res = trend.getChannelLines(self.data.close)
-        self.drawTrendLine(self.data.close.index(sup[0]), sup[0], self.data.close.index(sup[len(sup)-1]), sup[len(sup)-1], 'g')
-        self.drawTrendLine(self.data.close.index(res[0]), res[0], self.data.close.index(res[len(res)-1]), res[len(res)-1], 'r')
+        dataPart, sup, res = trend.getChannelLines(self.data.close)
+        diff = len(self.data.close) - len(dataPart)
+        self.drawTrendLine(dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1], 'g')
+        self.drawTrendLine(dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1], 'r')
             
 def getBoundsAsRect(axes):
     """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,

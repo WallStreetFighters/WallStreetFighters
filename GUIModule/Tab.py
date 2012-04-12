@@ -36,7 +36,7 @@ def tabUi(self,showLists=True):
         self.indexListView = QtGui.QTableView(self.listsFrame)
         self.indexListView.setAlternatingRowColors(True)
         self.indexListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.indexListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.indexListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         tableStyle(self,self.indexListView) #ustawiamy styl tabeli
         self.indexPageLayout.addWidget(self.indexListView)
         
@@ -48,7 +48,7 @@ def tabUi(self,showLists=True):
         self.stockListView = QtGui.QTableView(self.listsFrame)
         self.stockListView.setAlternatingRowColors(True)
         self.stockListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.stockListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.stockListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         tableStyle(self,self.stockListView)#ustawiamy styl tabeli
         self.stockPageLayout.addWidget(self.stockListView)
 
@@ -59,7 +59,7 @@ def tabUi(self,showLists=True):
         self.forexListView = QtGui.QTableView(self.listsFrame)
         self.forexListView.setAlternatingRowColors(True)
         self.forexListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.forexListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.forexListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         tableStyle(self,self.forexListView)#ustawiamy styl tabeli
         self.forexPageLayout.addWidget(self.forexListView)
 
@@ -75,16 +75,16 @@ def tabUi(self,showLists=True):
         self.bondPageLayout.addWidget(self.bondListView)
 
 
-        #Commodity
-        self.commodityPage = QtGui.QWidget(self.listsFrame)
-        self.commodityPageLayout = QtGui.QHBoxLayout(self.commodityPage)
-        self.listsToolBox.addItem(self.commodityPage, "Commodity")
-        self.commodityListView = QtGui.QTableView(self.listsFrame)
-        self.commodityListView.setAlternatingRowColors(True)
-        self.commodityListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.commodityListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        tableStyle(self,self.commodityListView)
-        self.commodityPageLayout.addWidget(self.commodityListView)
+        #Resource
+        self.resourcePage = QtGui.QWidget(self.listsFrame)
+        self.resourcePageLayout = QtGui.QHBoxLayout(self.resourcePage)
+        self.listsToolBox.addItem(self.resourcePage, "Resource")
+        self.resourceListView = QtGui.QTableView(self.listsFrame)
+        self.resourceListView.setAlternatingRowColors(True)
+        self.resourceListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.resourceListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        tableStyle(self,self.resourceListView)
+        self.resourcePageLayout.addWidget(self.resourceListView)
 
         #Futures contract
         self.futuresContractPage = QtGui.QWidget(self.listsFrame)
@@ -134,7 +134,7 @@ def tabUi(self,showLists=True):
         """Ramka przechowujaca opcje"""
         self.optionsFrame = QtGui.QFrame(self)
         # ustawimy maksymalna wysokosc na 120
-        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 120))
+        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 130))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.optionsFrame.setLineWidth(3)
@@ -155,8 +155,9 @@ def tabUi(self,showLists=True):
         self.endDateEdit.setCalendarWidget(Calendar())
         self.endDateEdit.setDate(QtCore.QDate.currentDate().addDays(-5))
         self.endDateEdit.setMaximumDate(QtCore.QDate.currentDate().addDays(-1))
-
         self.optionsLayout.addWidget(self.endDateEdit,2,0,1,1)
+        self.dateButton = QtGui.QPushButton('Ok',self.optionsFrame)
+        self.optionsLayout.addWidget(self.dateButton,3,0,1,1)
         #koniec pola do wprowadzania okresu
 	self.verticalLayout.addWidget(self.optionsFrame)
         
@@ -204,9 +205,10 @@ def addChartButton(self):
         self.paintCheckBox = QtGui.QCheckBox('Enable painting',self.optionsFrame)
         self.gridLayout.addWidget(self.paintCheckBox,1,3,1,1)
         #przycisk rysowania wykresu
-        self.chartButton = QtGui.QPushButton('Chart',self.optionsFrame)
-        self.chartButton.resize(self.chartButton.sizeHint())
-        self.gridLayout.addWidget(self.chartButton,2,3,1,1)
+        self.compareButton = QtGui.QPushButton('Compare',self.optionsFrame)
+        self.compareButton.resize(self.compareButton.sizeHint())
+        #self.compareButton.setEnabled(False)
+        self.gridLayout.addWidget(self.compareButton,2,3,1,1)
 	#Spacer
         #self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
         #self.gridLayout.addItem(self.spacer,0,5,1,3)
