@@ -74,7 +74,6 @@ def tabUi(self,showLists=True):
         tableStyle(self,self.bondListView)
         self.bondPageLayout.addWidget(self.bondListView)
 
-
         #Resource
         self.resourcePage = QtGui.QWidget(self.listsFrame)
         self.resourcePageLayout = QtGui.QHBoxLayout(self.resourcePage)
@@ -85,6 +84,7 @@ def tabUi(self,showLists=True):
         self.resourceListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         tableStyle(self,self.resourceListView)
         self.resourcePageLayout.addWidget(self.resourceListView)
+
 
         #Futures contract
         self.futuresContractPage = QtGui.QWidget(self.listsFrame)
@@ -134,6 +134,7 @@ def tabUi(self,showLists=True):
         """Ramka przechowujaca opcje"""
         self.optionsFrame = QtGui.QFrame(self)
         # ustawimy maksymalna wysokosc na 120
+
         self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 130))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)

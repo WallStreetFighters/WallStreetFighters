@@ -75,8 +75,8 @@ class Chart(FigureCanvas):
         """Odświeża wszystkie wykresy"""
         self.updateMainPlot()
         self.updateVolumeBars()
-        self.updateOscPlot()        
-        self.draw()
+        self.updateOscPlot()
+        self.draw()        
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            

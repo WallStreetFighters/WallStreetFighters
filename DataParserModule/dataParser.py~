@@ -429,7 +429,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 			finObj.valuesWeekly = finObj.valuesWeekly + dataRow
 	elif timePeriod == 'monthly':
 		for row in dataCsv:	
-			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
+			if financialType == 'forex' or financialType == 'bond' || financialType == 'resource':
 				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 			else:
 				date = parserStringToDate(row[0])
@@ -630,7 +630,7 @@ def loadHistory():
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
-	
+
 def top5Volume():
 	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
 	global TOP_VOLUME
@@ -694,5 +694,7 @@ def loadStats():
 
 
 ########################################################################################################
+
+
 
 

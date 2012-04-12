@@ -45,6 +45,7 @@ def aInRect(array):
     a, b = linearFun(array)
     if a == 0:
         return 0
+
     for i in range(2,array.size):
             y = a*i+b
             if y > (1+rectVul)*array[i] or y < (1-rectVul)*array[i]:
@@ -53,6 +54,7 @@ def aInRect(array):
 
 def divideArray(array, factor):
     """Dzielimy tablice na #factor tablic, kazda podtablica ma tyle samo elem oprocz ostatniej"""
+
     factor = min(factor, len(array))
     length = floor(len(array)*1.0/factor)
     res = []
@@ -60,6 +62,7 @@ def divideArray(array, factor):
         res = res + list([array[i*length:(i+1)*length]])
     return asarray(res + list([array[length*(factor - 1):]]))
         
+
 def findMaxMin(array, factor=div):
     """Znajdujemy linie wsparcia i oporu"""
     z = divideArray(asarray(array), factor)
@@ -189,3 +192,4 @@ def lookForReversedHeadAndShoulders(values, volumine):
 #print headAndShoulders(values, volumin, 21, 10)
 #lookForHeadAndShoulders(arange(10), arange(10))
 #lookForReversedHeadAndShoulders(arange(10), arange(10))
+
