@@ -22,18 +22,20 @@ class ApplicationWindow(QtGui.QMainWindow):
         l = QtGui.QVBoxLayout(self.main_widget)
         parser.loadData()         
 
-        finObj1 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[45][1],
-        parser.STOCK_LIST[45][0],'stock',parser.STOCK_LIST[45][3])         
+        finObj1 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[71][1],
+        parser.STOCK_LIST[71][0],'stock',parser.STOCK_LIST[71][3])         
         finObj1.updateArchive('daily')         
         chart = Chart(self.main_widget,finObj1)
-        chart.setData(finObj1,datetime.datetime(2011,8,12),datetime.datetime(2012,1,11),'daily')                
-        chart.setScaleType('log')                
+        chart.setData(finObj1,datetime.datetime(2009,11,1),datetime.datetime(2010,3,22),'daily')                                   
         l.addWidget(chart)                                      
+        chart.drawTrend()
         wedge=findWedge(chart.data.close)
         if(wedge!=None):
             print wedge
             chart.drawLine(wedge[1][0],wedge[1][1],wedge[1][2],wedge[1][3])
             chart.drawLine(wedge[2][0],wedge[2][1],wedge[2][2],wedge[2][3])
+        else:
+            print "nie ma klina :("
         #chart.setMainType('candlestick')
         #gaps=findGaps(chart.data.high,chart.data.low,1)        
         #print gaps        

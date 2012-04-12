@@ -5,7 +5,7 @@ from itertools import *
 import matplotlib.dates as mdates
 import math
 
-trendVul = 5
+trendVul = 0.05
 rectVul = 0.03
 div = 8
 
@@ -190,19 +190,21 @@ def findWedge(values):
     Interpretacja: 
     klin zwyżkujący zapowiada odwrócenie trendu wzrostowego lub kontynuację spadkowego
     klin zniżkujący -  na odwrót"""    
-    sup, res = getChannelLines(values)
-    supx0,supy0,supx1,supy1 = values.index(sup[0]), sup[0], values.index(sup[len(sup)-1]), sup[len(sup)-1]
-    resx0,resy0,resx1,resy1 = values.index(res[0]), res[0], values.index(res[len(res)-1]), res[len(res)-1]
+    dataPart, sup, res = getChannelLines(values)    
+    diff = len(values) - len(dataPart)        
+    supx0,supy0,supx1,supy1 = dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1]
+    resx0,resy0,resx1,resy1 = dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1]
     supLine=lineFrom2Points(supx0,supy0,supx1,supy1)
-    resLine=lineFrom2Points(resx0,resy0,resx1,resy1)
+    resLine=lineFrom2Points(resx0,resy0,resx1,resy1)    
     supAngle = arctan(supLine[0])*(180.0/pi)
     resAngle = arctan(resLine[0])*(180.0/pi)
+    print "supAngle: ", supAngle, "resAngle: ", resAngle
     #klin zwyżkujący
-    if supAngle>trendVul and resAngle>supAngle:
+    if resAngle>trendVul and supAngle>resAngle:
         return ('rising_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
     #klin zniżkujący
-    elif resAngle<-trendVul and supAngle<resAngle:
-        return ('falling_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
+    elif supAngle < -trendVul and resAngle<supAngle:
+        return ('falling_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))    
     return None
     
     
