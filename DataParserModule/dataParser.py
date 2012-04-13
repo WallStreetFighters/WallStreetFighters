@@ -11,7 +11,7 @@ import cStringIO
 import cPickle
 
 #ZMIENNE GLOBALNE
-REMEMBER_COUNT = 5
+REMEMBER_COUNT = 15
 DATABASE_LAST_UPDATE = datetime.date(2012,3,3)
 INDEX_LIST = []
 STOCK_LIST = []
@@ -144,7 +144,7 @@ class FinancialObject(object):
 
 	def getArray(self, time):
 		"""Funkcja zwracająca rekordowaną tablicę (numpy.recarray) dla informacji w odstępie czasu przekazanym jako parametr funkcji. Pozwala to dostać się do poszczególnych tablic używając odpowiednich rekordów: 'date' 'open' etc."""
-		if self.financialType == 'forex':
+		if self.financialType == 'forex' or self.financialType == 'bond' or self.financialType == 'resource':
 			tmplist = []
 			if time == 'daily':
 				for x in self.valuesDaily:
@@ -621,15 +621,18 @@ def isInStock(abbreviation):
 			return x	
 	return None
 
-def saveHistory():
+def saveHistory(file):
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
-	cPickle.dump(HISTORY_LIST, open('data.wsf', 'wb'))
+	print "zapisalem"
+	for x in HISTORY_LIST:
+		print x.abbreviation
+	cPickle.dump(HISTORY_LIST, file)
 
-def loadHistory():
+def loadHistory(file):
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
-	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
+	HISTORY_LIST = cPickle.load(file)
 	
 def top5Volume():
 	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""

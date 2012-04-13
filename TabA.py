@@ -30,6 +30,11 @@ class TabA(QtGui.QWidget):
         self.chart =None
         QtGui.QWidget.__init__(self)
         self.initUi()
+	
+	FILE = open("../GUIModule/data.wsf", 'r')
+	dataParser.loadHistory(FILE)
+	FILE.close()
+
     def initUi(self):
         
         
@@ -338,6 +343,7 @@ class TabA(QtGui.QWidget):
             self.chart.rmVolumeBars()
 
         self.setOptions()
+
     def paintCompareChart(self):
         self.finObj = []
         print self.qModelIndex
@@ -402,8 +408,7 @@ class TabA(QtGui.QWidget):
             self.stepComboBox.setCurrentIndex(2)
         if self.settings["painting"]:
             self.paintCheckBox.setCheckState(2)
-
-
+	
     def setOptions(self):
         #przywracamy odpowiednie ustawienia opcji w GUI
         #data
