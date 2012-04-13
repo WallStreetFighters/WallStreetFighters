@@ -78,14 +78,16 @@ class Chart(FigureCanvas):
         self.mainType=type
         self.updateMainPlot()
         
+        
     def updatePlot(self):
         """Odświeża wszystkie wykresy"""        
         self.updateMainPlot()
         self.updateVolumeBars()
         self.updateOscPlot()        
-        self.draw()
+        self.draw()        
         self.drawTrend()
-    
+        self.draw()
+
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
@@ -418,7 +420,8 @@ class Chart(FigureCanvas):
              
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
-        self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
+        trend.optimizedTrend(self.data.close)
+        #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
         sup, res = trend.getChannelLines(self.data.close)
         self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
         self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
@@ -429,7 +432,6 @@ class Chart(FigureCanvas):
         neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
             self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
-        
        # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         
      #   min, mindex = trend.findMinLine(asarray(self.data.close))

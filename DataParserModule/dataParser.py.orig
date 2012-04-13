@@ -618,8 +618,7 @@ def loadHistory():
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
-########################################################################################################
-<<<<<<< HEAD
+
 #TAKIE MOJE TESTOWANIE#
 #loadData()
 
@@ -731,6 +730,6 @@ print finObj.valuesDaily[x[1]][0]
 
 #print x['adv']end = datetime.datetime.now()
 =======
->>>>>>> test-merge
+
 
 
