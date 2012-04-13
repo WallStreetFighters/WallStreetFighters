@@ -61,6 +61,8 @@ class RSSWidget(QtGui.QWidget):
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.itemsList.sizePolicy().hasHeightForWidth())
         self.itemsList.setSizePolicy(sizePolicy)
+        self.itemsList.setWordWrap(True)
+        #setWrapping (self, bool enable)
         self.itemsList.setMaximumSize(QtCore.QSize(450, 16777215))
         self.itemsList.setMinimumSize(QtCore.QSize(440, 0))
 

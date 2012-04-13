@@ -9,6 +9,7 @@ from PyQt4 import QtGui, QtCore
 from TabA import TabA
 import cPickle
 import GUIModule.RSSgui as RSSgui
+from GUIModule.home import Home 
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -32,6 +33,7 @@ class GuiMainWindow(object):
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 
+
         # inicjujemy model danych dla Index
         self.indexModel = self.ListModel(list=dataParser.INDEX_LIST)
         # inicjujemy model danych dla Stock
@@ -42,9 +44,11 @@ class GuiMainWindow(object):
         self.resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
         # inicjujemy model danych dla Bond
         self.bondModel = self.ListModel(list=dataParser.BOND_LIST)
-        
-
-
+        """home """
+        self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
+        self.tabs.addTab(self.home,"Home")
+        self.rssWidget = RSSgui.RSSWidget(self.home)
+        self.home.rssLayout.addWidget(self.rssWidget)
 
         """tab A wskaźniki i oscylatory"""
 	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,)
@@ -55,8 +59,6 @@ class GuiMainWindow(object):
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
         self.tabA.bondListView.doubleClicked.connect(self.newBondTab)
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
-        self.rssWidget = RSSgui.RSSWidget(self.tabA)
-        self.tabA.chartsLayout.addWidget(self.rssWidget)
         self.tabA.compareButton.clicked.connect(self.compare)
 
 

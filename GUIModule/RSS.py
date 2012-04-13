@@ -58,7 +58,8 @@ class RSSReader:
 	def CreateRSSItem(self,itemNode):
 
 		"""Create an RSS item and return it"""
-		title = self.GetChildText(itemNode,"title")
+		title = '# '
+		title += self.GetChildText(itemNode,"title")
 		description = self.GetChildText(itemNode,"description")
 		link = self.GetChildText(itemNode, "link")
 		pubDate = self.GetChildText(itemNode, "pubDate")

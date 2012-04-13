@@ -9,6 +9,8 @@ class MainWindow(QtGui.QMainWindow):
         # obiekt Gui
         self.gui = GuiMainWindow()
         self.gui.setupGui(self)
+    def closeEvent(self, event):
+        print 'zamykam'
 
 
     
