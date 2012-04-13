@@ -19,9 +19,6 @@ FOREX_LIST = []
 RESOURCE_LIST = []
 BOND_LIST = []
 HISTORY_LIST = []
-TOP_VOLUME = []
-TOP_GAINERS = []
-TOP_LOSERS = []
 AMEX_HIST = []
 NYSE_HIST = []
 NASDAQ_HIST = []
@@ -636,7 +633,6 @@ def loadHistory(file):
 	
 def top5Volume():
 	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
-	global TOP_VOLUME
 	TOP_VOLUME = []
 	url = "http://finance.yahoo.com/actives?e=us"
 	try:
@@ -644,17 +640,18 @@ def top5Volume():
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
+	#pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_VOLUME.append([m.group(1),m.group(2)])
+			TOP_VOLUME.append([m.group(1),m.group(2),m.group(3),m.group(4)])
 			i += 1
+	return TOP_VOLUME
 
 def top5Gainers():
 	"""Funkcja zwracajaca listę 5 spółek o najwiekszym wzroscie"""
-	global TOP_GAINERS
 	TOP_GAINERS = []
 	url = "http://finance.yahoo.com/gainers?e=us"
 	try:
@@ -662,18 +659,17 @@ def top5Gainers():
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_GAINERS.append([m.group(1),m.group(2)])
+			TOP_GAINERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
 			i += 1
-
+	return TOP_GAINERS
 
 def top5Losers():
 	"""Funkcja zwracajaca listę 5 spółek o najwiekszym spadku"""
-	global TOP_LOSERS
 	TOP_LOSERS = []
 	url = "http://finance.yahoo.com/losers?e=us"
 	try:
@@ -681,13 +677,96 @@ def top5Losers():
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> \(([0-9.-]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_LOSERS.append([m.group(1),m.group(2)])
+			TOP_LOSERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
 			i += 1
+	return TOP_LOSERS
+
+def getMostPopular():
+	"""Funkcja zwracająca aktualne wartości najbardziej popularnych obiektów"""
+	mostPopular = []
+	
+	url = "http://finance.yahoo.com/marketupdate/overview?u"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()	
+	
+	mostPopular.append(mostPopularIndicesSearch('Dow', pageSource))
+	mostPopular.append(mostPopularIndicesSearch('Nasdaq', pageSource))
+	mostPopular.append(mostPopularIndicesSearch('S&amp;P 500', pageSource))
+
+	url = "http://finance.yahoo.com/"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+
+	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
+	mostPopular.append(mostPopularPatternSearch('10-Year',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Gold',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Oil',pageSource))
+
+	mostPopular[2][0] = 'S&P 500' 
+	return mostPopular
+
+
+def mostPopularPatternSearch(keyWord,source):
+
+	pattern = '">' + keyWord + '<.*?">([0-9,.]*)<.*?>([0-9,.+-]*)<\/span.*?>([0-9.+-]*%)<'
+	pattern = re.compile(pattern, re.DOTALL)
+	m = re.search(pattern,source)
+	return [keyWord,m.group(1),m.group(2),m.group(3)]
+
+def mostPopularIndicesSearch(keyWord,pageSource):
+	
+	pattern = '">' + keyWord + '<.*?">([0-9,.]*)<\/span>.*?"color:(.*?);.*?>([0-9,.]*)<.*?> \(([0-9.]*%)\)<'
+	pattern = re.compile(pattern, re.DOTALL)
+	m = re.search(pattern,pageSource)
+	if m.group(2) == '#cc0000':
+		return [keyWord,m.group(1),'-' + m.group(3),'-' + m.group(4)]
+	else:
+		return [keyWord,m.group(1),'+' + m.group(3),'+' + m.group(4)]
+
+def getMostPopularCurrencies():
+	""" """
+	
+	url = "http://finance.yahoo.com/"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	
+	mostPopular = []
+	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
+	mostPopular.append(mostPopularPatternSearch('USD/JPY',pageSource))
+	mostPopular.append(mostPopularPatternSearch('GBP/USD',pageSource))
+	
+	return mostPopular
+
+def getMostPopularCommodities():
+	""" """
+	
+	url = "http://finance.yahoo.com/"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	
+	mostPopular = []
+	mostPopular.append(mostPopularPatternSearch('Gold',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Silver',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Copper',pageSource))
+	
+	return mostPopular
 
 def loadStats():
 	"""Funkcja zwracajaca pobierajaca do globalnych tabel statystyki (5 najwiekszych spadkow/wzrostow/wolumenow)"""
@@ -695,6 +774,8 @@ def loadStats():
 	top5Volume()
 	top5Gainers()
 
+for x in getMostPopularCommodities():
+	print x
 
 ########################################################################################################
 
