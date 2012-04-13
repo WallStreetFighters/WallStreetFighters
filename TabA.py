@@ -333,7 +333,8 @@ class TabA(QtGui.QWidget):
         self.chart.setMainType(self.settings["chartType"])
         
         print "Bede rysowal wykres"
-        self.chart.drawTrend()
+        #self.chart.drawTrend()
+        self.chart.drawRectangle(3,self.chart.data.close[3],10,100)
         
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()

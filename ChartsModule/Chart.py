@@ -11,6 +11,7 @@ from matplotlib.textpath import TextPath
 from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
 import TechAnalysisModule.trendAnalysis as trend
     
 class Chart(FigureCanvas):
@@ -24,7 +25,8 @@ class Chart(FigureCanvas):
     mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
     volumeBars = None #wykres wolumenu
     oscPlot = None #wykres oscylatora    
-    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)    
+    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
+    rectangles = [] #lista prostokątów (do zaznaczania świec)
     
     mainType = None #typ głównego wykresu
     oscType = None #typ oscylatora (RSI, momentum, ...)
@@ -46,6 +48,8 @@ class Chart(FigureCanvas):
     def __init__(self, parent, finObj=None, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
         dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
+        self.additionalLines=[]
+        self.rectangles=[]
         self.setData(finObj)
         self.mainType='line'                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
@@ -79,12 +83,11 @@ class Chart(FigureCanvas):
         self.updateMainPlot()
         
     def updatePlot(self):
-        """Odświeża wszystkie wykresy"""        
+        """Odświeża wszystkie wykresy"""                
         self.updateMainPlot()
         self.updateVolumeBars()
-        self.updateOscPlot()        
-        self.draw()
-        self.drawTrend()
+        self.updateOscPlot()                
+        self.draw()        
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -92,11 +95,13 @@ class Chart(FigureCanvas):
         self.mainPlot=self.fig.add_axes(bounds)                        
         self.updateMainPlot()
     
-    def updateMainPlot(self):
+    def updateMainPlot(self):        
         if(self.mainPlot==None or self.data==None or self.data.corrupted):
             return
+        else:
+            print "updateuje ", self.data.name
         ax=self.mainPlot                
-        ax.clear()  
+        ax.clear()          
         x=range(len(self.data.close))
         if self.mainType=='line' :
             ax.plot(x,self.data.close,'b-',label=self.data.name)
@@ -110,7 +115,15 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))        
+        print self.additionalLines
+        print self.rectangles        
+        for line in self.additionalLines:
+            ax.add_line(line)
+            line.figure.draw_artist(line)         
+        for rect in self.rectangles:
+            ax.add_patch(rect)
+            rect.figure.draw_artist(rect)        
         if(self.scaleType=='log'):            
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
@@ -388,6 +401,22 @@ class Chart(FigureCanvas):
         for line in self.additionalLines:            
             line.remove()
         self.additionalLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
+    
+    def drawRectangle(self, x, y, width, height, colour='blue', lwidth = 2.0, lstyle = 'dashed'):
+        """Zaznacza prostokątem lukę/formację świecową czy coś tam jeszcze"""
+        newRect=Rectangle((x,y),width,height,facecolor='none',edgecolor=colour,linewidth=lwidth,linestyle=lstyle)                
+        self.mainPlot.add_patch(newRect)
+        self.rectangles.append(newRect)
+        newRect.figure.draw_artist(newRect)                                        
+        self.blit(self.mainPlot.bbox)    #blit to taki redraw        
+    
+    def clearRectangles(self):
+        """Usuwa prostokąty"""
+        for rect in self.rectangles:            
+            rect.remove()
+        self.rectangles = []
         self.draw()
         self.blit(self.mainPlot.bbox)
 
