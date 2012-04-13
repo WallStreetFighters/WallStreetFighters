@@ -480,4 +480,3 @@ class TabA(QtGui.QWidget):
         def closeEvent(self, event):
             self.parent.cid = self.parent.chart.mpl_connect('button_press_event', self.parent.showChartsWithAllIndicators)
         
-    
