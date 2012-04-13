@@ -774,8 +774,7 @@ def loadStats():
 	top5Volume()
 	top5Gainers()
 
-for x in getMostPopularCommodities():
-	print x
+
 
 ########################################################################################################
 

@@ -13,7 +13,6 @@ class MainWindow(QtGui.QMainWindow):
     def closeEvent(self, event):
 	FILE = open('data.wsf','w')
 	dataParser.saveHistory(FILE)
-	FILE.close()
 
     
     

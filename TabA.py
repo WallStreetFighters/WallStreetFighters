@@ -30,10 +30,6 @@ class TabA(QtGui.QWidget):
         self.chart =None
         QtGui.QWidget.__init__(self)
         self.initUi()
-	
-	FILE = open("../GUIModule/data.wsf", 'r')
-	dataParser.loadHistory(FILE)
-	FILE.close()
 
     def initUi(self):
         

@@ -32,9 +32,6 @@ class GuiMainWindow(object):
         #załadowanie List
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
-	FILE = open("../GUIModule/data.wsf", 'r')
-	dataParser.loadHistory(FILE)
-	FILE.close()
 
 
         # inicjujemy model danych dla Index

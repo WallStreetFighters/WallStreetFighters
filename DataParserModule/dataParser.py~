@@ -19,9 +19,6 @@ FOREX_LIST = []
 RESOURCE_LIST = []
 BOND_LIST = []
 HISTORY_LIST = []
-TOP_VOLUME = []
-TOP_GAINERS = []
-TOP_LOSERS = []
 AMEX_HIST = []
 NYSE_HIST = []
 NASDAQ_HIST = []
@@ -636,7 +633,6 @@ def loadHistory(file):
 	
 def top5Volume():
 	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
-	global TOP_VOLUME
 	TOP_VOLUME = []
 	url = "http://finance.yahoo.com/actives?e=us"
 	try:
@@ -652,10 +648,10 @@ def top5Volume():
 		if i < 5:
 			TOP_VOLUME.append([m.group(1),m.group(2),m.group(3),m.group(4)])
 			i += 1
+	return TOP_VOLUME
 
 def top5Gainers():
 	"""Funkcja zwracajaca listę 5 spółek o najwiekszym wzroscie"""
-	global TOP_GAINERS
 	TOP_GAINERS = []
 	url = "http://finance.yahoo.com/gainers?e=us"
 	try:
@@ -670,11 +666,10 @@ def top5Gainers():
 		if i < 5:
 			TOP_GAINERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
 			i += 1
-
+	return TOP_GAINERS
 
 def top5Losers():
 	"""Funkcja zwracajaca listę 5 spółek o najwiekszym spadku"""
-	global TOP_LOSERS
 	TOP_LOSERS = []
 	url = "http://finance.yahoo.com/losers?e=us"
 	try:
@@ -689,6 +684,7 @@ def top5Losers():
 		if i < 5:
 			TOP_LOSERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
 			i += 1
+	return TOP_LOSERS
 
 def getMostPopular():
 	"""Funkcja zwracająca aktualne wartości najbardziej popularnych obiektów"""
