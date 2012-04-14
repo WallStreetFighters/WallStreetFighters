@@ -18,6 +18,7 @@ STOCK_LIST = []
 FOREX_LIST = []
 RESOURCE_LIST = []
 BOND_LIST = []
+FUTURES_LIST = []
 HISTORY_LIST = []
 AMEX_HIST = []
 NYSE_HIST = []
@@ -491,6 +492,7 @@ def loadData():
 	global FOREX_LIST
 	global RESOURCE_LIST
 	global BOND_LIST
+	global FUTURES_LIST
 	global DATABASE_LAST_UPDATE
 	global HISTORY_LIST
 	global AMEX_HIST
@@ -509,7 +511,7 @@ def loadData():
 			DATABASE_LAST_UPDATE = parserStringToDate(row[1])
 			flag = False
 		else:	
-			STOCK_LIST = STOCK_LIST + [[row[0],row[1],row[2],row[3]]]
+			STOCK_LIST.append([row[0],row[1],row[2],row[3]])
 	
 	csvFile  = open('data3.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
@@ -526,6 +528,11 @@ def loadData():
 	dataCsv.next()
 	for row in dataCsv:
 		BOND_LIST = BOND_LIST + [[row[0],row[1],row[2],row[3]]]	
+	csvFile  = open('data6.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
+	dataCsv.next()
+	for row in dataCsv:
+		FUTURES_LIST = FUTURES_LIST + [[row[0],row[1],row[2],row[3]]]	
 	csvFile  = open('AMEX.csv', "rb")
 	dataCsv = csv.reader(csvFile)
 	for row in dataCsv:
@@ -641,13 +648,17 @@ def top5Volume():
 		print "Something wrong happend! Check your internet connection!"
 	pageSource = site.read()
 	#pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?"color:(.*?);.*?>([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_VOLUME.append([m.group(1),m.group(2),m.group(3),m.group(4)])
-			i += 1
+			if m.group(3) == '#cc0000':
+				TOP_VOLUME.append([m.group(1),m.group(2),'-' + m.group(4), '-' + m.group(5)])
+				i += 1
+			else:
+				TOP_VOLUME.append([m.group(1),m.group(2),m.group(4),m.group(5)])
+				i += 1
 	return TOP_VOLUME
 
 def top5Gainers():
@@ -659,7 +670,7 @@ def top5Gainers():
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
@@ -677,12 +688,12 @@ def top5Losers():
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_LOSERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
+			TOP_LOSERS.append([m.group(1),m.group(2),'-' + m.group(3),'-' + m.group(4)])
 			i += 1
 	return TOP_LOSERS
 
@@ -774,9 +785,9 @@ def loadStats():
 	top5Volume()
 	top5Gainers()
 
-for x in getMostPopularCommodities():
-	print x
+
 
 ########################################################################################################
 
+print top5Volume()
 
