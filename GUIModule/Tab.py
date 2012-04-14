@@ -90,12 +90,12 @@ def tabUi(self,showLists=True):
         self.futuresContractPage = QtGui.QWidget(self.listsFrame)
         self.futuresContractPageLayout = QtGui.QHBoxLayout(self.futuresContractPage)
         self.listsToolBox.addItem(self.futuresContractPage, "Futures Contract")
-        self.futuresContractListView = QtGui.QTableView(self.listsFrame)
-        self.futuresContractListView.setAlternatingRowColors(True)
-        self.futuresContractListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.futuresContractListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        tableStyle(self,self.futuresContractListView)
-        self.futuresContractPageLayout.addWidget(self.futuresContractListView)
+        self.futuresListView = QtGui.QTableView(self.listsFrame)
+        self.futuresListView.setAlternatingRowColors(True)
+        self.futuresListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.futuresListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        tableStyle(self,self.futuresListView)
+        self.futuresContractPageLayout.addWidget(self.futuresListView)
         
         self.listsLayout.addWidget(self.listsToolBox)
                 # koniec Tool Box

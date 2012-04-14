@@ -47,14 +47,17 @@ class GuiMainWindow(object):
         self.resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
         # inicjujemy model danych dla Bond
         self.bondModel = self.ListModel(list=dataParser.BOND_LIST)
+        # model danych dla Futures
+        self.futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
+        
         """home """
         self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
         self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 
-        """tSearch"""
-	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,)
+        """Search"""
+	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
         self.tabs.addTab(self.tabA,"Search")
         
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
@@ -62,6 +65,7 @@ class GuiMainWindow(object):
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
         self.tabA.bondListView.doubleClicked.connect(self.newBondTab)
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
+        self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
 
 
@@ -153,6 +157,11 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "resource",showLists = False)
         if not nameTab:
             nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+    def newFuturesTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "futures",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
 

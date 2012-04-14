@@ -11,12 +11,13 @@ import DataParserModule.dataParser as dataParser
 
 class TabA(QtGui.QWidget):
     def __init__(self,indexModel=None,stockModel=None,forexModel=None,bondModel= None,
-                 resourceModel = None,qModelIndex = None,settings = None,listName=None,showLists = True):
+                 resourceModel = None,futuresModel = None, qModelIndex = None,settings = None,listName=None,showLists = True):
         self.indexModel = indexModel
         self.stockModel = stockModel
         self.forexModel = forexModel
         self.bondModel = bondModel
         self.resourceModel = resourceModel
+        self.futuresModel = futuresModel
         self.showLists = showLists
         self.settings = settings
         self.qModelIndex = qModelIndex #lista przy porównywaniu
@@ -52,6 +53,7 @@ class TabA(QtGui.QWidget):
             self.forexListView.setModel(self.forexModel)
             self.bondListView.setModel(self.bondModel)
             self.resourceListView.setModel(self.resourceModel)
+            self.futuresListView.setModel(self.futuresModel)
         
         if not isinstance( self.qModelIndex,list):
             self.scrollArea = QtGui.QScrollArea(self.optionsFrame)
@@ -168,7 +170,6 @@ class TabA(QtGui.QWidget):
         
         if self.chart !=None:
             self.chart.setScaleType(self.settings["scale"])
-            self.updateDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -199,7 +200,6 @@ class TabA(QtGui.QWidget):
             else:
                 self.finObj.updateArchive(self.settings["step"])
             self.chart.setData(self.finObj,start,end,self.settings["step"])
-            self.updateDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -218,7 +218,6 @@ class TabA(QtGui.QWidget):
             else:
                 self.finObj.updateArchive(self.settings["step"])
             self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
-            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -231,7 +230,6 @@ class TabA(QtGui.QWidget):
                 self.settings["oscilator"] = str(box.text())
         if self.chart !=None:
             self.chart.setOscPlot(self.settings["oscilator"])
-            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -250,9 +248,9 @@ class TabA(QtGui.QWidget):
                 self.chart.addVolumeBars()
 
             self.chartsLayout.addWidget(self.chart)
-            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
+            self.checkDrawTrend()
             #self.chart.emit(QtCore.SIGNAL("movido"))
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
@@ -265,7 +263,6 @@ class TabA(QtGui.QWidget):
                 self.chartsLayout.removeWidget(self.chart)
             self.chart.setDrawingMode(painting)
             self.chartsLayout.addWidget(self.chart)
-            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -304,7 +301,6 @@ class TabA(QtGui.QWidget):
                 self.chart.setMainIndicator(self.settings['indicator'][-1])
             else:
                 self.chart.setMainIndicator("")
-            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -380,7 +376,13 @@ class TabA(QtGui.QWidget):
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
-        
+            
+        if self.listName == "futures":
+            if dataParser.FUTURES_LIST[index][2] == 'Yahoo':
+                self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
+	    else:
+		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'resource',dataParser.FUTURES_LIST[index][3],self.settings["step"])
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
 
         self.chart = Chart(self, self.finObj)
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
@@ -446,6 +448,15 @@ class TabA(QtGui.QWidget):
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
+                self.finObj.append(finObj)
+                
+        if self.listName == "futures":
+            for model in self.qModelIndex:
+                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                if dataParser.FUTURES_LIST[index][2] == 'Yahoo':
+                    finObj = dataParser.createWithArchivesFromYahoo(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
+                else:
+                    finObj = dataParser.createWithArchivesFromStooq(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
         
         self.chart = CompareChart(self)
