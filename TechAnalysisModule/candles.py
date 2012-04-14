@@ -5,8 +5,10 @@ kursy open, low, high, close. Parament trend oznacza to, w jakim trendzie się z
 (rosnący lub malejący). Zgodnie z konwencją Pawła 1=trend rosnący, -1 malejący.
 """
 
-from itertools import combinations
+import trendAnalysis as trend
 
+STRONG_TREND=0.3
+STRAIGHT_TREND_VUL=0.1
 LONG_BODY=0.03  #parametr określający jaką różnicę mięczy O a C traktujemy jako dużą (3%)
 SHORT_BODY=0.005    #parametr określający jaką różnicę mięczy O a C traktujemy jako małą (0,5%)
 
@@ -167,7 +169,21 @@ def findBear3(O,H,L,C):
 po pierwsze nie wymagają świec (wystarczy zwykły wykres słupkowy), 
 po drugie kształtują się przez dłuższy czas, więc są IMO ważniejsze"""
 
-def findGaps(H,L,trend):
+def isStraightTrend(array):    
+    """Sprawdzamy czy tablica opisuje zdecydowany ruch w górę lub w dół.
+    Robimy to wyliczając regresję i sprawdzając czy wszystkie punkty w tablicy 
+    są w pasie regresja +/- jakieś sensitivity. Oczywiście sprawdzamy też czy sam trend
+    jest odpowiednio silny poprzez badanie współczynnika kierunkowego prostej."""    
+    a, b = trend.regression(array)
+    if abs(a) < STRONG_TREND:
+        return 0
+    for i in range(array.size):
+            y = a*i+b
+            if y > (1+STRAIGHT_TREND_VUL)*array[i] or y < (1-STRAIGHT_TREND_VUL)*array[i]:
+                    return 0
+    return a       
+
+def findGaps(H,L,C):
     """Znajduje na danym wykresie (lub jego wycinku) lukę startową, ucieczki i wyczerpania. 
     Używać najlepiej na możliwie krótkim okresie, np po wybiciu z formacji. 
     Interpretacja: Luka startowa - sygnał rozpoczęcia trendu, 
@@ -176,42 +192,22 @@ def findGaps(H,L,trend):
     Uwaga na wartości zwracane przez funkcję, dostajemy None, lub parę składającą się
     ze stringa (po stringu poznamy co jest drugim argumentem) i krotki 3 lub 2 elementowej 
     lub pojedynczego elementu"""
-    if(len(H)!=len(L)):
-        return None
+    trend=isStraightTrend(C)
+    if not (len(H)==len(L)==len(C)) or trend==0:
+        return None    
     gaps=[] 
     if(trend>0):
         #szukamy wszystkich luk na wykresie (uwaga - w kolejności od najnowszej do najstarszej)
-        for i in range (len(H)-1,0,-1):
-            if(H[i-1]<L[i]):
-                gaps.append( (i,H[i-1]+(L[i]-H[i-1])/2.) )
-        if len(gaps)>=3:
-            #szukamy luki startowej, ucieczki i wyczerpania
-            #3 luki ułożone w mniej więcej równych odstępach
-            for gap1,gap2,gap3 in list(combinations(gaps,3)):                                       
-                if 0.8*(gap1[1]-gap2[1]) < (gap2[1]-gap3[1]) < 1.2*(gap1[1]-gap2[1]):
-                    return ('3gaps',(gap3,gap2,gap1))
-        if len(gaps)>=2:            
-            for gap1,gap2 in list(combinations(gaps,2)):                                       
-                #jeśli znajdziemy dwie luki rosnąco na różnych wysokościach to traktujemy
-                #je jako lukę startową i ucieczki
-                if gap1[1]>1.05*gap2[1]:
-                    return ('2gaps',(gap2,gap1))                
+        for i in range (len(H)-1):
+            if(H[i]<L[i+1]):
+                #pierwszy element pary to indeks, drugi to wartość (połowa wysokości luki)
+                gaps.append( (i,H[i]+(L[i+1]-H[i])/2.) )    
+        for i in range(len(gaps)):
+            pass
     #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
     elif(trend<0):                
-        for i in range (len(H)-1,0,-1):
-            if(L[i-1]>H[i]):
-                gaps.append( (i,L[i]+(H[i-1]-L[i])/2.) )
-        if len(gaps)>=3:            
-            for gap1,gap2,gap3 in list(combinations(gaps,3)):                                       
-                if 0.8*(gap2[1]-gap1[1]) < (gap3[1]-gap2[1]) < 1.2*(gap2[1]-gap1[1]):
-                    return ('3gaps',(gap3,gap2,gap1))
-        if len(gaps)>=2:            
-            for gap1,gap2 in list(combinations(gaps,2)):                                                       
-                if gap1[1]<1.05*gap2[1]:
-                    return ('2gaps',(gap2,gap1))                                
-    if len(gaps)>=1:
-        #jeśli nie mamy nic ciekawego to zwracamy po prostu ostatnią lukę
-        #traktujemy ją jako lukę startową
-        return ('1gap',gaps[0])
+        for i in range (len(H)-1):
+            if(L[i]>H[i+1]):
+                gaps.append( (i,L[i+1]+(H[i]-L[i+1])/2.) )            
     else: 
         return None                        

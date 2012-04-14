@@ -12,6 +12,7 @@ from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 import TechAnalysisModule.trendAnalysis as trend
+import TechAnalysisModule.candles as candles
     
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -421,7 +422,7 @@ class Chart(FigureCanvas):
         wedge=trend.findWedge(self.data.close)
         if wedge!=None:
             self.drawTrendLine(wedge[1][0], wedge[1][1], wedge[1][2], wedge[1][3], 'r')
-            self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r')
+            self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r')            
           
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
