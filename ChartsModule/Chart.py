@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.ticker import *
+from matplotlib.textpath import TextPath
 from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
@@ -33,9 +34,7 @@ class Chart(FigureCanvas):
     drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
     
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
-    grid = True #czy rysujemy grida
-    
-    num_ticks = 8 #tyle jest etykiet pod wykresem
+    grid = True #czy rysujemy grida        
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.1, 0.8     
@@ -79,14 +78,14 @@ class Chart(FigureCanvas):
         
         
     def updatePlot(self):
-        """Odświeża wszystkie wykresy"""
+        """Odświeża wszystkie wykresy"""        
         self.updateMainPlot()
         self.updateVolumeBars()
         self.updateOscPlot()        
         self.draw()        
         self.drawTrend()
         self.draw()
-
+    
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
@@ -231,23 +230,23 @@ class Chart(FigureCanvas):
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
-        """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
-        self.oscType=type                
-        if self.oscPlot==None:
-            oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
-            self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
-        self.updateOscPlot()
-        self.oscPlot.set_visible(True)
-        self.fixPositions()
-        self.fixTimeLabels()
-    
-    def rmOscPlot(self):
-        """Ukrywa wykres oscylatora"""
-        if self.oscPlot==None:
-            return
-        self.oscPlot.set_visible(False)        
-        self.fixPositions()                            
-        self.fixTimeLabels()
+        """Dodaje pod głównym wykresem wykres oscylatora danego typu lub ukrywa"""
+        if type not in ['momentum','CCI','RSI','ROC','williams']:
+            """Ukrywa wykres oscylatora"""
+            if self.oscPlot==None:
+                return
+            self.oscPlot.set_visible(False)        
+            self.fixPositions()                            
+            self.fixTimeLabels()
+        else:
+            self.oscType=type                
+            if self.oscPlot==None:
+                oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
+                self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
+            self.updateOscPlot()
+            self.oscPlot.set_visible(True)
+            self.fixPositions()
+            self.fixTimeLabels()                
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
@@ -304,9 +303,14 @@ class Chart(FigureCanvas):
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu."""
+        chartWidth=int(self.fig.get_figwidth()*self.fig.get_dpi()*self.maxSize)        
+        t = TextPath((0,0), '9999-99-99', size=7)
+        labelWidth = int(t.get_extents().width)    
+        num_ticks=chartWidth/labelWidth/2  
+        print chartWidth, labelWidth, num_ticks
         length=len(self.data.date)
-        if(length>self.num_ticks):
-            step=length/self.num_ticks        
+        if(length>num_ticks):
+            step=length/num_ticks        
         else:
             step=1
         x=range(0,length,step)

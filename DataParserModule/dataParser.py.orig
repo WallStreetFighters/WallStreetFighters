@@ -619,5 +619,118 @@ def loadHistory():
 	global HISTORY_LIST
 	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
 ########################################################################################################
+<<<<<<< HEAD
+#TAKIE MOJE TESTOWANIE#
+#loadData()
+
+#x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
+#print x['advv']
+
+#saveHistory()
+"""int 
+start = datetime.datetime.now()
+
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time1: %s" % x
+
+i = 0
+l = ""oin
+loadHistory()
+z = createWithArchivesFromYahoo('bmw','ZBB','forex','Yahoo','daily')
+for x in HISTORY_LIST:
+	print x.name
+
+
+"""
+
+"""for x in US_INDICES:
+	print x[1]+','+x[0]+',Yahoo'""" """
+x = createWithCurrentValueFromStooq('USD/GPB', 'plngbp', 'forex', 'gbp')
+x.getCurrentValue()
+print x.currentValue
+print x.previousValues
+for k in x.valuesMonthly:
+	print k 
+updateDatabase()
+"""
+"""
+sFCCY+SRCE+TCHC+SSRX+EGHT+AXAS+ACTG+ACAD+ANCX+ARAY+ACET+ACNB+BIRT+ACXM+ADUS+ADBE+AEGN+AEHR+AEPI+ATRM+AGEN+AIRM+AMCN+AIXG+ALKS+ALGT+ABVA+ALNC+ALLT+AFAM+AOSL+ALTI+ALTR+ALTE+ASPS+APSA+ALVR+AMRN+AMBT+AMCX+AMED+UHAL+ASBI+AGNC+MTGE+ANCI+AMIC+ALRN+ANAT+APFC+AMRB+AMSC+AMWD+ARGN+ABCB+ASRV+ASRVP+AMTC+AMTCP+ATLO+AMGN+AMPL+AMSG+ALOG+ANLY+ANCB+AMCF+ANGN+ANIK+ANNB+APAGF+ATNY+AINV+AAPL+AMCC+AREX+ARSD+ACGL+ACAT+ARCC+ARKR+ABFS+ARTX+ARRY+ARRS+AROW+ARWR+ARTNA+ARTC+AERL+APWC+ASMI+ASML+AACC+ASBC+ASBCW+ATRO+ASTC+ASUR+ATAI+AFCB+AAME+ACFC+AAWW+ATML+ATMI+ATPG+ATRI+AUDC+AAC+AACOU+AACOW+ADAT+ABTL+AMAP+AVGO+AXTI+BCOM+BOSC+BCPC+BANF+BANFP+BKMU+BOCH+BMRC+BKSC+OZRK+BOVA+BFIN+BANR+MSDXP+BCDS+BBBY+BELFA+BELFB+BNHN+BGSCU+BGFV+BIOD+BIOF+BIIB+BLRX+BMRN+BSTC+BITS+BBOX+BKCC+ADRA+ADRD+ADRE+ADRU+MNGL+MNGLU+MNGLW+BNCN+BODY+BOKF+BOLT+BONA+BBNK+BRID+BCOV+BKBK+BRCM+BYFC+BRKR+BMTC+BSDM+BSQR+BUR+CFFI+CA+CCMP+CZR+CAMP+CFNB+CAFI+CAC+CAMT+CSIQ+CPHC+CPLA+CBKN+CCBG+CPLP+CSWC+CFFN+CPST+CFNL+CRME+CECO+CLBH+CART+CRRB+CACB+CATY+CAZA+CAZAU+CAZAW+CFK+CECE+CELG+CELGZ+CLSN+CEDC+CETV+CFBK+CENT+CENTAtart = datetime.datetime.now()
+try:
+	
+	for x in HISTORY_LIST:
+		x.abbreviation
+except EOFError:
+	pass
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time2: %s" % x
+
+start = datetime.datetime.now()
+z = createWithArchivesFromYahoo('usdpln','CPE','forex','Yahoo','daily')
+print z.getIndex(datetime.date(1989,12,01),datetime.date(1989,12,03))
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time3: %s" % x
+
+#print z.name
+start = datetime.datetime.now()
+saveHistory()
+end = datetime.datetime.now()
+x = end-start
+print "Excecution_time4: %s" % x
+print isInHistory('USDPLN')
+for x in HISTORY_LIST:
+	print x.abbreviation
+
+"""
+
+"""    
+for x in FOREX_LIST:
+	i = i+1
+
+	start = datetime.datetime.now()
+	z = createWithArchivesFromStooq(x[1],x[0],'forex','stooq','daily')
+	print z.name
+	end = datetime.datetime.now()
+	z.updateArchive('monthly')
+	for y in z.valuesMonthly:
+		print y
+	x = end-start
+	print "Excecution_time: %s" % x
+"""
+"""
+csvFile  = open('companylist(1).csv', "rb")
+dataCsv = csv.reader(csvFile)
+dataCsv.next()
+i = 0
+for row in dataCsv:
+	print row[0]+','+row[1]+',Yahoo,AMEX'
+"""
+"""
+### PRZYKŁADOWE UŻYCIE ###
+loadData() #Wczytuje dane do zmiennych globalnych
+
+#załóżmy, że użytkownik chce informacje dotyczące "21Vianet Group Inc."
+
+finObj = createWithCurrentValueFromYahoo(STOCK_LIST[6][1],STOCK_LIST[6][0],'stock',STOCK_LIST[6][3]) #tworzymy obiekt z aktualną wartością akcji
+
+finObj.updateArchive() #pobieramy wartości archiwalne do obiektu
+print "Aktualna wartość: " + str(finObj.currentValue[0])
+
+a = finObj.getArray('daily')
+print a['date']
+
+x = finObj.getIndex(datetime.date(2011,8,8),datetime.date(2012,2,17),'daily')
+print x
+print finObj.valuesDaily[x[0]][0]
+print finObj.valuesDaily[x[1]][0]
+"""
+
+#x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+
+#print x['adv']end = datetime.datetime.now()
+=======
+>>>>>>> test-merge
 
 

@@ -67,6 +67,12 @@ def linearFunFromArray(array):
         return 0, 0
     return linearFun(0, array[0], 1, array[1])
 
+def lineFrom2Points(x1,y1,x2,y2):
+    """Zwraca współczynniki a,b prostej przechodzącej przez 2 dane punkty"""
+    a=(y2-y1)/(x2-x1)
+    b=y1-a*x1
+    return (a,b)
+
 def aInRect(array):
     """Sprawdzamy czy punkty w tablicy naleza do prostej +/- rectVul"""
     array = asarray(map(lambda x: x[0], array))
@@ -406,6 +412,28 @@ def lookForReversedHeadAndShoulders(values, volumine):
     print "nie znaleziono", z
     return [0, 0, 0, 0]
    
+def findWedge(values):  
+    """Znajdujemy formację klina. Generalnie sprowadza się to do tego samego co trend,
+    tylko sprawdzamy czy linie kanału są zbieżne.
+    Interpretacja: 
+    klin zwyżkujący zapowiada odwrócenie trendu wzrostowego lub kontynuację spadkowego
+    klin zniżkujący -  na odwrót"""    
+    dataPart, sup, res = getChannelLines(values)    
+    diff = len(values) - len(dataPart)        
+    supx0,supy0,supx1,supy1 = dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1]
+    resx0,resy0,resx1,resy1 = dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1]
+    supLine=lineFrom2Points(supx0,supy0,supx1,supy1)
+    resLine=lineFrom2Points(resx0,resy0,resx1,resy1)    
+    supAngle = arctan(supLine[0])*(180.0/pi)
+    resAngle = arctan(resLine[0])*(180.0/pi)
+    print "supAngle: ", supAngle, "resAngle: ", resAngle
+    #klin zwyżkujący
+    if resAngle>trendVul and supAngle>resAngle:
+        return ('rising_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
+    #klin zniżkujący
+    elif supAngle < -trendVul and resAngle<supAngle:
+        return ('falling_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))    
+    return None    
    
 #print findMaxMin(arange(1000))
 #lookForHeadAndShoulders(arange(100), arange(100))
@@ -464,6 +492,7 @@ def findMaxLine(array):
                     z += 1
             return resultTable,indexTable
     return array([-1]),array([-1]) 
+
     
     
     

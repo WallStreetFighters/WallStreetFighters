@@ -1,11 +1,8 @@
 # coding: utf-8
-
 """Dane wejściowe do każdej funkcji to 4 tablice jednakowej długości przechowujące
 kursy open, low, high, close. Parament trend oznacza to, w jakim trendzie się znajdujemy,
-(rosnący lub malejący). Zgodnie z konwencją Pawła 1=trend rosnący, -1 malejący.
+(rosnący lub malejący). Roboczo przekazuję jako string, ale to kwestia ustalenia.
 """
-
-from itertools import combinations
 
 LONG_BODY=0.03  #parametr określający jaką różnicę mięczy O a C traktujemy jako dużą (3%)
 SHORT_BODY=0.005    #parametr określający jaką różnicę mięczy O a C traktujemy jako małą (0,5%)
@@ -18,21 +15,21 @@ def findCandleFormations(O,H,L,C,trend):
         print "Tablice są różnej długości - co to kurwa ma być?"
         return None
     result=[]
-    if trend==1:
+    if trend=='rising':
         result.append(findBull3(O,H,L,C))        
-        result.append(findEveningStar(O,C))                
-        result.append(findDarkCloud(O,C))
+        result.append(findEveningStar(O,H,L,C))                
+        result.append(findDarkCloud(O,H,L,C))
     else:
         result.append(findBear3(O,H,L,C))        
-        result.append(findMorningStar(O,C))                 
-        result.append(findPiercing(O,C))
+        result.append(findMorningStar(O,H,L,C))                 
+        result.append(findPiercing(O,H,L,C))
     return [value for value in result if value != None]
 
 """Algorytm szukania każdej formacji jest identyczny: lecimy od końca i sprawdzamy po kolei
 świeczki czy są takie jak formacja nakazuje. Jeśli znajdziemy coś dobrego to kończymy 
 (nie interesuje nas co było wcześniej), jeśli nie to zwracamy None"""    
 
-def findDarkCloud(O,C):
+def findDarkCloud(O,H,L,C):
     """Znajduje formację zasłony ciemnej chmury - 2-dniowa formacja odwrócenia trendu wzrostowego"""
     if(len(O)<2):        
         return None    
@@ -49,7 +46,7 @@ def findDarkCloud(O,C):
         return ('dark_cloud',i-1,i)
     return None
 
-def findPiercing(O,C):
+def findPiercing(O,H,L,C):
     """Znajduje formację przenikania - 2-dniowa formacja odwrócenia trendu spadkowego"""
     if(len(O)<2):        
         return None    
@@ -66,7 +63,7 @@ def findPiercing(O,C):
         return ('piercing',i-1,i)
     return None    
 
-def findEveningStar(O,C):
+def findEveningStar(O,H,L,C):
     """Znajduje formację gwiazdy wieczornej - 3-dniowa formacja odwrócenia trendu wzrostowego"""
     if(len(O)<3):        
         return None    
@@ -84,7 +81,7 @@ def findEveningStar(O,C):
         return ('evening_star',i-2,i)
     return None    
 
-def findMorningStar(O,C):
+def findMorningStar(O,H,L,C):
     """Znajduje formację gwiazdy porannej - 3-dniowa formacja odwrócenia trendu spadkowego"""
     if(len(O)<3):        
         return None    
@@ -162,56 +159,18 @@ def findBear3(O,H,L,C):
         return ('bear3',i-4,i)
     return None    
 
-"""luki traktuję jako osobną rzecz od formacji świecowych 
+"""luki i wyspy traktuję jako osobną rzecz od formacji świecowych 
 (podobnie zresztą jak literatura)
 po pierwsze nie wymagają świec (wystarczy zwykły wykres słupkowy), 
 po drugie kształtują się przez dłuższy czas, więc są IMO ważniejsze"""
 
-def findGaps(H,L,trend):
-    """Znajduje na danym wykresie (lub jego wycinku) lukę startową, ucieczki i wyczerpania. 
-    Używać najlepiej na możliwie krótkim okresie, np po wybiciu z formacji. 
-    Interpretacja: Luka startowa - sygnał rozpoczęcia trendu, 
-    luka ucieczki - potwierdzenie siły trendu + orientacyjne określenie jego zasięgu (zazwyczaj jest w połowie)
-    luka wyczerpania - sygnał że trend się wkrótce skończy    
-    Uwaga na wartości zwracane przez funkcję, dostajemy None, lub parę składającą się
-    ze stringa (po stringu poznamy co jest drugim argumentem) i krotki 3 lub 2 elementowej 
-    lub pojedynczego elementu"""
-    if(len(H)!=len(L)):
-        return None
-    gaps=[] 
-    if(trend>0):
-        #szukamy wszystkich luk na wykresie (uwaga - w kolejności od najnowszej do najstarszej)
-        for i in range (len(H)-1,0,-1):
-            if(H[i-1]<L[i]):
-                gaps.append( (i,H[i-1]+(L[i]-H[i-1])/2.) )
-        if len(gaps)>=3:
-            #szukamy luki startowej, ucieczki i wyczerpania
-            #3 luki ułożone w mniej więcej równych odstępach
-            for gap1,gap2,gap3 in list(combinations(gaps,3)):                                       
-                if 0.8*(gap1[1]-gap2[1]) < (gap2[1]-gap3[1]) < 1.2*(gap1[1]-gap2[1]):
-                    return ('3gaps',(gap3,gap2,gap1))
-        if len(gaps)>=2:            
-            for gap1,gap2 in list(combinations(gaps,2)):                                       
-                #jeśli znajdziemy dwie luki rosnąco na różnych wysokościach to traktujemy
-                #je jako lukę startową i ucieczki
-                if gap1[1]>1.05*gap2[1]:
-                    return ('2gaps',(gap2,gap1))                
-    #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
-    elif(trend<0):                
-        for i in range (len(H)-1,0,-1):
-            if(L[i-1]>H[i]):
-                gaps.append( (i,L[i]+(H[i-1]-L[i])/2.) )
-        if len(gaps)>=3:            
-            for gap1,gap2,gap3 in list(combinations(gaps,3)):                                       
-                if 0.8*(gap2[1]-gap1[1]) < (gap3[1]-gap2[1]) < 1.2*(gap2[1]-gap1[1]):
-                    return ('3gaps',(gap3,gap2,gap1))
-        if len(gaps)>=2:            
-            for gap1,gap2 in list(combinations(gaps,2)):                                                       
-                if gap1[1]<1.05*gap2[1]:
-                    return ('2gaps',(gap2,gap1))                                
-    if len(gaps)>=1:
-        #jeśli nie mamy nic ciekawego to zwracamy po prostu ostatnią lukę
-        #traktujemy ją jako lukę startową
-        return ('1gap',gaps[0])
-    else: 
-        return None                        
+def findIsland(O,H,L,C,trend):
+    """Znajduje formację wyspy. Jest to formacja odwrócenia trendu"""
+    pass
+
+def findGaps(O,H,L,C,trend):
+    """Znajduje na danej tablicy lukę startową, ucieczki i wyczerpania. 
+    Używać najlepiej po wybiciu z formacji."""
+    pass
+
+#(breakaway gaps)  (continuation gaps)  (exhaustion gaps)
