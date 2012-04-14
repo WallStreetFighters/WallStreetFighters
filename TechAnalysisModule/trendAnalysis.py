@@ -507,6 +507,12 @@ def findWedge(values):
     supAngle = arctan(supLine[0])*(180.0/pi)
     resAngle = arctan(resLine[0])*(180.0/pi)
     print "supAngle: ", supAngle, "resAngle: ", resAngle
+    if resAngle < wedgeVul and resAngle > -wedgeVul and supAngle < wedgeVul and supAngle > -wedgeVul:
+        print "Found rect"
+        return ('rect',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1)) 
+    if resAngle < -wedgeVul and supAngle > wedgeVul:
+        print "Found triangle"
+    	return ('triangle',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1)) 
     #klin zwyżkujący
     if resAngle>wedgeVul and supAngle>resAngle:
         return ('rising_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
