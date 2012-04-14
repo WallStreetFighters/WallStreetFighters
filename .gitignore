@@ -20,7 +20,8 @@
 *.rar
 *.tar
 *.zip
-
+data.wsf
+data.wsf~
 # Logs and databases #
 ######################
 *.log
