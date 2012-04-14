@@ -16,6 +16,9 @@ STRONG_TREND=0.3
 STRAIGHT_TREND_VUL=0.1
 LONG_BODY=0.03  #parametr określający jaką różnicę mięczy O a C traktujemy jako dużą (3%)
 SHORT_BODY=0.005    #parametr określający jaką różnicę mięczy O a C traktujemy jako małą (0,5%)
+LOW_PART=0.25
+HIGH_PART=0.75
+
 
 def findCandleFormations(O,H,L,C,trend):
     """Szuka na wykresie formacji świecowych, dla każdej formacji która wystąpiła
@@ -182,7 +185,7 @@ def isStraightTrend(array):
     a, b = trend.regression(array)
     if abs(a) < STRONG_TREND:
         return 0
-    for i in range(array.size):
+    for i in range(len(array)):
             y = a*i+b
             if y > (1+STRAIGHT_TREND_VUL)*array[i] or y < (1-STRAIGHT_TREND_VUL)*array[i]:
                     return 0
@@ -194,25 +197,84 @@ def findGaps(H,L,C):
     Interpretacja: Luka startowa - sygnał rozpoczęcia trendu, 
     luka ucieczki - potwierdzenie siły trendu + orientacyjne określenie jego zasięgu (zazwyczaj jest w połowie)
     luka wyczerpania - sygnał że trend się wkrótce skończy    
-    Uwaga na wartości zwracane przez funkcję, dostajemy None, lub parę składającą się
-    ze stringa (po stringu poznamy co jest drugim argumentem) i krotki 3 lub 2 elementowej 
-    lub pojedynczego elementu"""
+    Funkcja zwraca listę 0, 1, 2 lub 3 elementową, której
+    elementy są krotkami 3-elementowymi: nazwa, indeks w tablicy, poziom y"""
     trend=isStraightTrend(C)
     if not (len(H)==len(L)==len(C)) or trend==0:
-        return None    
-    gaps=[] 
+        return []  
+    breakaway_gap=None
+    continuation_gap=None
+    exhaustion_gap=None
+    gaps=[]
+    amplitude=max(C)-min(C)    
+    base=min(C)
     if(trend>0):
-        #szukamy wszystkich luk na wykresie (uwaga - w kolejności od najnowszej do najstarszej)
+        #najpierw szukamy wszystkich luk na wykresie
         for i in range (len(H)-1):
             if(H[i]<L[i+1]):
                 #pierwszy element pary to indeks, drugi to wartość (połowa wysokości luki)
-                gaps.append( (i,H[i]+(L[i+1]-H[i])/2.) )    
-        for i in range(len(gaps)):
-            pass
+                gaps.append( (i,H[i]+(L[i+1]-H[i])/2.) )         
+        #teraz szukamy pośród nich luk startu, ucieczki i wyczerpania
+        for gap in gaps:
+            #luka startowa: możliwie blisko wartości najmniejszej i nie później niż ucieczki lub wyczerpania
+            if (((exhaustion_gap==None or gap[0]<exhaustion_gap[0]) and 
+                (continuation_gap==None or gap[0]<continuation_gap[0]))
+                and (gap[1]-base<LOW_PART*amplitude and breakaway_gap==None or breakaway_gap!=None and gap[1]-base<breakaway_gap[1]-base)):
+                breakaway_gap=gap
+            #luka ucieczki: możliwie blisko środka, i pomiędzy startową a wyczerpania
+            if (((breakaway_gap==None or gap[0]>breakaway_gap[0]) and 
+                (exhaustion_gap==None or gap[0]<exhaustion_gap[0]))
+                and (LOW_PART*amplitude < gap[1]-base < HIGH_PART*amplitude and continuation_gap==None) 
+                or (continuation_gap!=None and abs(gap[1]-base-0.5*amplitude)<abs(continuation_gap[1]-base-0.5*amplitude))):
+                continuation_gap=gap
+            #luka wyczerpania: możliwie blisko wartości największej ale też nie wcześniej niż ucieczki lub wyczerpania
+            if ((breakaway_gap==None or gap[0]>breakaway_gap[0]) and 
+                (continuation_gap==None or gap[0]>continuation_gap[0])
+                and (gap[1]-base>HIGH_PART*amplitude and exhaustion_gap==None or exhaustion_gap!=None and gap[1]-base>exhaustion_gap[1])):
+                exhaustion_gap=gap
+            gaps=[]
+            if breakaway_gap!=None:
+                breakaway_gap=('rising_breakaway_gap',breakaway_gap[0],breakaway_gap[1])
+                gaps.append(breakaway_gap)
+            if continuation_gap!=None:
+                continuation_gap=('rising_continuation_gap',continuation_gap[0],continuation_gap[1])
+                gaps.append(continuation_gap)
+            if exhaustion_gap!=None:
+                exhaustion_gap=('rising_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
+                gaps.append(exhaustion_gap)
+            return gaps
     #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
     elif(trend<0):                
         for i in range (len(H)-1):
             if(L[i]>H[i+1]):
-                gaps.append( (i,L[i+1]+(H[i]-L[i+1])/2.) )            
+                gaps.append( (i,L[i+1]+(H[i]-L[i+1])/2.) )                
+        for gap in gaps:
+            #luka startowa: możliwie blisko wartości najmniejszej i nie później niż ucieczki lub wyczerpania
+            if (((exhaustion_gap==None or gap[0]<exhaustion_gap[0]) and 
+                (continuation_gap==None or gap[0]<continuation_gap[0]))
+                and (gap[1]-base>HIGH_PART*amplitude and breakaway_gap==None or breakaway_gap!=None and gap[1]>breakaway_gap[1]-base)):
+                breakaway_gap=gap
+            #luka ucieczki: możliwie blisko środka, i pomiędzy startową a wyczerpania
+            if (((breakaway_gap==None or gap[0]>breakaway_gap[0]) and 
+                (exhaustion_gap==None or gap[0]<exhaustion_gap[0]))
+                and (LOW_PART*amplitude < gap[1]-base < HIGH_PART*amplitude and continuation_gap==None) 
+                or (continuation_gap!=None and abs(gap[1]-base-0.5*amplitude)<abs(continuation_gap[1]-base-0.5*amplitude))):
+                continuation_gap=gap
+            #luka wyczerpania: możliwie blisko wartości największej ale też nie wcześniej niż ucieczki lub wyczerpania
+            if ((breakaway_gap==None or gap[0]>breakaway_gap[0]) and 
+                (continuation_gap==None or gap[0]>continuation_gap[0])
+                and (gap[1]-base<LOW_PART*amplitude and exhaustion_gap==None or exhaustion_gap!=None and gap[1]-base<exhaustion_gap[1])):
+                exhaustion_gap=gap
+            gaps=[]
+            if breakaway_gap!=None:
+                breakaway_gap=('falling_breakaway_gap',breakaway_gap[0],breakaway_gap[1])
+                gaps.append(breakaway_gap)
+            if continuation_gap!=None:
+                continuation_gap=('falling_continuation_gap',continuation_gap[0],continuation_gap[1])
+                gaps.append(continuation_gap)
+            if exhaustion_gap!=None:
+                exhaustion_gap=('falling_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
+                gaps.append(exhaustion_gap)
+            return gaps
     else: 
-        return None                        
+        return []                

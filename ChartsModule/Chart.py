@@ -94,6 +94,7 @@ class Chart(FigureCanvas):
         self.draw()        
         #self.drawTrend()
         #self.drawCandleFormations()
+        self.drawGaps()
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -119,9 +120,7 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))        
-        print self.additionalLines
-        print self.rectangles        
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))                 
         for line in self.additionalLines:
             ax.add_line(line)
             line.figure.draw_artist(line)         
@@ -472,6 +471,30 @@ class Chart(FigureCanvas):
             height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
                         -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
             self.drawRectangle(x,y,width,height)        
+            
+    def drawGaps(self):
+        """Test luk. Tak się tego nie będzie używać! Ta funkcja powinna być
+        użyta przez moduł wnioskowania i tylko dla wycinka tablicy z danymi a nie dla całej. 
+        No i kuźwa tego *nie będzie* w charcie podobnie jak wyznaczania trendów."""
+        print "szukam luk"
+        self.clearRectangles()
+        H=self.data.high
+        L=self.data.low
+        C=self.data.close        
+        gaps=findGaps(H,L,C)       
+        print gaps
+        if(gaps!=None):
+            for gap in gaps:            
+                print gap
+                x=gap[1]-0.5
+                width=1
+                if("rising" in gap[0]):
+                    y=0.99*gap[2]            
+                    height=1.1*(L[gap[1]+1]-H[gap[1]])           
+                else:
+                    y=0.99*gap[2]            
+                    height=1.1*(L[gap[1]]-H[gap[1]+1])
+                self.drawRectangle(x,y,width,height)        
           
     def drawTrend(self):
         self.clearLines()
