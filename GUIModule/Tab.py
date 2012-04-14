@@ -74,7 +74,6 @@ def tabUi(self,showLists=True):
         tableStyle(self,self.bondListView)
         self.bondPageLayout.addWidget(self.bondListView)
 
-
         #Resource
         self.resourcePage = QtGui.QWidget(self.listsFrame)
         self.resourcePageLayout = QtGui.QHBoxLayout(self.resourcePage)

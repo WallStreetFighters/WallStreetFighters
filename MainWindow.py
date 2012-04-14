@@ -2,6 +2,7 @@ import sys
 import os
 from PyQt4 import QtGui
 from mainGui import GuiMainWindow
+import DataParserModule.dataParser as dataParser
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self,parent=None):
@@ -9,11 +10,10 @@ class MainWindow(QtGui.QMainWindow):
         # obiekt Gui
         self.gui = GuiMainWindow()
         self.gui.setupGui(self)
-
-
-    
-    
-
+    def closeEvent(self, event):
+	FILE = open('data.wsf','w')
+	dataParser.saveHistory(FILE)
+	FILE.close()
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
