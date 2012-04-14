@@ -8,6 +8,7 @@ import numpy as np
 import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as parser
 
+
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
     co daje mi FinancialObject Marcina. Czwarty parametr określa czy obliczamy dane

@@ -9,6 +9,7 @@ from PyQt4 import QtGui, QtCore
 from TabA import TabA
 import cPickle
 import GUIModule.RSSgui as RSSgui
+from GUIModule.home import Home 
 from ChartsModule.Chart import Chart
 import DataParserModule.dataParser as dataParser
 
@@ -31,6 +32,10 @@ class GuiMainWindow(object):
         #załadowanie List
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
+	FILE = open("../GUIModule/data.wsf", 'r')
+	dataParser.loadHistory(FILE)
+	FILE.close()
+
 
         # inicjujemy model danych dla Index
         self.indexModel = self.ListModel(list=dataParser.INDEX_LIST)
@@ -42,9 +47,11 @@ class GuiMainWindow(object):
         self.resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
         # inicjujemy model danych dla Bond
         self.bondModel = self.ListModel(list=dataParser.BOND_LIST)
-        
-
-
+        """home """
+        self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
+        self.tabs.addTab(self.home,"Home")
+        self.rssWidget = RSSgui.RSSWidget(self.home)
+        self.home.rssLayout.addWidget(self.rssWidget)
 
         """tab A wskaźniki i oscylatory"""
 	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,)
@@ -55,9 +62,7 @@ class GuiMainWindow(object):
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
         self.tabA.bondListView.doubleClicked.connect(self.newBondTab)
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
-        
         self.tabA.compareButton.clicked.connect(self.compare)
-
         
         """koniec tab A """
         
@@ -78,14 +83,7 @@ class GuiMainWindow(object):
         self.tabs.addTab(self.tabC,"tabC")
         
         Koniec tabC"""
-        
-        """ Rss tab"""
-        self.RSSTab = QtGui.QWidget()
-        self.tabs.addTab(self.RSSTab,"RSS")
-        self.rssWidget = RSSgui.RSSWidget(self.RSSTab)
-        self.verticalLayout2 = QtGui.QVBoxLayout(self.RSSTab)
-        self.verticalLayout2.addWidget(self.rssWidget)
-    
+
 	""" koniec ustawiania Zakładek"""
 
 	self.tabs.tabCloseRequested.connect(self.closeTab)
