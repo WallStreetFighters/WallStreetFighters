@@ -53,9 +53,9 @@ class GuiMainWindow(object):
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 
-        """tab A wskaźniki i oscylatory"""
+        """tSearch"""
 	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,)
-        self.tabs.addTab(self.tabA,"tabA")
+        self.tabs.addTab(self.tabA,"Search")
         
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
         self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
@@ -194,10 +194,15 @@ class GuiMainWindow(object):
         chartType = self.tabA.chartTypeComboBox.currentText()
         hideVolumen =self.tabA.volumenCheckBox.isChecked() 
         #painting
-        painting = self.tabA.paintCheckBox.isChecked() 
+        painting = self.tabA.paintCheckBox.isChecked()
+        #draw trend
+        drawTrend = self.tabA.drawTrendCheckBox.isChecked()
+        #line width
+        lineWidth = self.tabA.lineWidthSpinBox.value()
+        
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
-             "painting":painting,"scale":scale,"oscilator":oscilator}
+             "painting":painting,"scale":scale,"oscilator":oscilator,"drawTrend":drawTrend,'lineWidth':lineWidth}
         return t
     def closeTab(self,i):
         if i != 0:

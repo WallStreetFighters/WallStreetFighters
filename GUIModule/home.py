@@ -44,7 +44,11 @@ class Home (QtGui.QWidget):
         self.label1 = QtGui.QLabel("Most Activities",self.leftFrame)
         self.leftLayout.addWidget(self.label1)
         self.addTable(self.mostList)
+        self.label2 = QtGui.QLabel("Gainers",self.leftFrame)
+        self.leftLayout.addWidget(self.label2)
         self.addTable(self.gainerList)
+        self.label3= QtGui.QLabel("Losers",self.leftFrame)
+        self.leftLayout.addWidget(self.label3)
         self.addTable(self.loserList)
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.leftLayout.addItem(spacerItem2)
@@ -129,7 +133,7 @@ class Home (QtGui.QWidget):
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtGui.QTableWidgetItem('Change')
         self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem('Chg')
+        item = QtGui.QTableWidgetItem('%Chg')
         self.tableWidget.setHorizontalHeaderItem(3, item)
         k = 0
         for objList in objList2:
@@ -148,7 +152,10 @@ class Home (QtGui.QWidget):
             #Change
             item = QtGui.QTableWidgetItem(objList[2])
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            if objList[2][0] =='-':
+                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            else:
+                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
             brush.setStyle(QtCore.Qt.NoBrush)
             item.setForeground(brush)
             item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
@@ -156,7 +163,10 @@ class Home (QtGui.QWidget):
             #%chg
             item = QtGui.QTableWidgetItem(objList[3])
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))
+            if objList[2][0] == '-':
+                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            else:
+                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
             brush.setStyle(QtCore.Qt.NoBrush)
             item.setForeground(brush)
             item.setFlags(QtCore.Qt.ItemIsEnabled)

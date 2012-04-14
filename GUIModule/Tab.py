@@ -135,7 +135,7 @@ def tabUi(self,showLists=True):
         self.optionsFrame = QtGui.QFrame(self)
         # ustawimy maksymalna wysokosc na 120
 
-        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 130))
+        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 150))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.optionsFrame.setLineWidth(3)

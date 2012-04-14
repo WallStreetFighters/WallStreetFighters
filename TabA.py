@@ -54,48 +54,82 @@ class TabA(QtGui.QWidget):
             self.resourceListView.setModel(self.resourceModel)
         
         if not isinstance( self.qModelIndex,list):
+            self.scrollArea = QtGui.QScrollArea(self.optionsFrame)
+            self.scrollArea.setWidgetResizable(True)
+            self.buttonsFrame = QtGui.QWidget()
+            self.buttonsLayout = QtGui.QGridLayout(self.buttonsFrame)
+            self.buttonsLayout.setContentsMargins(-1, 0, -1, -1)
             self.idicatorsLabel = QtGui.QLabel('Indicators:',self.optionsFrame)
-            self.optionsLayout.addWidget(self.idicatorsLabel,0,2,1,1)
+            self.buttonsLayout.addWidget(self.idicatorsLabel,0,2,1,1)
+            
             #check box dla SMA
             self.smaCheckBox = QtGui.QCheckBox("SMA",self.optionsFrame)
-            self.optionsLayout.addWidget(self.smaCheckBox,1,2,1,1)
+            self.buttonsLayout.addWidget(self.smaCheckBox,1,2,1,1)
             self.indicatorCheckBoxList.append(self.smaCheckBox)
             #check box dla WMA
             self.wmaCheckBox = QtGui.QCheckBox("WMA",self.optionsFrame)
-            self.optionsLayout.addWidget(self.wmaCheckBox,2,2,1,1)
+            self.buttonsLayout.addWidget(self.wmaCheckBox,2,2,1,1)
             self.indicatorCheckBoxList.append(self.wmaCheckBox)
             #check box dla EMA
             self.emaCheckBox = QtGui.QCheckBox("EMA",self.optionsFrame)
-            self.optionsLayout.addWidget(self.emaCheckBox,3,2,1,1)
+            self.buttonsLayout.addWidget(self.emaCheckBox,3,2,1,1)
             self.indicatorCheckBoxList.append(self.emaCheckBox)
             #check box dla bollinger
             self.bollingerCheckBox = QtGui.QCheckBox("bollinger",self.optionsFrame)
-            self.optionsLayout.addWidget(self.bollingerCheckBox,0,3,1,1)
+            self.buttonsLayout.addWidget(self.bollingerCheckBox,0,3,1,1)
             self.indicatorCheckBoxList.append(self.bollingerCheckBox)
 
             self.oscilatorsLabel = QtGui.QLabel('Oscilators:',self.optionsFrame)
-            self.optionsLayout.addWidget(self.oscilatorsLabel,1,3,1,1)
+            self.buttonsLayout.addWidget(self.oscilatorsLabel,1,3,1,1)
             #check box dla wskaźnika momentum
             self.momentumCheckBox = QtGui.QRadioButton("momentum",self.optionsFrame)
-            self.optionsLayout.addWidget(self.momentumCheckBox,2,3,1,1)
+            self.buttonsLayout.addWidget(self.momentumCheckBox,2,3,1,1)
             self.oscilatorCheckBoxList.append(self.momentumCheckBox)
             #check box dla CCI
             self.cciCheckBox = QtGui.QRadioButton("CCI",self.optionsFrame)
-            self.optionsLayout.addWidget(self.cciCheckBox,3,3,1,1)
+            self.buttonsLayout.addWidget(self.cciCheckBox,3,3,1,1)
             self.oscilatorCheckBoxList.append(self.cciCheckBox)
             #check box dla ROC
             self.rocCheckBox = QtGui.QRadioButton("ROC",self.optionsFrame)
-            self.optionsLayout.addWidget(self.rocCheckBox,0,4,1,1)
+            self.buttonsLayout.addWidget(self.rocCheckBox,0,4,1,1)
             self.oscilatorCheckBoxList.append(self.rocCheckBox)
             #check box dla RSI
             self.rsiCheckBox = QtGui.QRadioButton("RSI",self.optionsFrame)
-            self.optionsLayout.addWidget(self.rsiCheckBox,1,4,1,1)
+            self.buttonsLayout.addWidget(self.rsiCheckBox,1,4,1,1)
             self.oscilatorCheckBoxList.append(self.rsiCheckBox)
             #check box dla Williams Oscilator
             self.williamsCheckBox = QtGui.QRadioButton("williams",
                                                          self.optionsFrame)
-            self.optionsLayout.addWidget(self.williamsCheckBox,2,4,1,1)
+            self.buttonsLayout.addWidget(self.williamsCheckBox,2,4,1,1)
             self.oscilatorCheckBoxList.append(self.williamsCheckBox)
+
+            #horizontal line
+            self.line = QtGui.QFrame(self.buttonsFrame)
+            self.line.setFrameShape(QtGui.QFrame.HLine)
+            self.line.setFrameShadow(QtGui.QFrame.Sunken)
+            self.buttonsLayout.addWidget(self.line, 4, 2, 1, 3)
+
+
+            #check box dla drawTrend
+            self.drawTrendCheckBox = QtGui.QCheckBox("drawTrend",self.optionsFrame)
+            self.buttonsLayout.addWidget(self.drawTrendCheckBox,5,2,1,1)
+            #label dla grubosci lini
+            self.lineWidthLabel = QtGui.QLabel("line Width",self)
+            self.buttonsLayout.addWidget(self.lineWidthLabel,5,3,1,1)
+            #spin box dla grubosci lini
+            self.lineWidthSpinBox = QtGui.QDoubleSpinBox(self.optionsFrame)
+            self.lineWidthSpinBox.setFrame(True)
+            self.lineWidthSpinBox.setReadOnly(False)
+            self.lineWidthSpinBox.setButtonSymbols(QtGui.QAbstractSpinBox.PlusMinus)
+            self.lineWidthSpinBox.setDecimals(1)
+            self.lineWidthSpinBox.setMinimum(0.5)
+            self.lineWidthSpinBox.setMaximum(5.0)
+            self.lineWidthSpinBox.setSingleStep(0.5)
+            self.lineWidthSpinBox.setProperty("value", 1.0)
+            self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)            
+
+            self.scrollArea.setWidget(self.buttonsFrame)
+            self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
         
 
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
@@ -121,6 +155,7 @@ class TabA(QtGui.QWidget):
                 self.smaCheckBox.stateChanged.connect(self.smaChanged)
                 self.emaCheckBox.stateChanged.connect(self.emaChanged)
                 self.wmaCheckBox.stateChanged.connect(self.wmaChanged)
+                self.drawTrendCheckBox.stateChanged.connect(self.updateDrawTrend)
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
             self.startDateEdit.dateChanged.connect(self.checkDate)
             self.endDateEdit.dateChanged.connect(self.checkDate)    
@@ -133,6 +168,7 @@ class TabA(QtGui.QWidget):
         
         if self.chart !=None:
             self.chart.setScaleType(self.settings["scale"])
+            self.updateDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -144,6 +180,7 @@ class TabA(QtGui.QWidget):
         self.settings["ChartType"] = self.chartTypeComboBox.currentText()
         if self.chart !=None:
             self.chart.setMainType(self.settings["ChartType"])
+            self.updateDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -162,6 +199,7 @@ class TabA(QtGui.QWidget):
             else:
                 self.finObj.updateArchive(self.settings["step"])
             self.chart.setData(self.finObj,start,end,self.settings["step"])
+            self.updateDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -180,6 +218,7 @@ class TabA(QtGui.QWidget):
             else:
                 self.finObj.updateArchive(self.settings["step"])
             self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -192,6 +231,7 @@ class TabA(QtGui.QWidget):
                 self.settings["oscilator"] = str(box.text())
         if self.chart !=None:
             self.chart.setOscPlot(self.settings["oscilator"])
+            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -210,6 +250,7 @@ class TabA(QtGui.QWidget):
                 self.chart.addVolumeBars()
 
             self.chartsLayout.addWidget(self.chart)
+            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -224,6 +265,7 @@ class TabA(QtGui.QWidget):
                 self.chartsLayout.removeWidget(self.chart)
             self.chart.setDrawingMode(painting)
             self.chartsLayout.addWidget(self.chart)
+            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             #self.chart.emit(QtCore.SIGNAL("movido"))
@@ -262,6 +304,7 @@ class TabA(QtGui.QWidget):
                 self.chart.setMainIndicator(self.settings['indicator'][-1])
             else:
                 self.chart.setMainIndicator("")
+            self.checkDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -276,6 +319,26 @@ class TabA(QtGui.QWidget):
         if self.settings['indicator']:
             name = self.settings['indicator'][-1].lower()
             eval ('self.'+name+'CheckBox.setFont(font)')
+    def updateDrawTrend(self):
+        drawTrend =self.drawTrendCheckBox.isChecked()
+        if self.chart !=None and drawTrend:
+            self.chart.drawTrend()
+            self.chart.repaint()
+            self.chart.update()
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+        else:
+            self.chart.repaint()
+            self.chart.update()
+            m= self.parentWidget().parentWidget().parentWidget().parentWidget()
+            m.resize(m.width() , m.height()-20)
+            m.resize(m.width() , m.height()+20)
+
+    def checkDrawTrend(self):
+        drawTrend =self.drawTrendCheckBox.isChecked()
+        if self.chart !=None and drawTrend:
+            self.chart.drawTrend()
 
             
             
@@ -317,7 +380,7 @@ class TabA(QtGui.QWidget):
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
-
+        
 
         self.chart = Chart(self, self.finObj)
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
@@ -332,8 +395,9 @@ class TabA(QtGui.QWidget):
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         
-        print "Bede rysowal wykres"
-        self.chart.drawTrend()
+        if self.settings['drawTrend']:
+            lineWidth = self.settings['lineWidth']
+            self.chart.drawTrend()
         
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
