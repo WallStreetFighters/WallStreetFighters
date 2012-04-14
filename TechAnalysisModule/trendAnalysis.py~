@@ -23,6 +23,7 @@ def trend(a, trendVuln = trendVul):
             return 1 # rosnacy
     if (angle <-trendVuln and angle > -90):
             return -1 # malejacy
+<<<<<<< HEAD
 
 def regression(values):
     """Wyznaczamy prosta ktora najlepiej przybliza wykres - y = ax + b"""
@@ -62,6 +63,17 @@ def linearFun(x1, y1, x2, y2):
 
 def evaluateFun(a, b, x):
     return a*x + b
+=======
+            
+def getChannelLines(y):
+    """Wylicza """
+    size = len(y)
+    z = y[3*size/4:]
+    if size >= 8:
+        return findMaxMin(z)
+    else:
+        return findMaxMin(y, 3)
+>>>>>>> GUI
 
 def linearFunFromArray(array):
     if array.size < 2:

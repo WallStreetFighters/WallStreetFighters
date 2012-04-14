@@ -11,7 +11,8 @@ import cStringIO
 import cPickle
 
 #ZMIENNE GLOBALNE
-REMEMBER_COUNT = 5
+
+REMEMBER_COUNT = 15
 DATABASE_LAST_UPDATE = datetime.date(2012,3,3)
 INDEX_LIST = []
 STOCK_LIST = []
@@ -19,7 +20,6 @@ FOREX_LIST = []
 RESOURCE_LIST = []
 BOND_LIST = []
 HISTORY_LIST = []
-
 AMEX_HIST = []
 NYSE_HIST = []
 NASDAQ_HIST = []
@@ -142,7 +142,7 @@ class FinancialObject(object):
 
 	def getArray(self, time):
 		"""Funkcja zwracająca rekordowaną tablicę (numpy.recarray) dla informacji w odstępie czasu przekazanym jako parametr funkcji. Pozwala to dostać się do poszczególnych tablic używając odpowiednich rekordów: 'date' 'open' etc."""
-		if self.financialType == 'forex':
+		if self.financialType == 'forex' or self.financialType == 'bond' or self.financialType == 'resource':
 			tmplist = []
 			if time == 'daily':
 				for x in self.valuesDaily:
@@ -173,7 +173,7 @@ class FinancialObject(object):
 			return
 		if time == 'daily':
 			if end < self.valuesDaily[0][0]:
-				raise Exception('')
+				raise DataAPIException('Stock was not noted yet ')
 			size = len(self.valuesDaily)
 			
 			if begin < self.valuesDaily[0][0]:
@@ -192,6 +192,8 @@ class FinancialObject(object):
 			return [start-1,finish+1]
 		if time == 'weekly':
 			size = len(self.valuesWeekly)
+			if end < self.valuesWeekly[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			if begin < self.valuesWeekly[0][0]:
 				start = 1
 			else:
@@ -208,6 +210,8 @@ class FinancialObject(object):
 			return [start-1,finish+1]
 		if time == 'monthly':
 			size = len(self.valuesMonthly)
+			if end < self.valuesMonthly[0][0]:
+				raise DataAPIException('Stock was not noted yet ')
 			if begin < self.valuesMonthly[0][0]:
 				start = 1
 			else:
@@ -223,6 +227,12 @@ class FinancialObject(object):
 					finish += 1
 			return [start-1,finish+1]
 #koniec definicji klasy
+
+class DataAPIException(Exception):
+	def __init__(self,value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
 
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
@@ -399,7 +409,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 	if timePeriod == 'daily':
 		for row in dataCsv:
 			try:
-				if financialType == 'forex':
+				if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
 					dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 				else:
 					date = parserStringToDate(row[0])
@@ -409,7 +419,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 				pass
 	elif timePeriod == 'weekly':
 		for row in dataCsv:
-			if financialType == 'forex':
+			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
 				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 			else:
 				date = parserStringToDate(row[0])
@@ -417,7 +427,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 			finObj.valuesWeekly = finObj.valuesWeekly + dataRow
 	elif timePeriod == 'monthly':
 		for row in dataCsv:	
-			if financialType == 'forex':
+			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
 				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
 			else:
 				date = parserStringToDate(row[0])
@@ -609,127 +619,163 @@ def isInStock(abbreviation):
 			return x	
 	return None
 
-def saveHistory():
+def saveHistory(file):
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
-	cPickle.dump(HISTORY_LIST, open('data.wsf', 'wb'))
-
-def loadHistory():
-	"""Funkcja zapisująca bierzącą historie w pliku"""
-	global HISTORY_LIST
-	HISTORY_LIST = cPickle.load(open('data.wsf', 'rb'))
-
-#TAKIE MOJE TESTOWANIE#
-#loadData()
-
-#x = getAdvDecInPeriodOfTime(datetime.date(2012,03,20),datetime.date(2012,03,23),'AMEX')
-#print x['advv']
-
-#saveHistory()
-"""int 
-start = datetime.datetime.now()
-
-end = datetime.datetime.now()
-x = end-start
-print "Excecution_time1: %s" % x
-
-i = 0
-l = ""oin
-loadHistory()
-z = createWithArchivesFromYahoo('bmw','ZBB','forex','Yahoo','daily')
-for x in HISTORY_LIST:
-	print x.name
-
-
-"""
-
-"""for x in US_INDICES:
-	print x[1]+','+x[0]+',Yahoo'""" """
-x = createWithCurrentValueFromStooq('USD/GPB', 'plngbp', 'forex', 'gbp')
-x.getCurrentValue()
-print x.currentValue
-print x.previousValues
-for k in x.valuesMonthly:
-	print k 
-updateDatabase()
-"""
-"""
-sFCCY+SRCE+TCHC+SSRX+EGHT+AXAS+ACTG+ACAD+ANCX+ARAY+ACET+ACNB+BIRT+ACXM+ADUS+ADBE+AEGN+AEHR+AEPI+ATRM+AGEN+AIRM+AMCN+AIXG+ALKS+ALGT+ABVA+ALNC+ALLT+AFAM+AOSL+ALTI+ALTR+ALTE+ASPS+APSA+ALVR+AMRN+AMBT+AMCX+AMED+UHAL+ASBI+AGNC+MTGE+ANCI+AMIC+ALRN+ANAT+APFC+AMRB+AMSC+AMWD+ARGN+ABCB+ASRV+ASRVP+AMTC+AMTCP+ATLO+AMGN+AMPL+AMSG+ALOG+ANLY+ANCB+AMCF+ANGN+ANIK+ANNB+APAGF+ATNY+AINV+AAPL+AMCC+AREX+ARSD+ACGL+ACAT+ARCC+ARKR+ABFS+ARTX+ARRY+ARRS+AROW+ARWR+ARTNA+ARTC+AERL+APWC+ASMI+ASML+AACC+ASBC+ASBCW+ATRO+ASTC+ASUR+ATAI+AFCB+AAME+ACFC+AAWW+ATML+ATMI+ATPG+ATRI+AUDC+AAC+AACOU+AACOW+ADAT+ABTL+AMAP+AVGO+AXTI+BCOM+BOSC+BCPC+BANF+BANFP+BKMU+BOCH+BMRC+BKSC+OZRK+BOVA+BFIN+BANR+MSDXP+BCDS+BBBY+BELFA+BELFB+BNHN+BGSCU+BGFV+BIOD+BIOF+BIIB+BLRX+BMRN+BSTC+BITS+BBOX+BKCC+ADRA+ADRD+ADRE+ADRU+MNGL+MNGLU+MNGLW+BNCN+BODY+BOKF+BOLT+BONA+BBNK+BRID+BCOV+BKBK+BRCM+BYFC+BRKR+BMTC+BSDM+BSQR+BUR+CFFI+CA+CCMP+CZR+CAMP+CFNB+CAFI+CAC+CAMT+CSIQ+CPHC+CPLA+CBKN+CCBG+CPLP+CSWC+CFFN+CPST+CFNL+CRME+CECO+CLBH+CART+CRRB+CACB+CATY+CAZA+CAZAU+CAZAW+CFK+CECE+CELG+CELGZ+CLSN+CEDC+CETV+CFBK+CENT+CENTAtart = datetime.datetime.now()
-try:
-	
+	print "zapisalem"
 	for x in HISTORY_LIST:
-		x.abbreviation
-except EOFError:
-	pass
-end = datetime.datetime.now()
-x = end-start
-print "Excecution_time2: %s" % x
+		print x.abbreviation
+	cPickle.dump(HISTORY_LIST, file)
 
-start = datetime.datetime.now()
-z = createWithArchivesFromYahoo('usdpln','CPE','forex','Yahoo','daily')
-print z.getIndex(datetime.date(1989,12,01),datetime.date(1989,12,03))
-end = datetime.datetime.now()
-x = end-start
-print "Excecution_time3: %s" % x
+def loadHistory(file):
+	"""Funkcja zapisująca bierzącą historie w pliku"""
+	global HISTORY_LIST
+	HISTORY_LIST = cPickle.load(file)
+	
+def top5Volume():
+	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
+	TOP_VOLUME = []
+	url = "http://finance.yahoo.com/actives?e=us"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	#pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = re.compile(pattern)
+	i = 0
+	for m in re.finditer(pattern,pageSource):
+		if i < 5:
+			TOP_VOLUME.append([m.group(1),m.group(2),m.group(3),m.group(4)])
+			i += 1
+	return TOP_VOLUME
 
-#print z.name
-start = datetime.datetime.now()
-saveHistory()
-end = datetime.datetime.now()
-x = end-start
-print "Excecution_time4: %s" % x
-print isInHistory('USDPLN')
-for x in HISTORY_LIST:
-	print x.abbreviation
+def top5Gainers():
+	"""Funkcja zwracajaca listę 5 spółek o najwiekszym wzroscie"""
+	TOP_GAINERS = []
+	url = "http://finance.yahoo.com/gainers?e=us"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = re.compile(pattern)
+	i = 0
+	for m in re.finditer(pattern,pageSource):
+		if i < 5:
+			TOP_GAINERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
+			i += 1
+	return TOP_GAINERS
 
-"""
+def top5Losers():
+	"""Funkcja zwracajaca listę 5 spółek o najwiekszym spadku"""
+	TOP_LOSERS = []
+	url = "http://finance.yahoo.com/losers?e=us"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = re.compile(pattern)
+	i = 0
+	for m in re.finditer(pattern,pageSource):
+		if i < 5:
+			TOP_LOSERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
+			i += 1
+	return TOP_LOSERS
 
-"""    
-for x in FOREX_LIST:
-	i = i+1
+def getMostPopular():
+	"""Funkcja zwracająca aktualne wartości najbardziej popularnych obiektów"""
+	mostPopular = []
+	
+	url = "http://finance.yahoo.com/marketupdate/overview?u"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()	
+	
+	mostPopular.append(mostPopularIndicesSearch('Dow', pageSource))
+	mostPopular.append(mostPopularIndicesSearch('Nasdaq', pageSource))
+	mostPopular.append(mostPopularIndicesSearch('S&amp;P 500', pageSource))
 
-	start = datetime.datetime.now()
-	z = createWithArchivesFromStooq(x[1],x[0],'forex','stooq','daily')
-	print z.name
-	end = datetime.datetime.now()
-	z.updateArchive('monthly')
-	for y in z.valuesMonthly:
-		print y
-	x = end-start
-	print "Excecution_time: %s" % x
-"""
-"""
-csvFile  = open('companylist(1).csv', "rb")
-dataCsv = csv.reader(csvFile)
-dataCsv.next()
-i = 0
-for row in dataCsv:
-	print row[0]+','+row[1]+',Yahoo,AMEX'
-"""
-"""
-### PRZYKŁADOWE UŻYCIE ###
-loadData() #Wczytuje dane do zmiennych globalnych
+	url = "http://finance.yahoo.com/"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
 
-#załóżmy, że użytkownik chce informacje dotyczące "21Vianet Group Inc."
+	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
+	mostPopular.append(mostPopularPatternSearch('10-Year',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Gold',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Oil',pageSource))
 
-finObj = createWithCurrentValueFromYahoo(STOCK_LIST[6][1],STOCK_LIST[6][0],'stock',STOCK_LIST[6][3]) #tworzymy obiekt z aktualną wartością akcji
+	mostPopular[2][0] = 'S&P 500' 
+	return mostPopular
 
-finObj.updateArchive() #pobieramy wartości archiwalne do obiektu
-print "Aktualna wartość: " + str(finObj.currentValue[0])
 
-a = finObj.getArray('daily')
-print a['date']
+def mostPopularPatternSearch(keyWord,source):
 
-x = finObj.getIndex(datetime.date(2011,8,8),datetime.date(2012,2,17),'daily')
-print x
-print finObj.valuesDaily[x[0]][0]
-print finObj.valuesDaily[x[1]][0]
-"""
+	pattern = '">' + keyWord + '<.*?">([0-9,.]*)<.*?>([0-9,.+-]*)<\/span.*?>([0-9.+-]*%)<'
+	pattern = re.compile(pattern, re.DOTALL)
+	m = re.search(pattern,source)
+	return [keyWord,m.group(1),m.group(2),m.group(3)]
 
-#x = getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+def mostPopularIndicesSearch(keyWord,pageSource):
+	
+	pattern = '">' + keyWord + '<.*?">([0-9,.]*)<\/span>.*?"color:(.*?);.*?>([0-9,.]*)<.*?> \(([0-9.]*%)\)<'
+	pattern = re.compile(pattern, re.DOTALL)
+	m = re.search(pattern,pageSource)
+	if m.group(2) == '#cc0000':
+		return [keyWord,m.group(1),'-' + m.group(3),'-' + m.group(4)]
+	else:
+		return [keyWord,m.group(1),'+' + m.group(3),'+' + m.group(4)]
 
-#print x['adv']end = datetime.datetime.now()
-=======
+def getMostPopularCurrencies():
+	""" """
+	
+	url = "http://finance.yahoo.com/"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	
+	mostPopular = []
+	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
+	mostPopular.append(mostPopularPatternSearch('USD/JPY',pageSource))
+	mostPopular.append(mostPopularPatternSearch('GBP/USD',pageSource))
+	
+	return mostPopular
 
+def getMostPopularCommodities():
+	""" """
+	
+	url = "http://finance.yahoo.com/"
+	try:
+		site = urllib2.urlopen(url)
+	except urllib2.URLError, ex:
+		print "Something wrong happend! Check your internet connection!"
+	pageSource = site.read()
+	
+	mostPopular = []
+	mostPopular.append(mostPopularPatternSearch('Gold',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Silver',pageSource))
+	mostPopular.append(mostPopularPatternSearch('Copper',pageSource))
+	
+	return mostPopular
+
+def loadStats():
+	"""Funkcja zwracajaca pobierajaca do globalnych tabel statystyki (5 najwiekszych spadkow/wzrostow/wolumenow)"""
+	top5Losers()
+	top5Volume()
+	top5Gainers()
+
+
+########################################################################################################
 
 
