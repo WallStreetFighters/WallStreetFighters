@@ -252,7 +252,7 @@ def lookForHeadAndShoulders(values, volumine):
     maxVal = max(values)
     maxVol = max(volumine)
     
-    for j in reversed(range(div, min(2*hsDiv, len(values)))):
+    for j in reversed(range(hsDiv - 4, min(2*hsDiv, len(values)))):
         val = list(divideArray(values, j))
         vol = list(divideArray(volumine, j))
         z = [0 for i in (range(len(val) - 1))]
@@ -377,7 +377,7 @@ def lookForReversedHeadAndShoulders(values, volumine):
     minVal = min(values)
     maxVol = max(volumine)
 
-    for j in reversed(range(div, min(2*hsDiv, len(values)))):
+    for j in reversed(range(hsDiv - 4, min(2*hsDiv, len(values)))):
         val = list(divideArray(values, j))
         vol = list(divideArray(volumine, j))
         z = [0 for i in (range(len(val) - 1))]
