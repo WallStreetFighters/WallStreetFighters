@@ -34,7 +34,13 @@ class Chart(FigureCanvas):
     drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
     
     scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
+<<<<<<< HEAD
+    grid = True #czy rysujemy grida
+    
+    num_ticks = 8 #tyle jest etykiet pod wykresem
+=======
     grid = True #czy rysujemy grida        
+>>>>>>> candles
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
     margin, maxSize = 0.1, 0.8     
@@ -83,10 +89,9 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.updateOscPlot()        
         self.draw()        
-        #self.drawTrend()
-        self.drawWedge()
+        self.drawTrend()
         self.draw()
-    
+
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
@@ -128,7 +133,11 @@ class Chart(FigureCanvas):
         self.fixTimeLabels()
         if(self.grid):
             for tick in ax.xaxis.get_major_ticks():
+<<<<<<< HEAD
                 # print tick.get_loc()
+=======
+                print tick.get_loc()
+>>>>>>> candles
                 tick.gridOn=True
     
     def addVolumeBars(self):
@@ -416,13 +425,7 @@ class Chart(FigureCanvas):
           self.additionalLines.append(newLine)
           newLine.figure.draw_artist(newLine)                                        
           self.blit(self.mainPlot.bbox)    #blit to taki redraw       
-   
-    def drawWedge(self):
-        wedge=trend.findWedge(self.data.close)
-        if wedge!=None:
-            self.drawTrendLine(wedge[1][0], wedge[1][1], wedge[1][2], wedge[1][3], 'r')
-            self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r')
-          
+             
     def drawTrend(self):
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)
