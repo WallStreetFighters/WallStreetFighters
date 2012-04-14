@@ -313,6 +313,7 @@ class TabA(QtGui.QWidget):
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+
         self.chart = Chart(self, self.finObj)
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
         self.chartsLayout.addWidget(self.chart)
@@ -322,13 +323,10 @@ class TabA(QtGui.QWidget):
         self.chart.setDrawingMode(self.settings["painting"])
         if self.settings["indicator"]:
             self.chart.setMainIndicator(self.settings["indicator"][-1])
+        
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
         self.chart.setScaleType(self.settings["scale"])
-        self.chart.setMainType(self.settings["chartType"])
-        
-        print "Bede rysowal wykres"
-        self.chart.drawWedge()
-        self.chart.drawTrend()
+        self.chart.setMainType(self.settings["chartType"])                                        
         
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
@@ -398,7 +396,8 @@ class TabA(QtGui.QWidget):
             self.stepComboBox.setCurrentIndex(2)
         if self.settings["painting"]:
             self.paintCheckBox.setCheckState(2)
-	
+
+
     def setOptions(self):
         #przywracamy odpowiednie ustawienia opcji w GUI
         #data
@@ -426,6 +425,8 @@ class TabA(QtGui.QWidget):
         #font.setWeight(75)
         if self.settings["indicator"]:
             name = self.settings["indicator"][-1].lower()
+            eval ('self.'+name+'CheckBox.setFont(font)')
+            
         if self.settings["oscilator"] == "momentum":
             self.momentumCheckBox.setChecked(True)
         elif self.settings["oscilator"] == "CCI":

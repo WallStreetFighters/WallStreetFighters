@@ -3,6 +3,11 @@
 """Dane wejściowe do każdej funkcji to 4 tablice jednakowej długości przechowujące
 kursy open, low, high, close. Parament trend oznacza to, w jakim trendzie się znajdujemy,
 (rosnący lub malejący). Zgodnie z konwencją Pawła 1=trend rosnący, -1 malejący.
+
+ACHTUNG !
+indeksy wystąpienia formacji są zwracane w odniesieniu do przekazanych tablic, czyli
+jeśli przekażemy ostatnie 10 elementów z tablicy 100 elementowej i dostaniemy indeksy
+2,3 to znaczy że w pierwotnej tablicy to było na pozycjach 92, 93
 """
 
 import trendAnalysis as trend
@@ -40,7 +45,7 @@ def findDarkCloud(O,C):
         return None    
     for i in range(len(O)-1, 1, -1):
         body1=(C[i-1]-O[i-1])/O[i-1]
-        body2=(C[i]-O[i])/O[i]        
+        body2=(C[i]-O[i])/O[i]                
         if body2 > -LONG_BODY or body1 <LONG_BODY:
             continue        
         if O[i]<=C[i-1]:
