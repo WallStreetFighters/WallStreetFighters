@@ -8,10 +8,12 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.ticker import *
 from matplotlib.textpath import TextPath
+from matplotlib.text import Text
 from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
+from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
     
 class Chart(FigureCanvas):
@@ -86,8 +88,10 @@ class Chart(FigureCanvas):
         """Odświeża wszystkie wykresy"""                
         self.updateMainPlot()
         self.updateVolumeBars()
-        self.updateOscPlot()                
+        self.updateOscPlot()                                
         self.draw()        
+        #self.drawTrend()
+        #self.drawCandleFormations()
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -148,10 +152,7 @@ class Chart(FigureCanvas):
         #tworzymy nowy wykres tylko za pierwszym razem, potem tylko pokazujemy i odświeżamy                
         if(self.volumeBars==None):
             volBounds=[self.margin, self.margin, self.maxSize, self.volHeight]
-            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                    
-            #usuwamy etykiety y dla wolumenu (zakomentujcie, to zobaczycie czemu)
-            for label in self.volumeBars.get_yticklabels():
-                label.set_visible(False)                                               
+            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                                                                               
         self.updateVolumeBars()
         self.volumeBars.set_visible(True)
         self.fixPositions()
@@ -175,15 +176,18 @@ class Chart(FigureCanvas):
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""                
         if self.data==None or self.data.corrupted:
-            return        
+            return                
         ax=self.volumeBars
         ax.clear()
         x=range(len(self.data.close))
-        ax.vlines(x,0,self.data.volume)
-        for label in self.volumeBars.get_yticklabels():
-            label.set_visible(False)            
+        ax.vlines(x,0,self.data.volume)        
         ax.set_xlim(x[0],x[-1])
-        ax.set_ylim(0,1.2*max(self.data.volume))
+        if(max(self.data.volume)>0):
+            ax.set_ylim(0,1.2*max(self.data.volume))
+        for label in self.volumeBars.get_yticklabels():
+            label.set_visible(False)                                
+        for o in ax.findobj(Text):
+            o.set_visible(False)
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -199,10 +203,7 @@ class Chart(FigureCanvas):
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.name) 
-        #poniższe dwie linie są po to, żeby wykres wypełniał całą szerokość
-        #self.mainPlot.xaxis_date()                
-        #self.mainPlot.autoscale_view()   
+        lines[0].set_label(self.data.name)         
         """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
         stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
         Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
@@ -319,8 +320,7 @@ class Chart(FigureCanvas):
         chartWidth=int(self.fig.get_figwidth()*self.fig.get_dpi()*self.maxSize)        
         t = TextPath((0,0), '9999-99-99', size=7)
         labelWidth = int(t.get_extents().width)    
-        num_ticks=chartWidth/labelWidth/2  
-        print chartWidth, labelWidth, num_ticks
+        num_ticks=chartWidth/labelWidth/2          
         length=len(self.data.date)
         if(length>num_ticks):
             step=length/num_ticks        
@@ -444,8 +444,31 @@ class Chart(FigureCanvas):
           self.additionalLines.append(newLine)
           newLine.figure.draw_artist(newLine)                                        
           self.blit(self.mainPlot.bbox)    #blit to taki redraw       
-             
+          
+    def drawCandleFormations(self):
+        """Test formacji świecowych. Tak się tego nie będzie używać! Ta funkcja powinna być
+        użyta przez moduł wnioskowania po rozpoznaniu odpowiedniego trendu (a nie dla obu) 
+        i tylko dla małego wycinka tablicy z danymi a nie dla całej. No i kuźwa tego *nie będzie* w
+        charcie podobnie jak wyznaczania trendów."""
+        print "szukam formacji świecowych"
+        self.clearRectangles()
+        O=self.data.open
+        H=self.data.high
+        L=self.data.low
+        C=self.data.close        
+        formations1=findCandleFormations(O,H,L,C,-1)
+        formations2=findCandleFormations(O,H,L,C,1)        
+        for formation in formations1+formations2:            
+            print formation                    
+            x=formation[1]-0.5
+            y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
+            width=formation[2]-formation[1]+1
+            height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
+                        -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
+            self.drawRectangle(x,y,width,height)        
+          
     def drawTrend(self):
+        self.clearLines()
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
         sup, res = trend.getChannelLines(self.data.close)

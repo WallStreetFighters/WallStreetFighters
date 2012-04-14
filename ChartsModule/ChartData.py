@@ -26,7 +26,7 @@ class ChartData:
         if(end==None):
             end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]                              
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -40,7 +40,7 @@ class ChartData:
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
-            self.volume=dataArray['open'].tolist()   
+            self.volume=dataArray['volume'].tolist()   
             if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
                     ==len(self.volume)==len(self.date))):
                 self.corrupted=True

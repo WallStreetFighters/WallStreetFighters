@@ -186,7 +186,7 @@ class TabA(QtGui.QWidget):
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
-            m.resize(m.width() , m.height()+20)
+            m.resize(m.width() , m.height()+20)            
     def updateOscilator(self):
         self.settings["oscilator"] =" "
         for box in self.oscilatorCheckBoxList:
@@ -330,11 +330,7 @@ class TabA(QtGui.QWidget):
         
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
         self.chart.setScaleType(self.settings["scale"])
-        self.chart.setMainType(self.settings["chartType"])
-        
-        print "Bede rysowal wykres"
-        #self.chart.drawTrend()
-        self.chart.drawRectangle(3,self.chart.data.close[3],10,100)
+        self.chart.setMainType(self.settings["chartType"])                                        
         
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
