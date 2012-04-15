@@ -15,7 +15,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
-import TechAnalysisModule.candles as candles
+
     
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -486,14 +486,14 @@ class Chart(FigureCanvas):
         if(gaps!=None):
             for gap in gaps:            
                 print gap
-                x=gap[1]-0.5
+                x=gap[1]
                 width=1
                 if("rising" in gap[0]):
-                    y=0.99*gap[2]            
-                    height=1.1*(L[gap[1]+1]-H[gap[1]])           
+                    y=H[gap[1]]            
+                    height=L[gap[1]+1]-H[gap[1]]
                 else:
-                    y=0.99*gap[2]            
-                    height=1.1*(L[gap[1]]-H[gap[1]+1])
+                    y=H[gap[1]+1]            
+                    height=L[gap[1]]-H[gap[1]+1]
                 self.drawRectangle(x,y,width,height)        
           
     def drawTrend(self):

@@ -16,8 +16,8 @@ STRONG_TREND=0.3
 STRAIGHT_TREND_VUL=0.1
 LONG_BODY=0.03  #parametr określający jaką różnicę mięczy O a C traktujemy jako dużą (3%)
 SHORT_BODY=0.005    #parametr określający jaką różnicę mięczy O a C traktujemy jako małą (0,5%)
-LOW_PART=0.25
-HIGH_PART=0.75
+LOW_PART=0.25  #poniżej tej części wykresu szukamy luki startowej
+HIGH_PART=0.75  #powyżej tej części wykresu szukamy luki wyczerpania
 
 
 def findCandleFormations(O,H,L,C,trend):
@@ -232,17 +232,17 @@ def findGaps(H,L,C):
                 (continuation_gap==None or gap[0]>continuation_gap[0])
                 and (gap[1]-base>HIGH_PART*amplitude and exhaustion_gap==None or exhaustion_gap!=None and gap[1]-base>exhaustion_gap[1])):
                 exhaustion_gap=gap
-            gaps=[]
-            if breakaway_gap!=None:
-                breakaway_gap=('rising_breakaway_gap',breakaway_gap[0],breakaway_gap[1])
-                gaps.append(breakaway_gap)
-            if continuation_gap!=None:
-                continuation_gap=('rising_continuation_gap',continuation_gap[0],continuation_gap[1])
-                gaps.append(continuation_gap)
-            if exhaustion_gap!=None:
-                exhaustion_gap=('rising_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
-                gaps.append(exhaustion_gap)
-            return gaps
+        gaps=[]
+        if breakaway_gap!=None:
+            breakaway_gap=('rising_breakaway_gap',breakaway_gap[0],breakaway_gap[1])
+            gaps.append(breakaway_gap)
+        if continuation_gap!=None:
+            continuation_gap=('rising_continuation_gap',continuation_gap[0],continuation_gap[1])
+            gaps.append(continuation_gap)
+        if exhaustion_gap!=None:
+            exhaustion_gap=('rising_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
+            gaps.append(exhaustion_gap)
+        return gaps
     #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
     elif(trend<0):                
         for i in range (len(H)-1):
@@ -265,16 +265,16 @@ def findGaps(H,L,C):
                 (continuation_gap==None or gap[0]>continuation_gap[0])
                 and (gap[1]-base<LOW_PART*amplitude and exhaustion_gap==None or exhaustion_gap!=None and gap[1]-base<exhaustion_gap[1])):
                 exhaustion_gap=gap
-            gaps=[]
-            if breakaway_gap!=None:
-                breakaway_gap=('falling_breakaway_gap',breakaway_gap[0],breakaway_gap[1])
-                gaps.append(breakaway_gap)
-            if continuation_gap!=None:
-                continuation_gap=('falling_continuation_gap',continuation_gap[0],continuation_gap[1])
-                gaps.append(continuation_gap)
-            if exhaustion_gap!=None:
-                exhaustion_gap=('falling_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
-                gaps.append(exhaustion_gap)
-            return gaps
+        gaps=[]
+        if breakaway_gap!=None:
+            breakaway_gap=('falling_breakaway_gap',breakaway_gap[0],breakaway_gap[1])
+            gaps.append(breakaway_gap)
+        if continuation_gap!=None:
+            continuation_gap=('falling_continuation_gap',continuation_gap[0],continuation_gap[1])
+            gaps.append(continuation_gap)
+        if exhaustion_gap!=None:
+            exhaustion_gap=('falling_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
+            gaps.append(exhaustion_gap)
+        return gaps
     else: 
         return []                
