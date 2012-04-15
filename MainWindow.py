@@ -3,6 +3,7 @@ import os
 from PyQt4 import QtGui
 from mainGui import GuiMainWindow
 import DataParserModule.dataParser as dataParser
+import cPickle
 
 class MainWindow(QtGui.QMainWindow):
     def __init__(self,parent=None):
@@ -14,6 +15,8 @@ class MainWindow(QtGui.QMainWindow):
 	FILE = open('data.wsf','w')
 	dataParser.saveHistory(FILE)
 	FILE.close()
+	valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList]
+	cPickle.dump(valueList, open('save.wsf','w'))
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

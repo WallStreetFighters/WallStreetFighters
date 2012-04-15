@@ -41,7 +41,7 @@ class ChartData:
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
-            self.volume=dataArray['open'].tolist()   
+            self.volume=dataArray['volume'].tolist()   
             if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
                     ==len(self.volume)==len(self.date))):
                 self.corrupted=True

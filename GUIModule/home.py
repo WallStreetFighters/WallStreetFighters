@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
+import DataParserModule.dataParser as dataParser
 
 class Home (QtGui.QWidget):
     def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None):
@@ -22,9 +23,7 @@ class Home (QtGui.QWidget):
         for objList in self.topList:
             self.addTopObject(objList)
 
-
-        
-        spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+	spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.topLayout.addItem(spacerItem1)
         self.gridLayout.addWidget(self.topFrame, 0, 1, 1, 1)
         #koniec top ramki
@@ -44,7 +43,11 @@ class Home (QtGui.QWidget):
         self.label1 = QtGui.QLabel("Most Activities",self.leftFrame)
         self.leftLayout.addWidget(self.label1)
         self.addTable(self.mostList)
+        self.label2 = QtGui.QLabel("Gainers",self.leftFrame)
+        self.leftLayout.addWidget(self.label2)
         self.addTable(self.gainerList)
+        self.label3= QtGui.QLabel("Losers",self.leftFrame)
+        self.leftLayout.addWidget(self.label3)
         self.addTable(self.loserList)
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.leftLayout.addItem(spacerItem2)
@@ -64,6 +67,16 @@ class Home (QtGui.QWidget):
         self.rssFrame.setSizePolicy(sizePolicy)
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
+
+    def updateTableValues(self):
+	try:
+		self.topList = dataParser.getMostPopular()
+		self.mostList =	dataParser.top5Volume()
+		self.loserList = dataParser.top5Losers()
+		self.gainerList = dataParser.top5Gainers()
+	except dataParser.DataAPIException:
+		pass
+		
 
     def addTopObject(self,objList):
         self.frame = QtGui.QFrame(self)
@@ -129,7 +142,7 @@ class Home (QtGui.QWidget):
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtGui.QTableWidgetItem('Change')
         self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem('Chg')
+        item = QtGui.QTableWidgetItem('%Chg')
         self.tableWidget.setHorizontalHeaderItem(3, item)
         k = 0
         for objList in objList2:
@@ -148,7 +161,10 @@ class Home (QtGui.QWidget):
             #Change
             item = QtGui.QTableWidgetItem(objList[2])
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            if objList[2][0] =='-':
+                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            else:
+                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
             brush.setStyle(QtCore.Qt.NoBrush)
             item.setForeground(brush)
             item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
@@ -156,7 +172,10 @@ class Home (QtGui.QWidget):
             #%chg
             item = QtGui.QTableWidgetItem(objList[3])
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))
+            if objList[2][0] == '-':
+                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            else:
+                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
             brush.setStyle(QtCore.Qt.NoBrush)
             item.setForeground(brush)
             item.setFlags(QtCore.Qt.ItemIsEnabled)
@@ -171,5 +190,8 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
         self.leftLayout.addWidget(self.tableWidget)
+
+	
+		
         
         

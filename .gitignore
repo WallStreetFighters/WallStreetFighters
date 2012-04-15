@@ -7,6 +7,8 @@
 *.o
 *.so
 *.pyc
+data.wsf
+
 
 # Packages #
 ############

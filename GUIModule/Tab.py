@@ -89,12 +89,12 @@ def tabUi(self,showLists=True):
         self.futuresContractPage = QtGui.QWidget(self.listsFrame)
         self.futuresContractPageLayout = QtGui.QHBoxLayout(self.futuresContractPage)
         self.listsToolBox.addItem(self.futuresContractPage, "Futures Contract")
-        self.futuresContractListView = QtGui.QTableView(self.listsFrame)
-        self.futuresContractListView.setAlternatingRowColors(True)
-        self.futuresContractListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.futuresContractListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        tableStyle(self,self.futuresContractListView)
-        self.futuresContractPageLayout.addWidget(self.futuresContractListView)
+        self.futuresListView = QtGui.QTableView(self.listsFrame)
+        self.futuresListView.setAlternatingRowColors(True)
+        self.futuresListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.futuresListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        tableStyle(self,self.futuresListView)
+        self.futuresContractPageLayout.addWidget(self.futuresListView)
         
         self.listsLayout.addWidget(self.listsToolBox)
                 # koniec Tool Box
@@ -133,7 +133,8 @@ def tabUi(self,showLists=True):
         """Ramka przechowujaca opcje"""
         self.optionsFrame = QtGui.QFrame(self)
         # ustawimy maksymalna wysokosc na 120
-        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 130))
+
+        self.optionsFrame.setMaximumSize(QtCore.QSize(16777215, 150))
         self.optionsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.optionsFrame.setLineWidth(3)
