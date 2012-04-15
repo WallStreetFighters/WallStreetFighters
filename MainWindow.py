@@ -18,6 +18,14 @@ class MainWindow(QtGui.QMainWindow):
 	valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList]
 	cPickle.dump(valueList, open('save.wsf','w'))
 
+	ran = range(self.gui.tabs.count())
+	tabHistoryList = []
+	for i in ran:
+            if i >1:
+                print self.gui.tabs.widget(i)
+                t=  self.gui.tabs.widget(i).getSettings()
+                tabHistoryList.append(t)
+        cPickle.dump(tabHistoryList, open('tabHistory.wsf','w'))
     
     
 

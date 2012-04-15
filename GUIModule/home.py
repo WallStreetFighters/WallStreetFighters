@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
+import DataParserModule.dataParser as dataParser
+import time
 
 class Home (QtGui.QWidget):
     def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None):
@@ -7,6 +9,8 @@ class Home (QtGui.QWidget):
         self.mostList = mostList
         self.loserList = loserList
         self.gainerList = gainerList
+	self.updateThread = UpdateThread()
+	self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
         QtGui.QWidget.__init__(self)
         self.initUi()
     def initUi(self):
@@ -191,31 +195,69 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setHighlightSections(True)
         self.leftLayout.addWidget(self.tableWidget)
 
-    def updateTopList(self,topList):
-
+    def updateTopList(self):
+       
+	self.topList = self.updateThread.topList
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
         for i in ran:
             self.topLayout.itemAt(i).widget().close()      
 
         # tworzymy nowe ramki z nowymi wartościami
-        for objList in topList:
+        for objList in self.topList:
             self.addTopObject(objList)
 
-    def updateTable(self,mostList,gainerList,loserList):
+    def updateTable(self):
+	
+	self.mostList = self.updateThread.mostList
+	self.loserList = self.updateThread.loserList
+	self.gainerList = self.updateThread.gainerList
+
         ran = range(self.leftLayout.count())
         for i in ran:
             self.leftLayout.itemAt(i).widget().close()
         label1 = QtGui.QLabel("Most Activities",self.leftFrame)
         self.leftLayout.addWidget(label1)
-        self.addTable(mostList)
+        self.addTable(self.mostList)
         label2 = QtGui.QLabel("Gainers",self.leftFrame)
         self.leftLayout.addWidget(label2)
-        self.addTable(gainerList)
+        self.addTable(self.gainerList)
         label3= QtGui.QLabel("Losers",self.leftFrame)
         self.leftLayout.addWidget(label3)
-        self.addTable(loserList)
-            
+        self.addTable(self.loserList)
+	
+    def updateHome(self):
+	self.updateTopList()
+	self.updateTable()
+
+    def startUpdating(self): 
+	self.updateThread.start()           
+
+class UpdateThread(QtCore.QThread):
+
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+	self.mostList = []
+	self.topList = []
+	self.loserList = []
+	self.gainerList = []
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+	while True:
+		time.sleep(10)
+		try:
+			self.mostList = dataParser.top5Volume()
+			self.loserList = dataParser.top5Losers()
+			self.gainerList = dataParser.top5Gainers()
+			self.topList = dataParser.getMostPopular()
+			self.emit(QtCore.SIGNAL("Update"))
+			
+		except dataParser.DataAPIException:
+			pass
+
         
         
         
