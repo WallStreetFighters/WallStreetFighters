@@ -3,7 +3,8 @@
 import sys
 import datetime
 import operator
-
+import threading
+import time
 import os
 from PyQt4 import QtGui, QtCore
 from TabA import TabA
@@ -59,6 +60,7 @@ class GuiMainWindow(object):
 	self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
+	self.home.startUpdating()
 
         """Search"""
 	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
@@ -264,6 +266,9 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
+
+
+
 
 
 
