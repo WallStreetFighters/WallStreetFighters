@@ -33,9 +33,8 @@ class GuiMainWindow(object):
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 	FILE = open("../GUIModule/data.wsf", 'r')
-	dataParser.loadHistory(FILE).start()
-	
-
+	dataParser.loadHistory(FILE)
+	FILE.close()
 
 
         # inicjujemy model danych dla Index
@@ -52,16 +51,13 @@ class GuiMainWindow(object):
         self.futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
         
         """home """
-
-	File = open("../GUIModule/save.wsf", 'r')
-	valueList = cPickle.load(File)
-	self.home = Home(valueList[0],valueList[1],valueList[2],valueList[3])       
-	self.tabs.addTab(self.home,"Home")
+        self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
+        self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 
         """Search"""
-	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
+	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
         self.tabs.addTab(self.tabA,"Search")
         
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
@@ -72,6 +68,42 @@ class GuiMainWindow(object):
         self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
 
+        """ teraz otwieramy zakładki z historii"""
+        tabHistoryFile = open('tabHistory.wsf','rb')
+        tabHistoryList = cPickle.load(tabHistoryFile)
+        for tabSettings in tabHistoryList:
+            if not isinstance(tabSettings['index'],list): #przywracanie taba z pojedynczym instrumentem
+                if tabSettings['finObjType'] == 'index':
+                    qModelIndex =  self.indexModel.index(tabSettings['index'],0)
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    print "oto : " + nameTab
+                    self.newIndexTab(qModelIndex ,nameTab,tabSettings)
+                if tabSettings['finObjType'] == 'stock':
+                    qModelIndex =  self.stockModel.index(tabSettings['index'],0)
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    print "oto : " + nameTab
+                    self.newStockTab(qModelIndex ,nameTab,tabSettings)
+                if tabSettings['finObjType'] == 'forex':
+                    qModelIndex =  self.forexModel.index(tabSettings['index'],0)
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    print "oto : " + nameTab
+                    self.newForexTab(qModelIndex ,nameTab,tabSettings)
+                if tabSettings['finObjType'] == 'bond':
+                    qModelIndex =  self.bondModel.index(tabSettings['index'],0)
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    print "oto : " + nameTab
+                    self.newBondTab(qModelIndex ,nameTab,tabSettings)
+                if tabSettings['finObjType'] == 'resources':
+                    qModelIndex =  self.resourceModel.index(tabSettings['index'],0)
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    print "oto : " + nameTab
+                    self.newResourceTab(qModelIndex ,nameTab,tabSettings)
+                if tabSettings['finObjType'] == 'futures':
+                    qModelIndex =  self.futuresModel.index(tabSettings['index'],0)
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    print "oto : " + nameTab
+                    self.newFuturesTab(qModelIndex ,nameTab,tabSettings)
+                              
 
         
         """koniec tab A """
@@ -134,36 +166,48 @@ class GuiMainWindow(object):
             self.newResourceTab(qModelIndex,"Resources' comparison")
         
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
-    def newIndexTab(self,qModelIndex,nameTab = None):
-        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "index",showLists = False)
+    def newIndexTab(self,qModelIndex,nameTab = None,settings = None):
+        if settings == None:
+            settings = self.settings()
+        self.tabA1 = TabA('index',qModelIndex = qModelIndex,settings = settings,listName = "index",showLists = False)
         if not nameTab:
             nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newStockTab(self,qModelIndex,nameTab = None):
-        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "stock",showLists = False)
+    def newStockTab(self,qModelIndex,nameTab = None,settings = None):
+        if settings == None:
+            settings = self.settings()
+        self.tabA1 = TabA('stock',qModelIndex = qModelIndex,settings = settings,listName = "stock",showLists = False)
         if not nameTab:
             nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
-    def newForexTab(self,qModelIndex,nameTab = None):
-        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "forex",showLists = False)
+    def newForexTab(self,qModelIndex,nameTab = None,settings = None):
+        if settings == None:
+            settings = self.settings()
+        self.tabA1 = TabA('forex',qModelIndex = qModelIndex,settings = settings,listName = "forex",showLists = False)
         if not nameTab:
             nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newBondTab(self,qModelIndex,nameTab = None):
-        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "bond",showLists = False)
+    def newBondTab(self,qModelIndex,nameTab = None,settings = None):
+        if settings == None:
+            settings = self.settings()
+        self.tabA1 = TabA('bond',qModelIndex = qModelIndex,settings = settings,listName = "bond",showLists = False)
         if not nameTab:
             nameTab = self.tabA.bondListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newResourceTab(self,qModelIndex,nameTab = None):
-        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "resource",showLists = False)
+    def newResourceTab(self,qModelIndex,nameTab = None,settings = None):
+        if settings == None:
+            settings = self.settings()
+        self.tabA1 = TabA('resources',qModelIndex = qModelIndex,settings = settings,listName = "resource",showLists = False)
         if not nameTab:
             nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
-    def newFuturesTab(self,qModelIndex,nameTab = None):
-        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "futures",showLists = False)
+    def newFuturesTab(self,qModelIndex,nameTab = None,settings = None):
+        if settings == None:
+            settings = self.settings()
+        self.tabA1 = TabA('futures',qModelIndex = qModelIndex,settings = settings,listName = "futures",showLists = False)
         if not nameTab:
             nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -218,7 +262,7 @@ class GuiMainWindow(object):
              "painting":painting,"scale":scale,"oscilator":oscilator,"drawTrend":drawTrend,'lineWidth':lineWidth}
         return t
     def closeTab(self,i):
-        if i != 0:
+        if i != 0 and i!=1:
             self.tabs.removeTab(i)
             
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
@@ -264,8 +308,3 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
-
-
-
-      
-	

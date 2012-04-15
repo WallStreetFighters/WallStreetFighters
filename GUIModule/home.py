@@ -212,10 +212,10 @@ class Home (QtGui.QWidget):
         label2 = QtGui.QLabel("Gainers",self.leftFrame)
         self.leftLayout.addWidget(label2)
         self.addTable(gainerList)
-        label3= QtGui.QLabel("Losers",self.leftFrame)
+        labeel3= QtGui.QLabel("Losers",self.leftFrame)
         self.leftLayout.addWidget(label3)
         self.addTable(loserList)
-            
+        
         
         
         
