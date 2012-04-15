@@ -3,7 +3,8 @@
 import sys
 import datetime
 import operator
-
+import threading
+import time
 import os
 from PyQt4 import QtGui, QtCore
 from TabA import TabA
@@ -51,10 +52,13 @@ class GuiMainWindow(object):
         self.futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
         
         """home """
-        self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
-        self.tabs.addTab(self.home,"Home")
+	File = open("../GUIModule/save.wsf", 'r')
+	valueList = cPickle.load(File)
+	self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2])       
+	self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
+	self.home.startUpdating()
 
         """Search"""
 	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
