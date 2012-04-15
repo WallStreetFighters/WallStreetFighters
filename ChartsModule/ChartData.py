@@ -13,14 +13,14 @@ class ChartData:
     co daje mi FinancialObject Marcina. Czwarty parametr określa czy obliczamy dane
     do wykresu zwykłego, czy do porównującego. Wersja porównująca wykresy potrzebuje
     znacznie mniej danych (jedynie procentowa zmiana kursów jednego i drugiego instrumentu
-    w czasie), podczas gdy zwykły chart pobiera OHLC + te dane z unicorna"""     
+    w czasie), podczas gdy zwykły chart pobiera OHLC"""     
     
     def __init__(self, finObj, start=None, end=None, step='monthly',compare=False):
         if start>=end:
             self.corrupted=True
             return        
         self.step=(step)
-	self.fullArray=finObj.getArray(step)
+		self.fullArray=finObj.getArray(step)
         if(start==None):
             start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
@@ -148,24 +148,4 @@ class ChartData:
             return indicators.bollingerBands(np.array(array),duration,type,2)
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
-            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
-    
-    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
-    """
-    def TRIN(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        advVol=self.advDecArray['advv']
-        decVol=self.advDecArray['decv']
-        return indicators.TRIN(advances, declines, advVol, decVol)
-    
-    def mcClellan(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        return indicators.mcClellanOscillator(advances,declines)
-    
-    def adLine(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        return indicators.adLine(advances,declines)
-    """
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                                 
