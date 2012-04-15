@@ -24,6 +24,7 @@ data.wsf
 *.zip
 data.wsf
 data.wsf~
+save.wsf
 # Logs and databases #
 ######################
 *.log
