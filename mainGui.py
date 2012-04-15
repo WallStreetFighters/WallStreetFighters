@@ -41,7 +41,13 @@ class GuiMainWindow(object):
         # inicjujemy model danych dla Index
         self.indexModel = self.ListModel(list=dataParser.INDEX_LIST)
         # inicjujemy model danych dla Stock
-        self.stockModel = self.ListModel(list=dataParser.STOCK_LIST)
+        self._stockModel = self.ListModel(list=dataParser.STOCK_LIST)
+        self.stockModel = QtGui.QSortFilterProxyModel()
+        self.stockModel.setSourceModel(self._stockModel)
+        #self.stockModel.setFilterKeyColumn(32)
+        self.stockModel.setFilterRole(32)
+        self.stockModel.setFilterCaseSensitivity(0)
+        self.stockModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Forex
         self.forexModel = self.ListModel(list=dataParser.FOREX_LIST)
         # inicjujemy model danych dla Resources
@@ -72,6 +78,14 @@ class GuiMainWindow(object):
         self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
 
+        self.tabA.nasdaqButton.pressed.connect(self.nasdaqFiltre)
+        self.tabA.nyseButton.pressed.connect(self.nyseFiltre)
+        self.tabA.wigButton.pressed.connect(self.wigFiltre)
+        self.tabA.wig20Button.pressed.connect(self.wig20Filtre)
+        self.tabA.amexButton.pressed.connect(self.amexFiltre)
+        self.tabA.allButton.pressed.connect(self.allFiltre)
+
+        
         """ teraz otwieramy zakładki z historii"""
         tabHistoryFile = open('tabHistory.wsf','rb')
         tabHistoryList = cPickle.load(tabHistoryFile)
@@ -107,6 +121,8 @@ class GuiMainWindow(object):
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
                     print "oto : " + nameTab
                     self.newFuturesTab(qModelIndex ,nameTab,tabSettings)
+            else:  # porównywanie chart
+                pass
                               
 
         
@@ -267,9 +283,24 @@ class GuiMainWindow(object):
         return t
     def closeTab(self,i):
         if i != 0 and i!=1:
+
             self.tabs.removeTab(i)
+
+    def nasdaqFiltre(self):
+        self.stockModel.setFilterRegExp("NASDAQ")
+    def nyseFiltre(self):
+        self.stockModel.setFilterRegExp("NYSE")
+    def wigFiltre(self):
+        self.stockModel.setFilterRegExp("WIG")
+    def amexFiltre(self):
+        self.stockModel.setFilterRegExp("AMEX")
+    def wig20Filtre(self):
+        self.stockModel.setFilterRegExp("WIG20")
+    def allFiltre(self):
+        self.stockModel.setFilterRegExp("")
+
             
-    """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""
+    """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""    
     class ListModel(QtCore.QAbstractTableModel):
         def __init__(self,list, parent = None):
             QtCore.QAbstractTableModel.__init__(self, parent)
@@ -292,17 +323,32 @@ class GuiMainWindow(object):
                 return QtCore.QVariant(self.headerdata[col])
             return QtCore.QVariant()
         
+        def showHideRows(self, name):
+            rowCount = len(self.list)
+
+            for row in range(rowCount):
+                if self.index(row, 0).data(QtCore.Qt.WhatsThisRole).toStringList()[-2] == 'name':
+                    self.setRowHidden(row, False)
+                else:
+                    self.setRowHidden(row,True)
+
+        
         def data(self, index, role):
             if not index.isValid():
                 return QtCore.QVariant()
             elif role == QtCore.Qt.WhatsThisRole:
                 return self.list[index.row()]
-            elif role != QtCore.Qt.DisplayRole:
+            elif role != QtCore.Qt.DisplayRole and role != 32:
                 return QtCore.QVariant()
-            if index.column() == 2:
-                return QtCore.QVariant(self.list[index.row()][index.column()+2])
-            else:
-                return QtCore.QVariant(self.list[index.row()][index.column()])
+
+
+            if role == 32:
+                print self.list[index.row()][3]
+                return self.list[index.row()][3]
+                
+            return QtCore.QVariant(self.list[index.row()][index.column()])
+                                        #if index.column() == 2:
+                #return QtCore.QVariant(self.list[index.row()][index.column()+2])
         
         def sort(self, Ncol, order):
             """Sort table by given column number.

@@ -17,8 +17,8 @@ def tabUi(self,showLists=True):
         sizePolicy.setHeightForWidth(self.listsFrame.sizePolicy().hasHeightForWidth())
         self.listsFrame.setSizePolicy(sizePolicy)
         # ustawimy maksymalna szerokosc kolumny na 350
-        self.listsFrame.setMaximumSize(QtCore.QSize(400, 16777215))
-        self.listsFrame.setMinimumSize(QtCore.QSize(350, 0))
+        self.listsFrame.setMaximumSize(QtCore.QSize(600, 16777215))
+        self.listsFrame.setMinimumSize(QtCore.QSize(550, 0))
         self.listsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.listsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.listsFrame.setLineWidth(3)
@@ -43,14 +43,42 @@ def tabUi(self,showLists=True):
 
         #Stock
         self.stockPage = QtGui.QWidget(self.listsFrame)
-        self.stockPageLayout = QtGui.QHBoxLayout(self.stockPage)
+        self.stockPageLayout = QtGui.QGridLayout(self.stockPage)
+        self.stockPageLayout.setSpacing(0)
         self.listsToolBox.addItem(self.stockPage , "Stock")
+
+        self.nasdaqButton = QtGui.QPushButton("NASDAQ",self.listsFrame)
+        self.nasdaqButton.setCheckable(True)
+        self.nasdaqButton.setAutoExclusive(True)
+        self.stockPageLayout.addWidget(self.nasdaqButton, 0, 0, 1, 1)
+        self.nyseButton = QtGui.QPushButton("NYSE",self.listsFrame)
+        self.nyseButton.setCheckable(True)
+        self.nyseButton.setAutoExclusive(True)
+        self.stockPageLayout.addWidget(self.nyseButton, 0, 1, 1, 1)
+        self.amexButton = QtGui.QPushButton("AMEX",self.listsFrame)
+        self.amexButton.setCheckable(True)
+        self.amexButton.setAutoExclusive(True)
+        self.stockPageLayout.addWidget(self.amexButton, 1, 0, 1, 1)
+        self.wigButton = QtGui.QPushButton("WIG",self.listsFrame)
+        self.wigButton.setCheckable(True)
+        self.wigButton.setAutoExclusive(True)
+        self.stockPageLayout.addWidget(self.wigButton, 1, 1, 1, 1)
+        self.wig20Button = QtGui.QPushButton("WIG20",self.listsFrame)
+        self.wig20Button.setCheckable(True)
+        self.wig20Button.setAutoExclusive(True)
+        self.stockPageLayout.addWidget(self.wig20Button, 0, 2, 1, 1)
+        self.allButton = QtGui.QPushButton("ALL",self.listsFrame)
+        self.allButton.setCheckable(True)
+        self.allButton.setChecked(True)
+        self.allButton.setAutoExclusive(True)
+        self.stockPageLayout.addWidget(self.allButton, 1, 2, 1, 1)
+               
         self.stockListView = QtGui.QTableView(self.listsFrame)
         self.stockListView.setAlternatingRowColors(True)
         self.stockListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.stockListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         tableStyle(self,self.stockListView)#ustawiamy styl tabeli
-        self.stockPageLayout.addWidget(self.stockListView)
+        self.stockPageLayout.addWidget(self.stockListView,2,0,1,3)
 
         #forex
         self.forexPage = QtGui.QWidget(self.listsFrame)
@@ -214,7 +242,7 @@ def addChartButton(self):
         #self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
         #self.gridLayout.addItem(self.spacer,0,5,1,3)
         return self.frame
-       
+
 def tableStyle(self,table):
         # hide grid
         table.setShowGrid(False)

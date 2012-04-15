@@ -56,7 +56,7 @@ class TabA(QtGui.QWidget):
             self.resourceListView.setModel(self.resourceModel)
             self.futuresListView.setModel(self.futuresModel)
         
-        if not isinstance( self.qModelIndex,list):
+        if not isinstance( self.qModelIndex,list) and self.finObj != None:
             self.scrollArea = QtGui.QScrollArea(self.optionsFrame)
             self.scrollArea.setWidgetResizable(True)
             self.buttonsFrame = QtGui.QWidget()
