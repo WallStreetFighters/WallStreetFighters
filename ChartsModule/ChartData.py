@@ -20,7 +20,7 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
-		self.fullArray=finObj.getArray(step)
+	self.fullArray=finObj.getArray(step)
         if(start==None):
             start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
