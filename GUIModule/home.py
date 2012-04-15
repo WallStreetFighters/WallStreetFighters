@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
+import DataParserModule.dataParser as dataParser
 
 class Home (QtGui.QWidget):
     def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None):
@@ -22,9 +23,7 @@ class Home (QtGui.QWidget):
         for objList in self.topList:
             self.addTopObject(objList)
 
-
-        
-        spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+	spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.topLayout.addItem(spacerItem1)
         self.gridLayout.addWidget(self.topFrame, 0, 1, 1, 1)
         #koniec top ramki
@@ -68,6 +67,16 @@ class Home (QtGui.QWidget):
         self.rssFrame.setSizePolicy(sizePolicy)
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
+
+    def updateTableValues(self):
+	try:
+		self.topList = dataParser.getMostPopular()
+		self.mostList =	dataParser.top5Volume()
+		self.loserList = dataParser.top5Losers()
+		self.gainerList = dataParser.top5Gainers()
+	except dataParser.DataAPIException:
+		pass
+		
 
     def addTopObject(self,objList):
         self.frame = QtGui.QFrame(self)
@@ -181,5 +190,8 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
         self.leftLayout.addWidget(self.tableWidget)
+
+	
+		
         
         

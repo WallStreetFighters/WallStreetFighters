@@ -33,8 +33,9 @@ class GuiMainWindow(object):
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 	FILE = open("../GUIModule/data.wsf", 'r')
-	dataParser.loadHistory(FILE)
-	FILE.close()
+	dataParser.loadHistory(FILE).start()
+	
+
 
 
         # inicjujemy model danych dla Index
@@ -51,8 +52,11 @@ class GuiMainWindow(object):
         self.futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
         
         """home """
-        self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
-        self.tabs.addTab(self.home,"Home")
+
+	File = open("../GUIModule/save.wsf", 'r')
+	valueList = cPickle.load(File)
+	self.home = Home(valueList[0],valueList[1],valueList[2],valueList[3])       
+	self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 
@@ -260,3 +264,8 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
+
+
+
+      
+	

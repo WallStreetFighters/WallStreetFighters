@@ -32,6 +32,10 @@ class GuiMainWindow(object):
         #załadowanie List
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
+	FILE = open("../GUIModule/data.wsf", 'r')
+	dataParser.loadHistory(FILE).start()
+	FILE.close()
+
 
 
         # inicjujemy model danych dla Index
@@ -44,21 +48,28 @@ class GuiMainWindow(object):
         self.resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
         # inicjujemy model danych dla Bond
         self.bondModel = self.ListModel(list=dataParser.BOND_LIST)
+        # model danych dla Futures
+        self.futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
+        
         """home """
-        self.home = Home(dataParser.getMostPopular(),dataParser.top5Volume(),dataParser.top5Gainers(),dataParser.top5Losers())
-        self.tabs.addTab(self.home,"Home")
+
+	File = open("../GUIModule/save.wsf", 'r')
+	valueList = cPickle.load(File)
+	self.home = Home(valueList[0],valueList[1],valueList[2],valueList[3])       
+	self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 
-        """tab A wskaźniki i oscylatory"""
-	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,)
-        self.tabs.addTab(self.tabA,"tabA")
+        """Search"""
+	self.tabA = TabA(self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
+        self.tabs.addTab(self.tabA,"Search")
         
         self.tabA.indexListView.doubleClicked.connect(self.newIndexTab)
         self.tabA.stockListView.doubleClicked.connect(self.newStockTab)
         self.tabA.forexListView.doubleClicked.connect(self.newForexTab)
         self.tabA.bondListView.doubleClicked.connect(self.newBondTab)
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
+        self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
 
 
@@ -151,6 +162,11 @@ class GuiMainWindow(object):
         if not nameTab:
             nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+    def newFuturesTab(self,qModelIndex,nameTab = None):
+        self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "futures",showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
 
     def settings(self):
@@ -191,10 +207,15 @@ class GuiMainWindow(object):
         chartType = self.tabA.chartTypeComboBox.currentText()
         hideVolumen =self.tabA.volumenCheckBox.isChecked() 
         #painting
-        painting = self.tabA.paintCheckBox.isChecked() 
+        painting = self.tabA.paintCheckBox.isChecked()
+        #draw trend
+        drawTrend = self.tabA.drawTrendCheckBox.isChecked()
+        #line width
+        lineWidth = self.tabA.lineWidthSpinBox.value()
+        
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
-             "painting":painting,"scale":scale,"oscilator":oscilator}
+             "painting":painting,"scale":scale,"oscilator":oscilator,"drawTrend":drawTrend,'lineWidth':lineWidth}
         return t
     def closeTab(self,i):
         if i != 0:
@@ -243,3 +264,8 @@ class GuiMainWindow(object):
             if order == QtCore.Qt.DescendingOrder:
                 self.list.reverse()
             self.emit(QtCore.SIGNAL("layoutChanged()"))
+
+
+
+      
+	
