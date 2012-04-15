@@ -227,7 +227,6 @@ class Home (QtGui.QWidget):
         self.addTable(self.loserList)
 	
     def updateHome(self):
-	
 	self.updateTopList()
 	self.updateTable()
 
@@ -248,7 +247,7 @@ class UpdateThread(QtCore.QThread):
 
     def run(self):
 	while True:
-		time.sleep(60)
+		time.sleep(10)
 		try:
 			self.mostList = dataParser.top5Volume()
 			self.loserList = dataParser.top5Losers()
