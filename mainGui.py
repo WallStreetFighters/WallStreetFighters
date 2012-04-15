@@ -39,23 +39,41 @@ class GuiMainWindow(object):
 
 
         # inicjujemy model danych dla Index
-        self.indexModel = self.ListModel(list=dataParser.INDEX_LIST)
+        self._indexModel = self.ListModel(list=dataParser.INDEX_LIST)
+        self.indexModel = QtGui.QSortFilterProxyModel()
+        self.indexModel.setSourceModel(self._indexModel)
+        self.indexModel.setFilterCaseSensitivity(0)
+        self.indexModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Stock
         self._stockModel = self.ListModel(list=dataParser.STOCK_LIST)
         self.stockModel = QtGui.QSortFilterProxyModel()
         self.stockModel.setSourceModel(self._stockModel)
-        #self.stockModel.setFilterKeyColumn(32)
-        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterCaseSensitivity(0)
         self.stockModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Forex
-        self.forexModel = self.ListModel(list=dataParser.FOREX_LIST)
+        self._forexModel = self.ListModel(list=dataParser.FOREX_LIST)
+        self.forexModel = QtGui.QSortFilterProxyModel()
+        self.forexModel.setSourceModel(self._forexModel)
+        self.forexModel.setFilterCaseSensitivity(0)
+        self.forexModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Resources
-        self.resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
+        self._resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
+        self.resourceModel = QtGui.QSortFilterProxyModel()
+        self.resourceModel.setSourceModel(self._resourceModel)
+        self.resourceModel.setFilterCaseSensitivity(0)
+        self.resourceModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Bond
-        self.bondModel = self.ListModel(list=dataParser.BOND_LIST)
+        self._bondModel = self.ListModel(list=dataParser.BOND_LIST)
+        self.bondModel = QtGui.QSortFilterProxyModel()
+        self.bondModel.setSourceModel(self._bondModel)
+        self.bondModel.setFilterCaseSensitivity(0)
+        self.bondModel.setDynamicSortFilter(True)
         # model danych dla Futures
-        self.futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
+        self._futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
+        self.futuresModel = QtGui.QSortFilterProxyModel()
+        self.futuresModel.setSourceModel(self._futuresModel)
+        self.futuresModel.setFilterCaseSensitivity(0)
+        self.futuresModel.setDynamicSortFilter(True)
         
         """home """
 	File = open("../GUIModule/save.wsf", 'r')
@@ -84,6 +102,8 @@ class GuiMainWindow(object):
         self.tabA.wig20Button.pressed.connect(self.wig20Filtre)
         self.tabA.amexButton.pressed.connect(self.amexFiltre)
         self.tabA.allButton.pressed.connect(self.allFiltre)
+
+        self.tabA.filterLineEdit.textChanged.connect(self.bigFiltre)
 
         
         """ teraz otwieramy zakładki z historii"""
@@ -286,17 +306,43 @@ class GuiMainWindow(object):
 
             self.tabs.removeTab(i)
 
+    def bigFiltre(self,text):
+
+        self.stockModel.setFilterRole(33)
+        self.stockModel.setFilterRegExp(text)
+
+        self.indexModel.setFilterRole(33)
+        self.indexModel.setFilterRegExp(text)
+        
+        self.forexModel.setFilterRole(33)
+        self.forexModel.setFilterRegExp(text)
+
+        self.resourceModel.setFilterRole(33)
+        self.resourceModel.setFilterRegExp(text)
+        
+        self.bondModel.setFilterRole(33)
+        self.bondModel.setFilterRegExp(text)
+        
+        self.futuresModel.setFilterRole(33)
+        self.futuresModel.setFilterRegExp(text)
+
     def nasdaqFiltre(self):
+        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterRegExp("NASDAQ")
     def nyseFiltre(self):
+        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterRegExp("NYSE")
     def wigFiltre(self):
+        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterRegExp("WIG")
     def amexFiltre(self):
+        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterRegExp("AMEX")
     def wig20Filtre(self):
+        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterRegExp("WIG20")
     def allFiltre(self):
+        self.stockModel.setFilterRole(32)
         self.stockModel.setFilterRegExp("")
 
             
@@ -338,13 +384,14 @@ class GuiMainWindow(object):
                 return QtCore.QVariant()
             elif role == QtCore.Qt.WhatsThisRole:
                 return self.list[index.row()]
-            elif role != QtCore.Qt.DisplayRole and role != 32:
+            elif role != QtCore.Qt.DisplayRole and role != 32 and role!= 33 :
                 return QtCore.QVariant()
 
 
             if role == 32:
-                print self.list[index.row()][3]
                 return self.list[index.row()][3]
+            if role == 33:
+                return self.list[index.row()][0] + ' ' + self.list[index.row()][1]+' '+ self.list[index.row()][3]
                 
             return QtCore.QVariant(self.list[index.row()][index.column()])
                                         #if index.column() == 2:

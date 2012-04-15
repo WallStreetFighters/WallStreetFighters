@@ -56,7 +56,7 @@ class TabA(QtGui.QWidget):
             self.resourceListView.setModel(self.resourceModel)
             self.futuresListView.setModel(self.futuresModel)
         
-        if not isinstance( self.qModelIndex,list) and self.finObj != None:
+        if not isinstance( self.qModelIndex,list):#  and self.finObj != None:
             self.scrollArea = QtGui.QScrollArea(self.optionsFrame)
             self.scrollArea.setWidgetResizable(True)
             self.buttonsFrame = QtGui.QWidget()
@@ -361,6 +361,7 @@ class TabA(QtGui.QWidget):
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        
         if self.listName == "forex":
             self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
