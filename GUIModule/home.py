@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
 import DataParserModule.dataParser as dataParser
+import time
 
 class Home (QtGui.QWidget):
     def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None):
@@ -8,6 +9,8 @@ class Home (QtGui.QWidget):
         self.mostList = mostList
         self.loserList = loserList
         self.gainerList = gainerList
+	self.updateThread = UpdateThread()
+	self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
         QtGui.QWidget.__init__(self)
         self.initUi()
     def initUi(self):
@@ -18,15 +21,21 @@ class Home (QtGui.QWidget):
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.topLayout = QtGui.QHBoxLayout(self.topFrame)
-        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.topLayout.addItem(spacerItem)
+        #spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        #self.topLayout.addItem(spacerItem)
         for objList in self.topList:
             self.addTopObject(objList)
 
-	spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.topLayout.addItem(spacerItem1)
+
+        
+        #spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        #self.topLayout.addItem(spacerItem1)
         self.gridLayout.addWidget(self.topFrame, 0, 1, 1, 1)
         #koniec top ramki
+        
+        #test update top list
+        #self.updateTopList([['a','a','a','a'],['a','a','a','a']])
+       
 
         #ramka zawierajaca Most Activities, Gainers i Losers
         self.scrollArea = QtGui.QScrollArea(self)
@@ -40,6 +49,7 @@ class Home (QtGui.QWidget):
         self.scrollArea.setWidgetResizable(True)
         self.leftFrame = QtGui.QWidget()
         self.leftLayout = QtGui.QVBoxLayout(self.leftFrame)
+        
         self.label1 = QtGui.QLabel("Most Activities",self.leftFrame)
         self.leftLayout.addWidget(self.label1)
         self.addTable(self.mostList)
@@ -49,10 +59,14 @@ class Home (QtGui.QWidget):
         self.label3= QtGui.QLabel("Losers",self.leftFrame)
         self.leftLayout.addWidget(self.label3)
         self.addTable(self.loserList)
-        spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.leftLayout.addItem(spacerItem2)
+        
+        #spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        #self.leftLayout.addItem(spacerItem2)
         self.scrollArea.setWidget(self.leftFrame)
         self.gridLayout.addWidget(self.scrollArea, 0, 0, 2, 1)
+
+        #test update Table
+        #self.updateTable([['a','a','a','a'],['a','a','a','a']],[],[])
 
 
         #rssLayout
@@ -68,27 +82,17 @@ class Home (QtGui.QWidget):
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
-    def updateTableValues(self):
-	try:
-		self.topList = dataParser.getMostPopular()
-		self.mostList =	dataParser.top5Volume()
-		self.loserList = dataParser.top5Losers()
-		self.gainerList = dataParser.top5Gainers()
-	except dataParser.DataAPIException:
-		pass
-		
-
     def addTopObject(self,objList):
-        self.frame = QtGui.QFrame(self)
+        self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setMaximumSize(QtCore.QSize(100, 100))
         self.frame.setMinimumSize(QtCore.QSize(100, 100))
         verticalLayout = QtGui.QVBoxLayout(self.frame)
-        nameLabel = QtGui.QLabel(self.frame)
-        nameLabel.setText(objList[0])
-        nameLabel.setStyleSheet('QLabel {color: blue}')
-        verticalLayout.addWidget(nameLabel)
+        self.frame.nameLabel = QtGui.QLabel(self.frame)
+        self.frame.nameLabel.setText(objList[0])
+        self.frame.nameLabel.setStyleSheet('QLabel {color: blue}')
+        verticalLayout.addWidget(self.frame.nameLabel)
         prizeLabel = QtGui.QLabel(self.frame)
         prizeLabel.setText(objList[1])
         verticalLayout.addWidget(prizeLabel)
@@ -191,7 +195,76 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setHighlightSections(True)
         self.leftLayout.addWidget(self.tableWidget)
 
+    def updateTopList(self):
+       
+	self.topList = self.updateThread.topList
+        #zamykamy wszystkie ramki
+        ran = range(self.topLayout.count())
+        for i in ran:
+            self.topLayout.itemAt(i).widget().close()      
+
+        # tworzymy nowe ramki z nowymi wartościami
+        for objList in self.topList:
+            self.addTopObject(objList)
+
+    def updateTable(self):
 	
-		
+	self.mostList = self.updateThread.mostList
+	self.loserList = self.updateThread.loserList
+	self.gainerList = self.updateThread.gainerList
+
+        ran = range(self.leftLayout.count())
+        for i in ran:
+            self.leftLayout.itemAt(i).widget().close()
+        label1 = QtGui.QLabel("Most Activities",self.leftFrame)
+        self.leftLayout.addWidget(label1)
+        self.addTable(self.mostList)
+        label2 = QtGui.QLabel("Gainers",self.leftFrame)
+        self.leftLayout.addWidget(label2)
+        self.addTable(self.gainerList)
+        label3= QtGui.QLabel("Losers",self.leftFrame)
+        self.leftLayout.addWidget(label3)
+        self.addTable(self.loserList)
+	
+    def updateHome(self):
+	self.updateTopList()
+	self.updateTable()
+
+    def startUpdating(self): 
+	self.updateThread.start()
+	
+class MyFrame(QtGui.QFrame):
+    def __init__(self,parent):
+        QtGui.QWidget.__init__(self)
+    def mousePressEvent(self,event):
+        print self.nameLabel.text()
+        
+
+class UpdateThread(QtCore.QThread):
+
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+	self.mostList = []
+	self.topList = []
+	self.loserList = []
+	self.gainerList = []
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+	while True:
+		time.sleep(10)
+		try:
+			self.mostList = dataParser.top5Volume()
+			self.loserList = dataParser.top5Losers()
+			self.gainerList = dataParser.top5Gainers()
+			self.topList = dataParser.getMostPopular()
+			self.emit(QtCore.SIGNAL("Update"))
+			
+		except dataParser.DataAPIException:
+			pass
+
+        
         
         

@@ -10,8 +10,9 @@ from ChartsModule.CompareChart import CompareChart
 import DataParserModule.dataParser as dataParser
 
 class TabA(QtGui.QWidget):
-    def __init__(self,indexModel=None,stockModel=None,forexModel=None,bondModel= None,
+    def __init__(self,finObjType = None, indexModel=None,stockModel=None,forexModel=None,bondModel= None,
                  resourceModel = None,futuresModel = None, qModelIndex = None,settings = None,listName=None,showLists = True):
+        self.finObjType = finObjType
         self.indexModel = indexModel
         self.stockModel = stockModel
         self.forexModel = forexModel
@@ -55,7 +56,7 @@ class TabA(QtGui.QWidget):
             self.resourceListView.setModel(self.resourceModel)
             self.futuresListView.setModel(self.futuresModel)
         
-        if not isinstance( self.qModelIndex,list):
+        if not isinstance( self.qModelIndex,list):#  and self.finObj != None:
             self.scrollArea = QtGui.QScrollArea(self.optionsFrame)
             self.scrollArea.setWidgetResizable(True)
             self.buttonsFrame = QtGui.QWidget()
@@ -131,8 +132,10 @@ class TabA(QtGui.QWidget):
             self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)            
 
             self.scrollArea.setWidget(self.buttonsFrame)
-            self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
-        
+            if self.showLists != True:
+                self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
+            else:
+                self.chartsLayout.addWidget(self.scrollArea)
 
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
         self.optionsLayout.addWidget(addChartButton(self),0,5,4,4)      
@@ -358,6 +361,7 @@ class TabA(QtGui.QWidget):
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        
         if self.listName == "forex":
             self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
@@ -566,6 +570,74 @@ class TabA(QtGui.QWidget):
                 k+=1
                 #self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
                 self.w.show()
+    def settingsTest(self):
+        dateStart = self.startDateEdit.date()
+        return dateStart
+    def getSettings(self):
+        #funkcja pobiera aktualnie zaznaczone opcje z tab
+        dateStart = self.startDateEdit.date()  # początek daty
+        start = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
+        
+        dateEnd = self.endDateEdit.date()     # koniec daty
+        end = datetime.datetime(dateEnd.year(),dateEnd.month(),dateEnd.day())
+
+        if not isinstance( self.qModelIndex,list):
+            indicator = []
+            if self.smaCheckBox.isChecked():
+                indicator.append("SMA")
+            if self.wmaCheckBox.isChecked():
+                indicator.append("WMA")
+            if self.emaCheckBox.isChecked():
+                indicator.append("EMA")
+            if self.bollingerCheckBox.isChecked():
+                indicator.append("bollinger")
+            oscilator = ''
+            if self.momentumCheckBox.isChecked():
+                oscilator = "momentum"
+            elif self.cciCheckBox.isChecked():
+                oscilator = "CCI"
+            elif self.rocCheckBox.isChecked():
+                oscilator = "ROC"
+            elif self.rsiCheckBox.isChecked():
+                oscilator = "RSI"
+            elif self.williamsCheckBox.isChecked():
+                oscilator = "williams"
+            #draw trend
+            drawTrend = self.drawTrendCheckBox.isChecked()
+            #line width
+            lineWidth = self.lineWidthSpinBox.value()
+            index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+        else:
+            index = []
+            for model in self.qModelIndex:
+                index.append( int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1]))
+        #step
+        step = self.stepComboBox.currentText()
+        #scale
+        if self.logRadioButton.isChecked():
+            scale = 'log'
+        else:
+            scale = 'linear'
+        #chartType
+        chartType = self.chartTypeComboBox.currentText()
+        hideVolumen =self.volumenCheckBox.isChecked() 
+        #painting
+        painting = self.paintCheckBox.isChecked()
+       
+
+        if not isinstance( self.qModelIndex,list):
+           t = {"finObjType":self.finObjType,"index":index,"start":start,"end":end,"indicator":indicator,"step":step,
+                 "chartType":chartType,"hideVolumen":hideVolumen,
+                 "painting":painting,"scale":scale,"oscilator":oscilator,
+                 "drawTrend":drawTrend,'lineWidth':lineWidth}
+        else:
+            t = {"finObjType":self.finObjType,"index":index,"start":start,
+                 "end":end,"step":step,
+                 "chartType":chartType,"hideVolumen":hideVolumen,
+                 "painting":painting,"scale":scale}
+        return t
+
+    
     class MyPopup(QtGui.QWidget):
         def __init__(self,parent):
             self.parent=parent

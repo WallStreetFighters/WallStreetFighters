@@ -1,3 +1,1 @@
 http://feeds.reuters.com/Reuters/PoliticsNews
-http://finance.yahoo.com/rss/InsuranceBrokers
-http://wiadomosci.onet.pl.dynamic.feedsportal.com/pf/615563/wiadomosci.onet.pl/swiat/rss.xml
