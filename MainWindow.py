@@ -22,7 +22,6 @@ class MainWindow(QtGui.QMainWindow):
 	tabHistoryList = []
 	for i in ran:
             if i >1:
-                print self.gui.tabs.widget(i)
                 t=  self.gui.tabs.widget(i).getSettings()
                 tabHistoryList.append(t)
         cPickle.dump(tabHistoryList, open('tabHistory.wsf','w'))

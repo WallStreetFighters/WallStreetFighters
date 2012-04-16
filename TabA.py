@@ -56,7 +56,7 @@ class TabA(QtGui.QWidget):
             self.resourceListView.setModel(self.resourceModel)
             self.futuresListView.setModel(self.futuresModel)
         
-        if not isinstance( self.qModelIndex,list) and self.finObj != None:
+        if not isinstance( self.qModelIndex,list):#  and self.finObj != None:
             self.scrollArea = QtGui.QScrollArea(self.optionsFrame)
             self.scrollArea.setWidgetResizable(True)
             self.buttonsFrame = QtGui.QWidget()
@@ -132,8 +132,10 @@ class TabA(QtGui.QWidget):
             self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)            
 
             self.scrollArea.setWidget(self.buttonsFrame)
-            self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
-        
+            if self.showLists != True:
+                self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
+            else:
+                self.chartsLayout.addWidget(self.scrollArea)
 
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
         self.optionsLayout.addWidget(addChartButton(self),0,5,4,4)      
@@ -361,6 +363,7 @@ class TabA(QtGui.QWidget):
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        
         if self.listName == "forex":
             self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
