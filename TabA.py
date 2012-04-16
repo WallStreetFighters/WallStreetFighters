@@ -132,8 +132,10 @@ class TabA(QtGui.QWidget):
             self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)            
 
             self.scrollArea.setWidget(self.buttonsFrame)
-            self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
-        
+            if self.showLists != True:
+                self.optionsLayout.addWidget(self.scrollArea, 0, 1, 4, 4)         
+            else:
+                self.chartsLayout.addWidget(self.scrollArea)
 
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
         self.optionsLayout.addWidget(addChartButton(self),0,5,4,4)      

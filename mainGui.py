@@ -48,6 +48,7 @@ class GuiMainWindow(object):
         self._stockModel = self.ListModel(list=dataParser.STOCK_LIST)
         self.stockModel = QtGui.QSortFilterProxyModel()
         self.stockModel.setSourceModel(self._stockModel)
+        self.stockModelNestedPattern = ''
         self.stockModel.setFilterCaseSensitivity(0)
         self.stockModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Forex
@@ -83,6 +84,7 @@ class GuiMainWindow(object):
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 	self.home.startUpdating()
+	#self.home.sup.connect(self.sup)
 
         """Search"""
 	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
@@ -114,35 +116,64 @@ class GuiMainWindow(object):
                 if tabSettings['finObjType'] == 'index':
                     qModelIndex =  self.indexModel.index(tabSettings['index'],0)
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
-                    print "oto : " + nameTab
                     self.newIndexTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'stock':
                     qModelIndex =  self.stockModel.index(tabSettings['index'],0)
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
-                    print "oto : " + nameTab
                     self.newStockTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'forex':
                     qModelIndex =  self.forexModel.index(tabSettings['index'],0)
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
-                    print "oto : " + nameTab
                     self.newForexTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'bond':
                     qModelIndex =  self.bondModel.index(tabSettings['index'],0)
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
-                    print "oto : " + nameTab
                     self.newBondTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'resources':
                     qModelIndex =  self.resourceModel.index(tabSettings['index'],0)
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
-                    print "oto : " + nameTab
                     self.newResourceTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'futures':
                     qModelIndex =  self.futuresModel.index(tabSettings['index'],0)
                     nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
-                    print "oto : " + nameTab
                     self.newFuturesTab(qModelIndex ,nameTab,tabSettings)
             else:  # porównywanie chart
-                pass
+                if tabSettings['finObjType'] == "index":
+                    qModelIndex = []
+                    for i in tabSettings['index']:
+                        qModelIndex.append(self.indexModel.index(i,0))
+                    nameTab = "Indices' comparison"
+                    self.newIndexTab(qModelIndex ,nameTab,tabSettings,"index")
+                if tabSettings['finObjType'] == "stock":
+                    qModelIndex = []
+                    for i in tabSettings['index']:
+                        qModelIndex.append(self.indexModel.index(i,0))
+                    nameTab = "Stocks' comparison"
+                    self.newStockTab(qModelIndex ,nameTab,tabSettings,"stock")
+                if tabSettings['finObjType'] == "forex":
+                    qModelIndex = []
+                    for i in tabSettings['index']:
+                        qModelIndex.append(self.indexModel.index(i,0))
+                    nameTab = "Forex comparison"
+                    self.newForexTab(qModelIndex ,nameTab,tabSettings,"forex")
+                if tabSettings['finObjType'] == "bond":
+                    qModelIndex = []
+                    for i in tabSettings['index']:
+                        qModelIndex.append(self.indexModel.index(i,0))
+                    nameTab = "Bonds' comparison"
+                    self.newBondTab(qModelIndex ,nameTab,tabSettings,"bond")
+                if tabSettings['finObjType'] == "resources":
+                    qModelIndex = []
+                    for i in tabSettings['index']:
+                        qModelIndex.append(self.indexModel.index(i,0))
+                    nameTab = "Resources' comparison"
+                    self.newResourceTab(qModelIndex ,nameTab,tabSettings,"resources")
+                if tabSettings['finObjType'] == "futures":
+                    qModelIndex = []
+                    for i in tabSettings['index']:
+                        qModelIndex.append(self.indexModel.index(i,0))
+                    nameTab = "Futures' comparison"
+                    self.newFuturesTab(qModelIndex ,nameTab,tabSettings,"futures")
                               
 
         
@@ -204,50 +235,65 @@ class GuiMainWindow(object):
             qModelIndex = self.tabA.resourceListView.selectedIndexes()
             qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
             self.newResourceTab(qModelIndex,"Resources' comparison")
+        if pageIndex == 5:
+            qModelIndex = self.tabA.futuresListView.selectedIndexes()
+            qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
+            self.newFuturesTab(qModelIndex,"Furures' comparison")
         
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
-    def newIndexTab(self,qModelIndex,nameTab = None,settings = None):
+    def newIndexTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
-        self.tabA1 = TabA('index',qModelIndex = qModelIndex,settings = settings,listName = "index",showLists = False)
+            tabType = 'index'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "index",showLists = False)
         if not nameTab:
             nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newStockTab(self,qModelIndex,nameTab = None,settings = None):
+    def newStockTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
-        self.tabA1 = TabA('stock',qModelIndex = qModelIndex,settings = settings,listName = "stock",showLists = False)
+        if tabType == None:
+            tabType = 'stock'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "stock",showLists = False)
         if not nameTab:
             nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
-    def newForexTab(self,qModelIndex,nameTab = None,settings = None):
+    def newForexTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
-        self.tabA1 = TabA('forex',qModelIndex = qModelIndex,settings = settings,listName = "forex",showLists = False)
+        if tabType == None:
+            tabType = 'forex'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "forex",showLists = False)
         if not nameTab:
             nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newBondTab(self,qModelIndex,nameTab = None,settings = None):
+    def newBondTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
-        self.tabA1 = TabA('bond',qModelIndex = qModelIndex,settings = settings,listName = "bond",showLists = False)
+        if tabType == None:
+            tabType = 'bond'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "bond",showLists = False)
         if not nameTab:
             nameTab = self.tabA.bondListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
-    def newResourceTab(self,qModelIndex,nameTab = None,settings = None):
+    def newResourceTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
-        self.tabA1 = TabA('resources',qModelIndex = qModelIndex,settings = settings,listName = "resource",showLists = False)
+        if tabType == None:
+            tabType = 'resources'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "resource",showLists = False)
         if not nameTab:
             nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
-    def newFuturesTab(self,qModelIndex,nameTab = None,settings = None):
+    def newFuturesTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
-        self.tabA1 = TabA('futures',qModelIndex = qModelIndex,settings = settings,listName = "futures",showLists = False)
+        if tabType == None:
+            tabType = 'futures'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "futures",showLists = False)
         if not nameTab:
             nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -308,8 +354,15 @@ class GuiMainWindow(object):
 
     def bigFiltre(self,text):
 
-        self.stockModel.setFilterRole(33)
-        self.stockModel.setFilterRegExp(text)
+
+        reg= self.stockModel.filterRegExp()
+        pattern = text + QtCore.QString(".*"+self.stockModelNestedPattern)
+        print pattern
+        reg.setPattern(pattern)
+            
+            
+        self.stockModel.setFilterRole(34)
+        self.stockModel.setFilterRegExp(reg)
 
         self.indexModel.setFilterRole(33)
         self.indexModel.setFilterRegExp(text)
@@ -327,23 +380,45 @@ class GuiMainWindow(object):
         self.futuresModel.setFilterRegExp(text)
 
     def nasdaqFiltre(self):
-        self.stockModel.setFilterRole(32)
-        self.stockModel.setFilterRegExp("NASDAQ")
+        reg= self.stockModel.filterRegExp()
+        self.stockModel.setFilterRole(34)
+        reg.setPattern(self.tabA.filterLineEdit.text()+".*NASDAQ")
+        self.stockModel.setFilterRegExp(reg)
+        self.stockModelNestedPattern = "NASDAQ"
     def nyseFiltre(self):
-        self.stockModel.setFilterRole(32)
-        self.stockModel.setFilterRegExp("NYSE")
+        reg= self.stockModel.filterRegExp()
+        self.stockModel.setFilterRole(34)
+        reg.setPattern(self.tabA.filterLineEdit.text()+".*NYSE")
+        self.stockModel.setFilterRegExp(reg)
+        self.stockModelNestedPattern = "NYSE"
     def wigFiltre(self):
-        self.stockModel.setFilterRole(32)
-        self.stockModel.setFilterRegExp("WIG")
+        reg= self.stockModel.filterRegExp()
+        self.stockModel.setFilterRole(34)
+        reg.setPattern(self.tabA.filterLineEdit.text()+".*WIG")
+        self.stockModel.setFilterRegExp(reg)
+        self.stockModelNestedPattern = "WIG"
     def amexFiltre(self):
-        self.stockModel.setFilterRole(32)
-        self.stockModel.setFilterRegExp("AMEX")
+        reg= self.stockModel.filterRegExp()
+        self.stockModel.setFilterRole(34)
+        reg.setPattern(self.tabA.filterLineEdit.text()+".*AMEX")
+        self.stockModel.setFilterRegExp(reg)
+        self.stockModelNestedPattern = "AMEX"
     def wig20Filtre(self):
-        self.stockModel.setFilterRole(32)
-        self.stockModel.setFilterRegExp("WIG20")
+        reg= self.stockModel.filterRegExp()
+        self.stockModel.setFilterRole(34)
+        reg.setPattern(self.tabA.filterLineEdit.text()+".*WIG20")
+        self.stockModel.setFilterRegExp(reg)
+        self.stockModelNestedPattern = "WIG20"
+        print self.tabA.filterLineEdit.text()+".*WIG20"
     def allFiltre(self):
-        self.stockModel.setFilterRole(32)
-        self.stockModel.setFilterRegExp("")
+        reg= self.stockModel.filterRegExp()
+        self.stockModel.setFilterRole(34)
+        reg.setPattern(self.tabA.filterLineEdit.text()+".*")
+        self.stockModel.setFilterRegExp(reg)
+        self.stockModelNestedPattern = ""
+    def sup(self,text):
+        print "000"
+        
 
             
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""    
@@ -384,15 +459,17 @@ class GuiMainWindow(object):
                 return QtCore.QVariant()
             elif role == QtCore.Qt.WhatsThisRole:
                 return self.list[index.row()]
-            elif role != QtCore.Qt.DisplayRole and role != 32 and role!= 33 :
+            elif role != QtCore.Qt.DisplayRole and role != 32 and role!= 33 and role!=34 :
                 return QtCore.QVariant()
 
 
             if role == 32:
                 return self.list[index.row()][3]
             if role == 33:
-                return self.list[index.row()][0] + ' ' + self.list[index.row()][1]+' '+ self.list[index.row()][3]
+                return self.list[index.row()][0] + ' ' + self.list[index.row()][1]
                 
+            if role == 34:
+                return self.list[index.row()][0] + ' ' + self.list[index.row()][1] + ' ' + self.list[index.row()][3]
             return QtCore.QVariant(self.list[index.row()][index.column()])
                                         #if index.column() == 2:
                 #return QtCore.QVariant(self.list[index.row()][index.column()+2])

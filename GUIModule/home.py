@@ -83,16 +83,16 @@ class Home (QtGui.QWidget):
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
     def addTopObject(self,objList):
-        self.frame = QtGui.QFrame(self)
+        self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
         self.frame.setMaximumSize(QtCore.QSize(100, 100))
         self.frame.setMinimumSize(QtCore.QSize(100, 100))
         verticalLayout = QtGui.QVBoxLayout(self.frame)
-        nameLabel = QtGui.QLabel(self.frame)
-        nameLabel.setText(objList[0])
-        nameLabel.setStyleSheet('QLabel {color: blue}')
-        verticalLayout.addWidget(nameLabel)
+        self.frame.nameLabel = QtGui.QLabel(self.frame)
+        self.frame.nameLabel.setText(objList[0])
+        self.frame.nameLabel.setStyleSheet('QLabel {color: blue}')
+        verticalLayout.addWidget(self.frame.nameLabel)
         prizeLabel = QtGui.QLabel(self.frame)
         prizeLabel.setText(objList[1])
         verticalLayout.addWidget(prizeLabel)
@@ -231,7 +231,14 @@ class Home (QtGui.QWidget):
 	self.updateTable()
 
     def startUpdating(self): 
-	self.updateThread.start()           
+	self.updateThread.start()
+	
+class MyFrame(QtGui.QFrame):
+    def __init__(self,parent):
+        QtGui.QWidget.__init__(self)
+    def mousePressEvent(self,event):
+        print self.nameLabel.text()
+        
 
 class UpdateThread(QtCore.QThread):
 

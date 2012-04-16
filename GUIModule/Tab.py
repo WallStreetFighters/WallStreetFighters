@@ -102,7 +102,7 @@ def tabUi(self,showLists=True):
                 self.bondListView = QtGui.QTableView(self.listsFrame)
                 self.bondListView.setAlternatingRowColors(True)
                 self.bondListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.bondListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+                self.bondListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.bondListView)
                 self.bondPageLayout.addWidget(self.bondListView)
 
@@ -113,7 +113,7 @@ def tabUi(self,showLists=True):
                 self.resourceListView = QtGui.QTableView(self.listsFrame)
                 self.resourceListView.setAlternatingRowColors(True)
                 self.resourceListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.resourceListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+                self.resourceListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.resourceListView)
                 self.resourcePageLayout.addWidget(self.resourceListView)
 
@@ -125,7 +125,7 @@ def tabUi(self,showLists=True):
                 self.futuresListView = QtGui.QTableView(self.listsFrame)
                 self.futuresListView.setAlternatingRowColors(True)
                 self.futuresListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.futuresListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+                self.futuresListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.futuresListView)
                 self.futuresContractPageLayout.addWidget(self.futuresListView)
         
