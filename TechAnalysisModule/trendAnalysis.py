@@ -94,7 +94,7 @@ def lineFrom2Points(x1,y1,x2,y2):
 def aInRect(array):
     """Sprawdzamy czy punkty w tablicy naleza do prostej +/- rectVul"""
     array = asarray(map(lambda x: x[0], array))
-    a, b = linearFunFromArray(array)
+    a, b = regression(array)
     if a == 0:
         return 0
 
