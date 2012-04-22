@@ -73,6 +73,10 @@ class Chart(FigureCanvas):
         self.data=ChartData(finObj, start, end, step)
         if(self.mainPlot!=None):
             self.updatePlot()
+            
+    def getData(self):
+        """Zwraca obiekt klasy ChartData, będący modelem danych do aktualnego wykresu."""
+        return self.data
     
     def setGrid(self, grid):
         """Włącza (True) lub wyłącza (False) rysowanie grida"""
@@ -94,7 +98,7 @@ class Chart(FigureCanvas):
         #self.drawCandleFormations()
     
     def addMainPlot(self):
-        """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
+        """Stworzenie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
         self.mainPlot=self.fig.add_axes(bounds)                        
         self.updateMainPlot()
@@ -143,8 +147,7 @@ class Chart(FigureCanvas):
         self.formatDateAxis(self.mainPlot)        
         self.fixTimeLabels()
         if(self.grid):
-            for tick in ax.xaxis.get_major_ticks():
-                # print tick.get_loc()
+            for tick in ax.xaxis.get_major_ticks():                
                 tick.gridOn=True
     
     def addVolumeBars(self):
@@ -278,13 +281,7 @@ class Chart(FigureCanvas):
         elif type == 'RSI':
             oscData=self.data.RSI()
         elif type == 'williams':
-            oscData=self.data.williams()
-        elif type == 'TRIN':
-            oscData=self.data.TRIN()
-        elif type == 'mcClellan':
-            oscData=self.data.mcClellan()
-        elif type == 'adLine':
-            oscData=self.data.adLine()
+            oscData=self.data.williams()        
         else:            
             return
         if oscData!=None:
@@ -493,13 +490,3 @@ class Chart(FigureCanvas):
             self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
             self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
         
-            
-def getBoundsAsRect(axes):
-    """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
-        tzn. tablicy."""
-    bounds=axes.get_position().get_points()
-    left=bounds[0][0]
-    bottom=bounds[0][1]
-    width=bounds[1][0]-left
-    height=bounds[1][0]-bottom
-    return [left, bottom, width, height]
