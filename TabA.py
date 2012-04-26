@@ -9,7 +9,8 @@ from ChartsModule.Chart import Chart
 from ChartsModule.CompareChart import CompareChart
 import DataParserModule.dataParser as dataParser
 
-class TabA(QtGui.QWidget):
+class TabA(QtGui.QWidget):    
+    
     def __init__(self,indexModel=None,stockModel=None,forexModel=None,bondModel= None,
                  resourceModel = None,qModelIndex = None,settings = None,listName=None,showLists = True):
         self.indexModel = indexModel
@@ -181,7 +182,7 @@ class TabA(QtGui.QWidget):
                     fin.updateArchive(self.settings['step'])
             else:
                 self.finObj.updateArchive(self.settings["step"])
-            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])            
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -318,7 +319,8 @@ class TabA(QtGui.QWidget):
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
 
-        self.chart = Chart(self, self.finObj)
+        self.chart = Chart(self, self.finObj)        
+        
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
@@ -328,7 +330,7 @@ class TabA(QtGui.QWidget):
         if self.settings["indicator"]:
             self.chart.setMainIndicator(self.settings["indicator"][-1])
         
-        self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+        self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])                
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])                                        
         
