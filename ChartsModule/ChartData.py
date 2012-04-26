@@ -15,7 +15,7 @@ class ChartData:
     do wykresu zwykłego, czy do porównującego. Wersja porównująca wykresy potrzebuje
     znacznie mniej danych (jedynie procentowa zmiana kursów jednego i drugiego instrumentu
     w czasie), podczas gdy zwykły chart pobiera OHLC"""     
-    defaultSettings={'avgDur':20, 'RSIDur':10, 'CCIDur':10, 
+    defaultSettings={'avgDur':20, 'RSIDur':10, 'CCIDur':10, 'bollingerD':2.0,
                         'ROCDur':10, 'momentumDur':10, 'williamsDur': 10}
     
     def __init__(self, finObj, start=None, end=None, step='monthly', settings=defaultSettings, compare=False):
@@ -147,6 +147,7 @@ class ChartData:
     
     def bollinger(self, type):
         duration=self.settings['avgDur']
+        D=self.settings['bollingerD']
         if type=='upper':
             type=1
         elif type=='lower':
@@ -156,10 +157,10 @@ class ChartData:
         length=len(self.close)
         if(length>=2*(duration+1)):
             array=self.getEarlierValues(length)                
-            return indicators.bollingerBands(np.array(array),duration,type,2)
+            return indicators.bollingerBands(np.array(array),duration,type,D)
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
-            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                                 
+            return indicators.bollingerBands(np.array(array),duration,type,D)[(duration+1)-length/2:]                                 
             
     def getSettings(self):
         """Zwraca głęboką kopię słownika settings"""
