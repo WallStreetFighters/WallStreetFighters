@@ -108,6 +108,8 @@ class Chart(FigureCanvas):
             ax.plot(x,self.data.close,'b.',label=self.data.name)
         elif self.mainType=='candlestick':
             self.drawCandlePlot()
+        elif self.mainType=='bar':
+            self.drawBarPlot()
         else:            
             return
         if self.mainIndicator != None:
@@ -206,6 +208,18 @@ class Chart(FigureCanvas):
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
             rect.update({'edgecolor':'k','linewidth':0.5})     
+    
+    def drawBarPlot(self):
+        if self.data==None or self.data.corrupted:
+            return                        
+        ax=self.mainPlot
+        x=range(len(self.data.close))
+        lines=ax.vlines(x,self.data.low,self.data.high,label=self.data.name)
+        for i in x:
+            newLine=Line2D([i-0.3,i],[self.data.open[i],self.data.open[i]],color='k')                
+            ax.add_line(newLine)
+            newLine=Line2D([i,i+0.3],[self.data.close[i],self.data.close[i]],color='k')                
+            ax.add_line(newLine)
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
