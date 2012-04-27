@@ -345,7 +345,6 @@ class TabA(QtGui.QWidget):
             self.endDateEdit.setDate(self.startDateEdit.date())
 
     def paint2Chart(self):
-        print self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[2]
         index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
 
         if self.listName == "index":

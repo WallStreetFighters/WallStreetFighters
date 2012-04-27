@@ -82,6 +82,10 @@ class GuiMainWindow(object):
         self.rssWidget = RSSgui.RSSWidget(self.home)
         self.home.rssLayout.addWidget(self.rssWidget)
 	self.home.startUpdating()
+	#self.home.tableClic.connect(self.aa)
+	QtCore.QObject.connect(self.home, QtCore.SIGNAL("tabFromHome"), self.tabHome)
+
+    
 	#self.home.sup.connect(self.sup)
 
         """Search"""
@@ -108,7 +112,11 @@ class GuiMainWindow(object):
         
         """ teraz otwieramy zakładki z historii"""
         tabHistoryFile = open('tabHistory.wsf','rb')
-        tabHistoryList = cPickle.load(tabHistoryFile)
+        try:
+            tabHistoryList = cPickle.load(tabHistoryFile)
+        except:
+            tabHistoryList = []
+            
         for tabSettings in tabHistoryList:
             if not isinstance(tabSettings['index'],list): #przywracanie taba z pojedynczym instrumentem
                 if tabSettings['finObjType'] == 'index':
@@ -208,7 +216,8 @@ class GuiMainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)        
+        MainWindow.setStatusBar(self.statusbar)
+    
         
     def compare(self):
         pageIndex = self.tabA.listsToolBox.currentIndex()
@@ -347,6 +356,51 @@ class GuiMainWindow(object):
         if i != 0 and i!=1:
 
             self.tabs.removeTab(i)
+    def tabHome(self,name):
+        print name
+        k = 0
+        for  x in dataParser.INDEX_LIST:
+            if name in x:
+                qModelIndex =  self.indexModel.index(k,0)
+                self.newIndexTab(qModelIndex,nameTab = name,settings = None,tabType = None)
+                return
+            k= k+1
+        k = 0
+        for  x in dataParser.STOCK_LIST:
+            if name in x:
+                qModelIndex =  self.stockModel.index(k,0)
+                self.newStockTab(qModelIndex,nameTab = name,settings = None,tabType = None)
+                return
+            k= k+1
+        k = 0
+        for  x in dataParser.FOREX_LIST:
+            if name in x:
+                qModelIndex =  self.forexModel.index(k,0)
+                self.newForexTab(qModelIndex,nameTab = name,settings = None,tabType = None)
+                return
+            k= k+1
+        k = 0
+        for  x in dataParser.BOND_LIST:
+            if name in x:
+                qModelIndex =  self.bondModel.index(k,0)
+                self.newBondTab(qModelIndex,nameTab = name,settings = None,tabType = None)
+                return
+            k= k+1
+        k = 0
+        for  x in dataParser.FUTRES_LIST:
+            if name in x:
+                qModelIndex =  self.futuresModel.index(k,0)
+                self.newFuturesTab(qModelIndex,nameTab = name,settings = None,tabType = None)
+                return
+            k= k+1
+        k = 0
+        for  x in dataParser.RESOURCE_LIST:
+            if name in x:
+                qModelIndex =  self.resourceModel.index(k,0)
+                self.newResourceTab(qModelIndex,nameTab = name,settings = None,tabType = None)
+                return
+            k= k+1
+        
 
     def bigFiltre(self,text):
 
@@ -411,10 +465,7 @@ class GuiMainWindow(object):
         self.stockModel.setFilterRole(34)
         reg.setPattern(self.tabA.filterLineEdit.text()+".*")
         self.stockModel.setFilterRegExp(reg)
-        self.stockModelNestedPattern = ""
-    def sup(self,text):
-        print "000"
-        
+        self.stockModelNestedPattern = ""      
 
             
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""    
