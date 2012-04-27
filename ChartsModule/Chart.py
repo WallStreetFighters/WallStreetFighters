@@ -15,6 +15,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
+import TechAnalysisModule.oscilators as osc
 
     
 class Chart(FigureCanvas):
@@ -96,6 +97,7 @@ class Chart(FigureCanvas):
         #self.drawTrend()
         #self.drawCandleFormations()
         self.drawGaps()
+		
     
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -452,6 +454,9 @@ class Chart(FigureCanvas):
             self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r') 
 
     def drawRateLines(self):
+		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
+        a,b = osc.oscillatorStrategy(array(self.data.close),array(self.data.high),array(self.data.low),10)
+        print a,b
         self.clearLines()
         print "Rysuje wachlarze."
         values = trend.rateLines(array(self.data.close),0.38,0.62)
