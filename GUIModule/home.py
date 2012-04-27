@@ -193,6 +193,8 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
+
+        self.tableWidget.itemClicked.connect(self.tableClicked)
         self.leftLayout.addWidget(self.tableWidget)
 
     def updateTopList(self):
@@ -233,13 +235,30 @@ class Home (QtGui.QWidget):
     def startUpdating(self): 
 	self.updateThread.start()
 	
+    def tableClicked(self,a):
+        if a.column() ==0:
+            self.emit(QtCore.SIGNAL("tabFromHome"),(a.text()))
+	
 class MyFrame(QtGui.QFrame):
     def __init__(self,parent):
+        self.parent = parent
         QtGui.QWidget.__init__(self)
     def mousePressEvent(self,event):
-        print self.nameLabel.text()
+        if self.nameLabel.text() == "Dow":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^DJI'))
+        if self.nameLabel.text() == "Nasdaq":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^IXIC'))
+        if self.nameLabel.text() == "S&P 500":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^GSPC'))
+        if self.nameLabel.text() == "EUR/USD":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('EURUSD'))
+        if self.nameLabel.text() == "10-Year Bond":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^TNX'))
+        if self.nameLabel.text() == "Gold":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('GCM12.CMX'))
+        if self.nameLabel.text() == "Oil":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('CLM12.NYM'))
         
-
 class UpdateThread(QtCore.QThread):
 
     def __init__(self):
