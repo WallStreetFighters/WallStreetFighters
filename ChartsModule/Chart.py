@@ -93,10 +93,11 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.updateOscPlot()                                
         self.draw()        
-        self.drawRateLines()
+        self.drawGeometricFormation()
+        #self.drawRateLines()
         #self.drawTrend()
         #self.drawCandleFormations()
-        self.drawGaps()
+        #self.drawGaps()
 		
     
     def addMainPlot(self):
@@ -447,11 +448,13 @@ class Chart(FigureCanvas):
           newLine.figure.draw_artist(newLine)                                        
           self.blit(self.mainPlot.bbox)    #blit to taki redraw       
    
-    def drawWedge(self):
-        wedge=trend.findWedge(self.data.close)
-        if wedge!=None:
-            self.drawTrendLine(wedge[1][0], wedge[1][1], wedge[1][2], wedge[1][3], 'r')
-            self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r') 
+    def drawGeometricFormation(self):
+        self.clearLines()
+        form=trend.findGeometricFormations(self.data.close)
+        print form
+        if form!=None:
+            self.drawTrendLine(form[1][0], form[1][1], form[1][2], form[1][3], 'r')
+            self.drawTrendLine(form[2][0], form[2][1], form[2][2], form[2][3], 'r') 
 
     def drawRateLines(self):
 		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
