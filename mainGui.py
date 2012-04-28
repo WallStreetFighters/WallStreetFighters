@@ -215,7 +215,41 @@ class GuiMainWindow(object):
         MainWindow.setStatusBar(self.statusbar)        
         
     def compare(self):
-        pageIndex = self.tabA.listsToolBox.currentIndex()
+        text = self.tabA.compareLineEdit.text().toUpper()
+        chartList = text.split(' VS ')
+        qModelIndex = []
+        listName = []
+        for x in chartList:
+            t = self.findIndexModel(x)
+            if t:
+                if t[0] == "index":
+                    qModelIndex.append(self.indexModel.index(t[1],0))
+                    listName.append('index')
+                if t[0] == "stock":
+                    qModelIndex.append(self.stockModel.index(t[1],0))
+                    listName.append('stock')
+                if t[0] == "forex":
+                    qModelIndex.append(self.forexModel.index(t[1],0))
+                    listName.append('forex')
+                if t[0] == "bond":
+                    qModelIndex.append(self.bondModel.index(t[1],0))
+                    listName.append('bond')
+                if t[0] =="futures":
+                    qModelIndex.append(self.futuresModel.index(t[1],0))
+                    listName.append('futures')
+                if t[0] == "resource":
+                    qModelIndex.append(self.resourceModel.index(t[1],0))
+                    listName.append('resource')
+        if not qModelIndex :
+            print "pusta list do porównania"
+        else:
+            self.newCompareTab(qModelIndex,"comparison",listName)
+            
+            
+            
+
+      
+        """pageIndex = self.tabA.listsToolBox.currentIndex()
         if pageIndex == 0:
             qModelIndex = self.tabA.indexListView.selectedIndexes()
             qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
@@ -239,9 +273,16 @@ class GuiMainWindow(object):
         if pageIndex == 5:
             qModelIndex = self.tabA.futuresListView.selectedIndexes()
             qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
-            self.newFuturesTab(qModelIndex,"Furures' comparison")
+            self.newFuturesTab(qModelIndex,"Furures' comparison")"""
         
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
+    def newCompareTab(self,qModelIndex,nameTab,listName):
+        settings = self.settings()
+        tabType = 'compare'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = listName,showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     def newIndexTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
@@ -351,8 +392,41 @@ class GuiMainWindow(object):
         if i != 0 and i!=1:
 
             self.tabs.removeTab(i)
+            
+    def findIndexModel(self,name):
+        k = 0
+        for  x in dataParser.INDEX_LIST:
+            if name in x:
+                return ("index",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.STOCK_LIST:
+            if name in x:
+               return ("stock",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.FOREX_LIST:
+            if name in x:
+                return ("forex",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.BOND_LIST:
+            if name in x:
+                return ("bond",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.FUTURES_LIST:
+            if name in x:
+                return ("futures",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.RESOURCE_LIST:
+            if name in x:
+                return ("resource",k)
+            k= k+1
+        return None
+    
     def tabHome(self,name):
-        print name
         k = 0
         for  x in dataParser.INDEX_LIST:
             if name in x:
