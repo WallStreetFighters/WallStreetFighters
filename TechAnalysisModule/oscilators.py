@@ -263,6 +263,21 @@ def TRIN(advances, declines, advVol, decVol):
     denominator=advVol.astype(float)/decVol.astype(float)
     return numerator/denominator
 
+def HPI(volume, high, low, openInterest, smoothFactor=10, centValue=250):
+    """Oblicza wartość Herrick Payoff Index dla danej tablicy. 
+    Parametry:    
+    http://www.moneyshow.com/trading/article/31/tebiwkly08-14614/Trading-Techniques--The-Herrick-Payoff-Index/
+    tablice volume, high, low, openInterest jako listy
+    Zwracany wynik to tablica z wartościami HPI, długości tej samej co przekazane 4 tablice."""
+    #if(not len(volume)==len(high)==len(low)==len(openInterest)):
+    #    return None
+    #hpiTable=[0]
+    #for i in range (1,len(volume)):
+    #    Ky=hpiTable[i-1]
+    #    Kprim=(centValue*volume[i]*(M-My))()
+    pass
+        
+
 # Funkcja zwracajaca wartosci sygnalu kupna lub sprzedazy dla oscylatorow
 # Zwraca sume wskaznikow oraz tablice z wartosciami dla poszczegolnych wskaznikow
 # W tablicy po kolei dla indeksow mamy :
