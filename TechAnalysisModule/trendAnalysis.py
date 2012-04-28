@@ -9,8 +9,12 @@ import math
 
 # kiedy trend boczny, od 0 stopni do +/-trendVul
 trendVul = 5
-#cos do klinow - > Andrzej to okomentuje
-wedgeVul = 0.05
+"""Jest to coś jak trendVul, tylko dla formacji. Tzn jest to wartość
+nachylenia prostej w stopniach, aby uznać linię za nie-poziomą."""
+formVul = 5
+"""Miara zbieżności prostych, tzn różnica kątów nachylenia, powyżej której
+traktujemy linie jako nie-równoległe"""
+convergenceVul = 15
 #o ile procent moga odbiegac od siebie wartosci w linii kanału, default 3 %
 rectVul = 0.03
 """o ile procent moga odbiegac od siebie szczytowe wartosci
@@ -493,35 +497,64 @@ def lookForReversedHeadAndShoulders(values, volumine):
     # print "nie znaleziono", z
     return [0, 0, 0, 0]
    
-def findWedge(values):  
-    """Znajdujemy formację klina. Generalnie sprowadza się to do tego samego co trend,
-    tylko sprawdzamy czy linie kanału są zbieżne.
+"""
+Formacje "geometryczne" = kliny (zwyżkujący, zniżkujący), 
+trójkąty (zwyżkujący, zniżkujący, symetryczny), prostokąt   
+"""
+   
+def findGeometricFormations(values):   
+    """Zwraca "najbardziej wartościową", tzn. największą formację geometryczną jaką uda się
+    znaleźć na danej tablicy. Wynik podobny jak w findWedgeOnArray plus czwarty element
+    oznaczający wartość z przedziału [0,1] """
+    intervals=[(0,1),(1,4),(1,2),(3,4)]
+    value=1.0
+    for a,b in intervals:        
+        wedge=findGeometricFormationOnArray(values,a,b)
+        if(wedge!=None):
+            wedge[3]=value
+            break
+        value*=0.75
+    return wedge
+   
+def findGeometricFormationOnArray(values,a,b):  
+    """Znajdujemy formację geometryczną na wycinku danej tablicy określonym za pomocą a i b 
+    (patrz getChannelLines). Generalnie sprowadza się to do tego samego co trend,
+    tylko sprawdzamy czy i w jaki sposób linie kanału są zbieżne.
     Interpretacja: 
     klin zwyżkujący zapowiada odwrócenie trendu wzrostowego lub kontynuację spadkowego
-    klin zniżkujący -  na odwrót"""    
-    #print values
-    sup, res = getChannelLines(values)   
-    # sup, res = findMaxMin(values) - czemu to nie działa?
+    klin zniżkujący -  na odwrót"""        
+    sup, res = getChannelLines(values,a,b) 
+    minY=min(values)
+    #skalujemy znalezione proste na [0,1]x[0,1]
+    factorX=1.0/len(values)
+    factorY=1.0/(max(values)-minY)    
     supx0,supy0,supx1,supy1 = sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0]     
     resx0,resy0,resx1,resy1 = res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0]
-    supLine=lineFrom2Points(supx0,supy0,supx1,supy1)
-    resLine=lineFrom2Points(resx0,resy0,resx1,resy1)    
-    supAngle = arctan(supLine[0])*(180.0/pi)
-    resAngle = arctan(resLine[0])*(180.0/pi)
+    if(supy0>=resy0 or supy1>resy1):
+        return None        
+    scaledSupLine=lineFrom2Points(factorX*supx0,factorY*(supy0-minY),factorX*supx1,factorY*(supy1-minY))
+    scaledResLine=lineFrom2Points(factorX*resx0,factorY*(resy0-minY),factorX*resx1,factorY*(resy1-minY))
+    supAngle = arctan(scaledSupLine[0])*(180.0/pi)
+    resAngle = arctan(scaledResLine[0])*(180.0/pi)
     print "supAngle: ", supAngle, "resAngle: ", resAngle
-    if resAngle < wedgeVul and resAngle > -wedgeVul and supAngle < wedgeVul and supAngle > -wedgeVul:
-        print "Found rect"
-        return ('rect',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1)) 
-    if resAngle < -wedgeVul and supAngle > wedgeVul:
-        print "Found triangle"
-        return ('triangle',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1)) 
+    #prostokąt
+    if resAngle < formVul and resAngle > -formVul and supAngle < formVul and supAngle > -formVul:        
+        return ['rect',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1),1] 
+    #trójkąt symetryczny
+    elif resAngle < -formVul and supAngle > formVul:        
+        return ['symmetric_triangle',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1),1] 
+    #trójkąt zniżkujący
+    elif resAngle < -formVul and abs(supAngle) < formVul and supAngle-resAngle > convergenceVul:        
+        return ['falling_triangle',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1),1] 
+    #trójkąt zwyżkujący
+    elif abs(resAngle) < formVul and supAngle > formVul:        
+        return ['rising_triangle',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1),1]
     #klin zwyżkujący
-    if resAngle>wedgeVul and supAngle>resAngle:
-        return ('rising_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))
+    elif resAngle>formVul and supAngle>resAngle and abs(resAngle-supAngle)>convergenceVul:
+        return ['rising_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1),1]
     #klin zniżkujący
-    elif supAngle < -wedgeVul and resAngle<supAngle:
-        return ('falling_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1))    
-    print "nie ma klina"
+    elif supAngle < -formVul and resAngle<supAngle and abs(resAngle-supAngle)>convergenceVul:
+        return ['falling_wedge',(resx0,resy0,resx1,resy1),(supx0,supy0,supx1,supy1),1]        
     return None    
    
 ## print findMaxMin(arange(1000))
