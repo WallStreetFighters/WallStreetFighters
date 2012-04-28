@@ -8,10 +8,15 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.ticker import *
 from matplotlib.textpath import TextPath
+from matplotlib.text import Text
 from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
+import TechAnalysisModule.oscilators as osc
+
     
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -24,7 +29,8 @@ class Chart(FigureCanvas):
     mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
     volumeBars = None #wykres wolumenu
     oscPlot = None #wykres oscylatora    
-    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)    
+    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
+    rectangles = [] #lista prostokątów (do zaznaczania świec)
     
     mainType = None #typ głównego wykresu
     oscType = None #typ oscylatora (RSI, momentum, ...)
@@ -46,6 +52,8 @@ class Chart(FigureCanvas):
     def __init__(self, parent, finObj=None, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
         dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
+        self.additionalLines=[]
+        self.rectangles=[]
         self.setData(finObj)
         self.mainType='line'                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
@@ -80,22 +88,24 @@ class Chart(FigureCanvas):
         
         
     def updatePlot(self):
-        """Odświeża wszystkie wykresy"""        
+        """Odświeża wszystkie wykresy"""                
         self.updateMainPlot()
         self.updateVolumeBars()
-        self.updateOscPlot()        
+        self.updateOscPlot()                                
         self.draw()        
+        self.drawRateLines()
         #self.drawTrend()
-        self.drawWedge()
-        self.draw()
-
+        #self.drawCandleFormations()
+        self.drawGaps()
+		
+    
     def addMainPlot(self):
         """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
         self.mainPlot=self.fig.add_axes(bounds)                        
         self.updateMainPlot()
     
-    def updateMainPlot(self):
+    def updateMainPlot(self):        
         if(self.mainPlot==None or self.data==None or self.data.corrupted):
             return
         ax=self.mainPlot                
@@ -113,7 +123,13 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))                 
+        for line in self.additionalLines:
+            ax.add_line(line)
+            line.figure.draw_artist(line)         
+        for rect in self.rectangles:
+            ax.add_patch(rect)
+            rect.figure.draw_artist(rect)        
         if(self.scaleType=='log'):            
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
@@ -138,10 +154,7 @@ class Chart(FigureCanvas):
         #tworzymy nowy wykres tylko za pierwszym razem, potem tylko pokazujemy i odświeżamy                
         if(self.volumeBars==None):
             volBounds=[self.margin, self.margin, self.maxSize, self.volHeight]
-            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                    
-            #usuwamy etykiety y dla wolumenu (zakomentujcie, to zobaczycie czemu)
-            for label in self.volumeBars.get_yticklabels():
-                label.set_visible(False)                                               
+            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                                                                               
         self.updateVolumeBars()
         self.volumeBars.set_visible(True)
         self.fixPositions()
@@ -169,11 +182,14 @@ class Chart(FigureCanvas):
         ax=self.volumeBars
         ax.clear()
         x=range(len(self.data.close))
-        ax.vlines(x,0,self.data.volume)
-        for label in self.volumeBars.get_yticklabels():
-            label.set_visible(False)            
+        ax.vlines(x,0,self.data.volume)        
         ax.set_xlim(x[0],x[-1])
-        ax.set_ylim(0,1.2*max(self.data.volume))
+        if(max(self.data.volume)>0):
+            ax.set_ylim(0,1.2*max(self.data.volume))
+        for label in self.volumeBars.get_yticklabels():
+            label.set_visible(False)                                
+        for o in ax.findobj(Text):
+            o.set_visible(False)
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -189,10 +205,7 @@ class Chart(FigureCanvas):
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.name) 
-        #poniższe dwie linie są po to, żeby wykres wypełniał całą szerokość
-        #self.mainPlot.xaxis_date()                
-        #self.mainPlot.autoscale_view()   
+        lines[0].set_label(self.data.name)         
         """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
         stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
         Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
@@ -309,8 +322,7 @@ class Chart(FigureCanvas):
         chartWidth=int(self.fig.get_figwidth()*self.fig.get_dpi()*self.maxSize)        
         t = TextPath((0,0), '9999-99-99', size=7)
         labelWidth = int(t.get_extents().width)    
-        num_ticks=chartWidth/labelWidth/2  
-        print chartWidth, labelWidth, num_ticks
+        num_ticks=chartWidth/labelWidth/2          
         length=len(self.data.date)
         if(length>num_ticks):
             step=length/num_ticks        
@@ -393,6 +405,22 @@ class Chart(FigureCanvas):
         self.additionalLines = []
         self.draw()
         self.blit(self.mainPlot.bbox)
+    
+    def drawRectangle(self, x, y, width, height, colour='blue', lwidth = 2.0, lstyle = 'dashed'):
+        """Zaznacza prostokątem lukę/formację świecową czy coś tam jeszcze"""
+        newRect=Rectangle((x,y),width,height,facecolor='none',edgecolor=colour,linewidth=lwidth,linestyle=lstyle)                
+        self.mainPlot.add_patch(newRect)
+        self.rectangles.append(newRect)
+        newRect.figure.draw_artist(newRect)                                        
+        self.blit(self.mainPlot.bbox)    #blit to taki redraw        
+    
+    def clearRectangles(self):
+        """Usuwa prostokąty"""
+        for rect in self.rectangles:            
+            rect.remove()
+        self.rectangles = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
 
     def onClick(self, event):
         """Rysujemy linię pomiędzy dwoma kolejnymi kliknięciami. Później to będzie 
@@ -423,9 +451,68 @@ class Chart(FigureCanvas):
         wedge=trend.findWedge(self.data.close)
         if wedge!=None:
             self.drawTrendLine(wedge[1][0], wedge[1][1], wedge[1][2], wedge[1][3], 'r')
-            self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r')
+            self.drawTrendLine(wedge[2][0], wedge[2][1], wedge[2][2], wedge[2][3], 'r') 
+
+    def drawRateLines(self):
+		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
+        a,b = osc.oscillatorStrategy(array(self.data.close),array(self.data.high),array(self.data.low),10)
+        print a,b
+        self.clearLines()
+        print "Rysuje wachlarze."
+        values = trend.rateLines(array(self.data.close),0.38,0.62)
+        print values
+        self.drawTrendLine(values[0][0],values[0][1],values[0][2],values[0][3],'y')
+        self.drawTrendLine(values[1][0],values[1][1],values[1][2],values[1][3],'y')
+        self.drawTrendLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
+          
+    def drawCandleFormations(self):
+        """Test formacji świecowych. Tak się tego nie będzie używać! Ta funkcja powinna być
+        użyta przez moduł wnioskowania po rozpoznaniu odpowiedniego trendu (a nie dla obu) 
+        i tylko dla małego wycinka tablicy z danymi a nie dla całej. No i kuźwa tego *nie będzie* w
+        charcie podobnie jak wyznaczania trendów."""
+        print "szukam formacji świecowych"
+        self.clearRectangles()
+        O=self.data.open
+        H=self.data.high
+        L=self.data.low
+        C=self.data.close        
+        formations1=findCandleFormations(O,H,L,C,-1)
+        formations2=findCandleFormations(O,H,L,C,1)        
+        for formation in formations1+formations2:            
+            print formation                    
+            x=formation[1]-0.5
+            y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
+            width=formation[2]-formation[1]+1
+            height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
+                        -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
+            self.drawRectangle(x,y,width,height)        
+            
+    def drawGaps(self):
+        """Test luk. Tak się tego nie będzie używać! Ta funkcja powinna być
+        użyta przez moduł wnioskowania i tylko dla wycinka tablicy z danymi a nie dla całej. 
+        No i kuźwa tego *nie będzie* w charcie podobnie jak wyznaczania trendów."""
+        print "szukam luk"
+        self.clearRectangles()
+        H=self.data.high
+        L=self.data.low
+        C=self.data.close        
+        gaps=findGaps(H,L,C)       
+        print gaps
+        if(gaps!=None):
+            for gap in gaps:            
+                print gap
+                x=gap[1]
+                width=1
+                if("rising" in gap[0]):
+                    y=H[gap[1]]            
+                    height=L[gap[1]+1]-H[gap[1]]
+                else:
+                    y=H[gap[1]+1]            
+                    height=L[gap[1]]-H[gap[1]+1]
+                self.drawRectangle(x,y,width,height)        
           
     def drawTrend(self):
+        self.clearLines()
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)
         #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
