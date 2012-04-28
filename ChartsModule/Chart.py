@@ -96,7 +96,7 @@ class Chart(FigureCanvas):
         self.drawGeometricFormation()
         #self.drawRateLines()
         #self.drawTrend()
-        #self.drawCandleFormations()
+        self.drawCandleFormations()
         #self.drawGaps()
 		
     
@@ -479,9 +479,8 @@ class Chart(FigureCanvas):
         H=self.data.high
         L=self.data.low
         C=self.data.close        
-        formations1=findCandleFormations(O,H,L,C,-1)
-        formations2=findCandleFormations(O,H,L,C,1)        
-        for formation in formations1+formations2:            
+        formation=findCandleFormations(O,H,L,C)                
+        if formation!=None:
             print formation                    
             x=formation[1]-0.5
             y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])

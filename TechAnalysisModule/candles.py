@@ -10,33 +10,58 @@ jeśli przekażemy ostatnie 10 elementów z tablicy 100 elementowej i dostaniemy
 2,3 to znaczy że w pierwotnej tablicy to było na pozycjach 92, 93
 """
 
-import trendAnalysis as trend
+import trendAnalysis as trendA
 
-STRONG_TREND=0.3
-STRAIGHT_TREND_VUL=0.1
+CANDLE_MAX_LEN = 20 #maksymalna ilość świec, które bierzemy pod uwagę szukając formacji
+STRONG_TREND=0.3 #wartość współczynnika kierunkowego prostej, powyżej którego traktujemy trend jako silny
+STRAIGHT_TREND_VUL=0.1 #o ile wartości mogą odchylać się od regresji przy szukaniu luk
 LONG_BODY=0.03  #parametr określający jaką różnicę mięczy O a C traktujemy jako dużą (3%)
 SHORT_BODY=0.005    #parametr określający jaką różnicę mięczy O a C traktujemy jako małą (0,5%)
 LOW_PART=0.25  #poniżej tej części wykresu szukamy luki startowej
 HIGH_PART=0.75  #powyżej tej części wykresu szukamy luki wyczerpania
 
 
-def findCandleFormations(O,H,L,C,trend):
+def findCandleFormations(O,H,L,C):
     """Szuka na wykresie formacji świecowych, dla każdej formacji która wystąpiła
     zwraca tablicę krotek ('nazwa',indeks rozpoczęcia, indeks zakończenia). Przy czym,
     dla każdej formacji jest co najwyżej jedna krotka z jej ostatnim wystąpieniem"""
-    if not (len(O)==len(H)==len(L)==len(C)):
-        print "Tablice są różnej długości - co to kurwa ma być?"
+    trend=trendA.optimizedTrend(C)
+    if not (len(O)==len(H)==len(L)==len(C)):        
         return None
-    result=[]
-    if trend==1:
-        result.append(findBull3(O,H,L,C))        
-        result.append(findEveningStar(O,C))                
-        result.append(findDarkCloud(O,C))
+    if len(O)>CANDLE_MAX_LEN:
+        offset=len(O)-CANDLE_MAX_LEN
+        O=O[-CANDLE_MAX_LEN::1]
+        H=H[-CANDLE_MAX_LEN::1]
+        L=L[-CANDLE_MAX_LEN::1]
+        C=C[-CANDLE_MAX_LEN::1]        
     else:
-        result.append(findBear3(O,H,L,C))        
-        result.append(findMorningStar(O,C))                 
-        result.append(findPiercing(O,C))
-    return [value for value in result if value != None]
+        offset=0       
+    print "trend= ",trend
+    print "offset= ", offset
+    if trend==1:
+        result=findBull3(O,H,L,C)
+        if result==None:
+            result=findEveningStar(O,C)        
+            if result==None:
+                result=findDarkCloud(O,C)        
+    else:
+        result=findBear3(O,H,L,C)                
+        if result==None:
+            result=findMorningStar(O,C)                         
+            if result==None:
+                result=findPiercing(O,C)        
+    if result!=None:
+        #wartość jest odwrotnie proporcjonalna do tego, jak dawno wystąpiła formacja
+        #żeby dawne wartości nie były zbyt małe, dzielimy przez 0.8*min(długość tablicy, CANDLE_MAX_LEN)
+        if offset==0:
+            factor=len(O)
+        else:
+            factor=CANDLE_MAX_LEN
+        value=result[2]/(0.8*factor)
+        if value>1:
+            value=1
+        result=(result[0],result[1]+offset,result[2]+offset,value)
+        return result
 
 """Algorytm szukania każdej formacji jest identyczny: lecimy od końca i sprawdzamy po kolei
 świeczki czy są takie jak formacja nakazuje. Jeśli znajdziemy coś dobrego to kończymy 
@@ -52,7 +77,7 @@ def findDarkCloud(O,C):
         if body2 > -LONG_BODY or body1 <LONG_BODY:
             continue        
         if O[i]<=C[i-1]:
-            return
+            continue
         body1mid=C[i-1]-(C[i-1]-O[i-1])/2
         if(C[i]>=body1mid):
             continue
@@ -69,7 +94,7 @@ def findPiercing(O,C):
         if body2 < LONG_BODY or body1 > -LONG_BODY:
             continue
         if O[i]>=C[i-1]:
-            return
+            continue
         body1mid=C[i-1]-(C[i-1]-O[i-1])/2
         if(C[i]<=body1mid):
             continue
@@ -182,7 +207,7 @@ def isStraightTrend(array):
     Robimy to wyliczając regresję i sprawdzając czy wszystkie punkty w tablicy 
     są w pasie regresja +/- jakieś sensitivity. Oczywiście sprawdzamy też czy sam trend
     jest odpowiednio silny poprzez badanie współczynnika kierunkowego prostej."""    
-    a, b = trend.regression(array)
+    a, b = trendA.regression(array)
     if abs(a) < STRONG_TREND:
         return 0
     for i in range(len(array)):
@@ -208,6 +233,7 @@ def findGaps(H,L,C):
     gaps=[]
     amplitude=max(C)-min(C)    
     base=min(C)
+    print "straight trend"
     if(trend>0):
         #najpierw szukamy wszystkich luk na wykresie
         for i in range (len(H)-1):
