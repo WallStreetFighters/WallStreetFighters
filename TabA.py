@@ -32,7 +32,6 @@ class TabA(QtGui.QWidget):
         self.chart =None
         QtGui.QWidget.__init__(self)
         self.initUi()
-
     def initUi(self):
         
         
@@ -239,7 +238,7 @@ class TabA(QtGui.QWidget):
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
-            
+
     def updateHideVolumen(self):
         hideVolumen =self.volumenCheckBox.isChecked()
         if self.chart !=None:
@@ -272,7 +271,7 @@ class TabA(QtGui.QWidget):
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
-            
+
     def smaChanged(self,state):
         print state
         if state == 0:
@@ -340,7 +339,6 @@ class TabA(QtGui.QWidget):
             self.chart.drawTrend()
 
             
-            
     def checkDate(self):
         if self.startDateEdit.date() >= self.endDateEdit.date():
             self.endDateEdit.setDate(self.startDateEdit.date())
@@ -395,6 +393,7 @@ class TabA(QtGui.QWidget):
         self.chart.setDrawingMode(self.settings["painting"])
         if self.settings["indicator"]:
             self.chart.setMainIndicator(self.settings["indicator"][-1])
+        
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
@@ -405,7 +404,6 @@ class TabA(QtGui.QWidget):
         
         if self.settings["hideVolumen"]:
             self.chart.rmVolumeBars()
-
         self.setOptions()
 
     def paintCompareChart(self):
@@ -481,7 +479,8 @@ class TabA(QtGui.QWidget):
             self.stepComboBox.setCurrentIndex(2)
         if self.settings["painting"]:
             self.paintCheckBox.setCheckState(2)
-	
+
+
     def setOptions(self):
         #przywracamy odpowiednie ustawienia opcji w GUI
         #data
@@ -509,7 +508,8 @@ class TabA(QtGui.QWidget):
         #font.setWeight(75)
         if self.settings["indicator"]:
             name = self.settings["indicator"][-1].lower()
-            eval ('self.'+name+'CheckBox.setFont(font)')            
+            eval ('self.'+name+'CheckBox.setFont(font)')
+            
         if self.settings["oscilator"] == "momentum":
             self.momentumCheckBox.setChecked(True)
         elif self.settings["oscilator"] == "CCI":
@@ -540,6 +540,7 @@ class TabA(QtGui.QWidget):
         #painting
         if self.settings["painting"]:
             self.paintCheckBox.setCheckState(2)
+
     def showChartsWithAllIndicators(self,x):
        
         if len(self.settings["indicator"]) >= 3:

@@ -12,7 +12,15 @@ import cPickle
 import threading
 
 #ZMIENNE GLOBALNE
+<<<<<<< HEAD
 REMEMBER_COUNT = 10
+=======
+<<<<<<< HEAD
+REMEMBER_COUNT = 5
+=======
+REMEMBER_COUNT = 15
+>>>>>>> GUI
+>>>>>>> techAnalysis
 DATABASE_LAST_UPDATE = datetime.date(2012,3,3)
 INDEX_LIST = []
 STOCK_LIST = []
@@ -801,7 +809,10 @@ def loadStats():
 	top5Volume()
 	top5Gainers()
 
+<<<<<<< HEAD
 print datetime.date.today()
+=======
+>>>>>>> techAnalysis
 
 
 ########################################################################################################

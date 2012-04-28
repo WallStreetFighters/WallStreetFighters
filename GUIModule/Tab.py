@@ -43,8 +43,7 @@ def tabUi(self,showLists=True):
                 self.indexListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.indexListView) #ustawiamy styl tabeli
                 self.indexPageLayout.addWidget(self.indexListView)
-        
-
+                
                 #Stock
                 self.stockPage = QtGui.QWidget(self.listsFrame)
                 self.stockPageLayout = QtGui.QGridLayout(self.stockPage)

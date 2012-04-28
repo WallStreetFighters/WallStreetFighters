@@ -8,6 +8,7 @@ import numpy as np
 import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as parser
 
+
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
     co daje mi FinancialObject Marcina. Czwarty parametr określa czy obliczamy dane
@@ -26,7 +27,7 @@ class ChartData:
         if(end==None):
             end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]                              
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -40,7 +41,7 @@ class ChartData:
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
-            self.volume=dataArray['open'].tolist()   
+            self.volume=dataArray['volume'].tolist()   
             if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
                     ==len(self.volume)==len(self.date))):
                 self.corrupted=True
@@ -149,7 +150,6 @@ class ChartData:
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
-
     
     #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
     """
@@ -170,4 +170,3 @@ class ChartData:
         declines=self.advDecArray['dec']
         return indicators.adLine(advances,declines)
     """
-

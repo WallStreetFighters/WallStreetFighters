@@ -34,9 +34,14 @@ class GuiMainWindow(object):
         os.chdir("../WallStreetFighters/DataParserModule")
         dataParser.loadData()
 	FILE = open("../GUIModule/data.wsf", 'r')
+<<<<<<< HEAD
 	dataParser.loadHistory(FILE).start()
 	
 
+=======
+	dataParser.loadHistory(FILE)
+	FILE.close()
+>>>>>>> techAnalysis
 
 
         # inicjujemy model danych dla Index
@@ -73,7 +78,10 @@ class GuiMainWindow(object):
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
         self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
+<<<<<<< HEAD
+=======
 
+>>>>>>> GUI
 
         
         """koniec tab A """
@@ -95,7 +103,12 @@ class GuiMainWindow(object):
         self.tabs.addTab(self.tabC,"tabC")
         
         Koniec tabC"""
+<<<<<<< HEAD
+        
+    
+=======
            
+>>>>>>> GUI
 	""" koniec ustawiania Zakładek"""
 
 	self.tabs.tabCloseRequested.connect(self.closeTab)
@@ -164,12 +177,18 @@ class GuiMainWindow(object):
         if not nameTab:
             nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+<<<<<<< HEAD
     def newFuturesTab(self,qModelIndex,nameTab = None):
         self.tabA1 = TabA(qModelIndex = qModelIndex,settings = self.settings(),listName = "futures",showLists = False)
         if not nameTab:
             nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> techAnalysis
 
+>>>>>>> GUI
 
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA

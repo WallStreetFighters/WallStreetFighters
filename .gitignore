@@ -28,6 +28,7 @@ data.wsf
 *.log
 *.sql
 *.sqlite
+*.wsf
 
 # OS generated files #
 ######################

@@ -25,9 +25,6 @@ class MainWindow(QtGui.QMainWindow):
                 t=  self.gui.tabs.widget(i).getSettings()
                 tabHistoryList.append(t)
         cPickle.dump(tabHistoryList, open('tabHistory.wsf','w'))
-    
-    
-
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

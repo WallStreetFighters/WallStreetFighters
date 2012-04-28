@@ -98,7 +98,6 @@ class GuiMainWindow(object):
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
         self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
-
         self.tabA.nasdaqButton.pressed.connect(self.nasdaqFiltre)
         self.tabA.nyseButton.pressed.connect(self.nyseFiltre)
         self.tabA.wigButton.pressed.connect(self.wigFiltre)
@@ -178,8 +177,6 @@ class GuiMainWindow(object):
                         qModelIndex.append(self.indexModel.index(i,0))
                     nameTab = "Futures' comparison"
                     self.newFuturesTab(qModelIndex ,nameTab,tabSettings,"futures")
-                              
-
         
         """koniec tab A """
         
@@ -200,7 +197,7 @@ class GuiMainWindow(object):
         self.tabs.addTab(self.tabC,"tabC")
         
         Koniec tabC"""
-           
+
 	""" koniec ustawiania Zakładek"""
 
 	self.tabs.tabCloseRequested.connect(self.closeTab)
@@ -301,7 +298,6 @@ class GuiMainWindow(object):
         if not nameTab:
             nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
-
 
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA

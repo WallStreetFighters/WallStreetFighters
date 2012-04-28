@@ -84,12 +84,15 @@ class CompareChart(FigureCanvas):
                 maxVal=max(data.percentChng)            
         #skalujemy osie
         ax.set_xlim(x[0],x[-1])
-        ax.set_yscale(self.scaleType)        
-        ax.set_ylim(minVal-0.1*abs(minVal),max(210,maxVal+0.1*abs(maxVal)))        
+        ax.set_yscale(self.scaleType)                        
         #przy skali logarytmicznej ustawiamy etykietki żeby były gęściej niż przy 10^k
         if(self.scaleType=='log'):            
+            ax.set_ylim(minVal-0.1*abs(minVal),max(210,maxVal+0.1*abs(maxVal)))    
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f%%'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f%%'))            
+        else:
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f%%'))            
+            ax.set_ylim(minVal-0.01*abs(minVal),maxVal+0.01*abs(maxVal))    
         for label in (ax.get_yticklabels() + ax.get_yminorticklabels()):
             label.set_size(8)
         #legenda
