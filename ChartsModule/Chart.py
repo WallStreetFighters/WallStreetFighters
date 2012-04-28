@@ -84,8 +84,7 @@ class Chart(FigureCanvas):
     def setMainType(self, type):
         """Ustawiamy typ głównego wykresu ('point','line','candlestick','none')"""
         self.mainType=type
-        self.updateMainPlot()
-        
+        self.updateMainPlot()        
         
     def updatePlot(self):
         """Odświeża wszystkie wykresy"""                
@@ -93,11 +92,11 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.updateOscPlot()                                
         self.draw()        
-        self.drawGeometricFormation()
+        #self.drawGeometricFormation()
         #self.drawRateLines()
         #self.drawTrend()
-        self.drawCandleFormations()
-        #self.drawGaps()
+        #self.drawCandleFormations()
+        self.drawGaps()
 		
     
     def addMainPlot(self):
@@ -469,10 +468,7 @@ class Chart(FigureCanvas):
         self.drawTrendLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
           
     def drawCandleFormations(self):
-        """Test formacji świecowych. Tak się tego nie będzie używać! Ta funkcja powinna być
-        użyta przez moduł wnioskowania po rozpoznaniu odpowiedniego trendu (a nie dla obu) 
-        i tylko dla małego wycinka tablicy z danymi a nie dla całej. No i kuźwa tego *nie będzie* w
-        charcie podobnie jak wyznaczania trendów."""
+        """Test formacji świecowych."""
         print "szukam formacji świecowych"
         self.clearRectangles()
         O=self.data.open
@@ -490,9 +486,7 @@ class Chart(FigureCanvas):
             self.drawRectangle(x,y,width,height)        
             
     def drawGaps(self):
-        """Test luk. Tak się tego nie będzie używać! Ta funkcja powinna być
-        użyta przez moduł wnioskowania i tylko dla wycinka tablicy z danymi a nie dla całej. 
-        No i kuźwa tego *nie będzie* w charcie podobnie jak wyznaczania trendów."""
+        """Test luk."""
         print "szukam luk"
         self.clearRectangles()
         H=self.data.high
@@ -500,8 +494,8 @@ class Chart(FigureCanvas):
         C=self.data.close        
         gaps=findGaps(H,L,C)       
         print gaps
-        if(gaps!=None):
-            for gap in gaps:            
+        if(gaps!=[]):
+            for gap in gaps[0]:            
                 print gap
                 x=gap[1]
                 width=1
