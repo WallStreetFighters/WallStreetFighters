@@ -507,14 +507,14 @@ def findGeometricFormations(values):
     intervals=[(0,1),(1,4),(1,2),(3,4)]
     value=1.0
     for a,b in intervals:        
-        wedge=findGeometricFormationOnArray(values,a,b)
+        wedge=findGeometricFormationOnFragment(values,a,b)
         if(wedge!=None):
             wedge[3]=value
             break
         value*=0.75
     return wedge
    
-def findGeometricFormationOnArray(values,a,b):  
+def findGeometricFormationOnFragment(values,a,b):  
     """Znajdujemy formację geometryczną na wycinku danej tablicy określonym za pomocą a i b 
     (patrz getChannelLines). Generalnie sprowadza się to do tego samego co trend,
     tylko sprawdzamy czy i w jaki sposób linie kanału są zbieżne.

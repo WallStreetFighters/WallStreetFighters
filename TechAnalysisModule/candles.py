@@ -14,7 +14,7 @@ import trendAnalysis as trendA
 
 CANDLE_MAX_LEN = 20 #maksymalna ilość świec, które bierzemy pod uwagę szukając formacji
 STRONG_TREND=0.3 #wartość współczynnika kierunkowego prostej, powyżej którego traktujemy trend jako silny
-STRAIGHT_TREND_VUL=0.1 #o ile wartości mogą odchylać się od regresji przy szukaniu luk
+STRAIGHT_TREND_VUL=0.05 #o ile wartości mogą odchylać się od regresji przy szukaniu luk
 LONG_BODY=0.03  #parametr określający jaką różnicę mięczy O a C traktujemy jako dużą (3%)
 SHORT_BODY=0.005    #parametr określający jaką różnicę mięczy O a C traktujemy jako małą (0,5%)
 LOW_PART=0.25  #poniżej tej części wykresu szukamy luki startowej
@@ -216,17 +216,35 @@ def isStraightTrend(array):
                     return 0
     return a       
 
-def findGaps(H,L,C):
-    """Znajduje na danym wykresie (lub jego wycinku) lukę startową, ucieczki i wyczerpania. 
-    Używać najlepiej na możliwie krótkim okresie, np po wybiciu z formacji. 
+def findGaps(H,L,C):   
+    """Szuka luk na fragmentach tablicy o różnej wielkości, zwraca te, które znalazł
+    na największym. Zwraca parę, której pierwszy element to
+    lista luk, każda opisana tak jak w findGapsOnFragment, a drugi to wartość."""
+    intervals=[(0,1),(1,4),(1,2),(3,4)][-1::-1]
+    value=1
+    for a,b in intervals:        
+        gaps=findGapsOnFragment(H,L,C,a,b)
+        if(gaps!=[]):
+            gaps=(gaps,value)
+            break
+        value*=0.75
+    return gaps
+
+def findGapsOnFragment(H,L,C,a,b):
+    """Znajduje na danym wycinku wykresu lukę startową, ucieczki i wyczerpania.     
     Interpretacja: Luka startowa - sygnał rozpoczęcia trendu, 
     luka ucieczki - potwierdzenie siły trendu + orientacyjne określenie jego zasięgu (zazwyczaj jest w połowie)
     luka wyczerpania - sygnał że trend się wkrótce skończy    
     Funkcja zwraca listę 0, 1, 2 lub 3 elementową, której
-    elementy są krotkami 3-elementowymi: nazwa, indeks w tablicy, poziom y"""
+    elementy są krotkami 3-elementowymi: (nazwa, indeks w tablicy, poziom y)"""        
+    oldlen=len(C)
+    C=C[a*len(C)/b:]
+    H=H[a*len(C)/b:]
+    L=L[a*len(C)/b:]
+    offset=oldlen-len(C)
     trend=isStraightTrend(C)
     if not (len(H)==len(L)==len(C)) or trend==0:
-        return []  
+        return []      
     breakaway_gap=None
     continuation_gap=None
     exhaustion_gap=None
@@ -272,8 +290,9 @@ def findGaps(H,L,C):
     #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
     elif(trend<0):                
         for i in range (len(H)-1):
-            if(L[i]>H[i+1]):
-                gaps.append( (i,L[i+1]+(H[i]-L[i+1])/2.) )                
+            if(H[i+1]<L[i]):
+                print i, H[i+1], L[i]
+                gaps.append( (i+offset,L[i+1]+(H[i]-L[i+1])/2.) )                
         for gap in gaps:
             #luka startowa: możliwie blisko wartości najmniejszej i nie później niż ucieczki lub wyczerpania
             if (((exhaustion_gap==None or gap[0]<exhaustion_gap[0]) and 
