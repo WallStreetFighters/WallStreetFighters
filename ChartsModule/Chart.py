@@ -506,7 +506,8 @@ class Chart(FigureCanvas):
                     y=H[gap[1]+1]            
                     height=L[gap[1]]-H[gap[1]+1]
                 self.drawRectangle(x,y,width,height)        
-          
+        self.drawTrend()
+        
     def drawTrend(self):
         self.clearLines()
         a, b = trend.regression(self.data.close)
@@ -519,6 +520,14 @@ class Chart(FigureCanvas):
         if (neckLine[0] != neckLine[2]):
             self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
         
+        trend.hornBottoms(self.data.close, self.data.volume)
+        trend.hornTops(self.data.close, self.data.volume)
+        neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'y', 2.0, '-')
+        neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'b', 2.0, '-')
         neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
             self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
