@@ -20,26 +20,7 @@ class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
     Paweł, na jednym wykresie wyświetlam jeden wskaźnik i jeden oscylator, a jak ktoś
     będzie chciał więcej, to kliknie sobie jakiś guzik, który mu pootwiera kilka wykresów
-    w nowym oknie."""
-    data = None #obiekt klasy Data przechowujący dane    
-    
-    fig = None #rysowany wykres (tzn. obiekt klasy Figure)
-    mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
-    volumeBars = None #wykres wolumenu
-    oscPlot = None #wykres oscylatora    
-    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
-    rectangles = [] #lista prostokątów (do zaznaczania świec)
-    
-    mainType = None #typ głównego wykresu
-    oscType = None #typ oscylatora (RSI, momentum, ...)
-    mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
-    
-    x0, y0 = None,None      #współrzędne początku linii        
-    drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
-    
-    scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
-    grid = True #czy rysujemy grida
-    
+    w nowym oknie."""        
     num_ticks = 8 #tyle jest etykiet pod wykresem
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
@@ -49,9 +30,19 @@ class Chart(FigureCanvas):
     
     def __init__(self, parent, finObj=None, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
-        dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
-        self.additionalLines=[]
-        self.rectangles=[]
+        dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                                                                            
+        self.mainPlot=None
+        self.volumeBars=None
+        self.oscPlot=None
+        self.additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
+        self.rectangles = [] #lista prostokątów (do zaznaczania świec)
+        self.mainType = None #typ głównego wykresu
+        self.oscType = None #typ oscylatora (RSI, momentum, ...)
+        self.mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
+        self.x0, self.y0 = None,None      #współrzędne początku linii        
+        self.drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
+        self.scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
+        self.grid = True #czy rysujemy grida        
         self.setData(finObj)
         self.mainType='line'                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
@@ -65,12 +56,12 @@ class Chart(FigureCanvas):
         self.addVolumeBars()                                        
         self.mpl_connect('button_press_event', self.onClick)        
            
-    def setData(self, finObj, start=None, end=None, step='daily'):
+    def setData(self, finObj, start=None, end=None, step='daily', settings=ChartData.defaultSettings):
         """Ustawiamy model danych, który ma reprezentować wykres. Następnie
         konieczne jest jego ponowne odrysowanie"""
         if(finObj==None):
             return;
-        self.data=ChartData(finObj, start, end, step)
+        self.data=ChartData(finObj, start, end, step, settings)
         if(self.mainPlot!=None):
             self.updatePlot()
             
@@ -116,6 +107,8 @@ class Chart(FigureCanvas):
             ax.plot(x,self.data.close,'b.',label=self.data.name)
         elif self.mainType=='candlestick':
             self.drawCandlePlot()
+        elif self.mainType=='bar':
+            self.drawBarPlot()
         else:            
             return
         if self.mainIndicator != None:
@@ -214,6 +207,18 @@ class Chart(FigureCanvas):
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
             rect.update({'edgecolor':'k','linewidth':0.5})     
+    
+    def drawBarPlot(self):
+        if self.data==None or self.data.corrupted:
+            return                        
+        ax=self.mainPlot
+        x=range(len(self.data.close))
+        lines=ax.vlines(x,self.data.low,self.data.high,label=self.data.name)
+        for i in x:
+            newLine=Line2D([i-0.3,i],[self.data.open[i],self.data.open[i]],color='k')                
+            ax.add_line(newLine)
+            newLine=Line2D([i,i+0.3],[self.data.close[i],self.data.close[i]],color='k')                
+            ax.add_line(newLine)
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -382,7 +387,7 @@ class Chart(FigureCanvas):
     def setDrawingMode(self, mode):
         """Włączamy (True) lub wyłączamy (False) tryb rysowania po wykresie"""
         self.drawingMode=mode            
-        x0, y0 = None,None
+        self.x0, self.y0 = None,None
     
     def drawLine(self, x0,y0,x1,y1):
         """Dodaje linię (trend) do wykresu."""
