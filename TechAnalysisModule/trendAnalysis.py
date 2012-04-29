@@ -32,6 +32,8 @@ dateVul = 6
 hsDiff = 0.03
 """jaka ma byc maksymalna roznica procentowa miedzy kolejnymi szczytami w formacjach potrojnego szczytu i dna"""
 tripleDiff = 0.03
+"""na ile podzbiorow dzielimy tablice przy wyznaczaniu formacji potrojnego szczytu"""
+tripleDiv = 12
 """jak dlugi moze byc okres formowania sie formacji V w stosunku do badanego okresu"""
 hornVul = 0.1
 """jak bardzo lewy wierzcholek formacji moze odbiegac od prawego"""
@@ -112,16 +114,20 @@ def lineFrom2Points(x1, y1, x2, y2):
 
 def aInRect(array, vul=rectVul):
     """Sprawdzamy czy punkty w tablicy naleza do prostej + / - rectVul"""
-    array = asarray(map(lambda x: x[0], array))
     a, b = regression(array)
     if a == 0:
         return 0
 
     for i in range(2, array.size):
-            y = a * i + b
-            if y > (1 + vul) * array[i] or y < (1 - vul) * array[i]:
-                    return 0
-    return 1       
+        y = a * i + b
+        if y > (1 + vul) * array[i] or y < (1 - vul) * array[i]:
+            return 0
+    return 1
+
+
+def aInRectTupleArray(array, vul=rectVul):
+    """Sprawdzamy czy punkty w tablicy krotek [[wartosci], [indeksy wartosci] naleza do prostej + / - rectVul"""
+    return aInRect(asarray(map(lambda x: x[0], array)))  
 
 
 def divideArray(array, factor):
@@ -163,13 +169,13 @@ def findMaxMin(array, factor=div):
     x2 = asarray(map(myMax, z))
     for i in reversed(range(len(x))):
         y = asarray(list(combinations(x, i + 1)))
-        z = map(aInRect, y)
+        z = map(aInRectTupleArray, y)
         if max(z) == 1:
             sup = y[z.index(1)]
             break
     for i in reversed(range(len(x2))):
         y = asarray(list(combinations(x2, i + 1)))
-        z = map(aInRect, y)
+        z = map(aInRectTupleArray, y)
         if max(z) == 1:
             res = y[z.index(1)]
             break
@@ -238,7 +244,7 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
     prev          - tablica z wartosciami poprzedzajacymi formacje, sluzy do okreslenia trendu przed formacja
     """
     if len(prev):
-        if optimizedTrend(prev) == - 1:
+        if optimizedTrend(prev) == -1:
             return 0, [0, 0, 0, 0]     #trend jest rosnacy, nie bedzie zmiany trendu
     #Wartosc lewego ramienia < glowy i wartosc wolumenu lewego ramienia ma byc najwieksza
     if maxLeftArmVal > (1 - hsDiff) * maxHeadVal  or maxRightArmVal > (1 - hsDiff) * maxHeadVal: 
@@ -251,7 +257,7 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
     if (volTrend > 0):
         return 0, [0, 0, 0, 0]
     result = (1.0 * maxHeadVal / maxVal + 1.0 * maxLeftArmVol / maxVol) / 2.0
-    if volTrend > - 1:
+    if volTrend > -1:
         result = result  * 0.8
     #wykreslamy linie szyi
     leftArmVal = list(leftArmVal)
@@ -420,7 +426,7 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
     diff = len(leftArmVal) + len(headVal)
     a, b = linearFun(leftArmVal.index(maxLeftArmVal), maxLeftArmVal,
             rightArmVal.index(maxRightArmVal) + diff, maxRightArmVal)
-    if (trend(a) == - 1):
+    if (trend(a) == -1):
         return 0, [0, 0, 0, 0]
     
     # print "Czy przelamano linie szyi?"
@@ -533,17 +539,19 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
         if optimizedTrend(prev) == - 1:
             return 0, [0, 0, 0, 0]     #trend jest rosnacy, nie bedzie zmiany trendu
     #Wartosc szczytow lewego ramienia, glowy i prawego ramienia lezy mniej wiecej na tym samym poziomie
-    if aInRect([maxFirstArmVal, maxMiddleVal, maxLastArmVal], tripleDiff) == 0:
+    if aInRect(asarray([maxFirstArmVal, maxMiddleVal, maxLastArmVal]), tripleDiff) == 0:
         return 0, [0, 0, 0, 0]
     #na kolejnych szczytach wolumen zmniejsza sie
+    firstArmVal = list(firstArmVal)
+    lastArmVal = list(lastArmVal)
+    middleVal = list(middleVal)
     firstArmVolPeak = firstArmVol[firstArmVal.index(maxFirstArmVal)]
     middleVolPeak = middleVol[middleVal.index(maxMiddleVal)]
     lastArmVolPeak = lastArmVol[lastArmVal.index(maxLastArmVal)]
     if ( firstArmVolPeak < middleVolPeak or firstArmVolPeak < lastArmVolPeak or middleVolPeak < lastArmVolPeak):
         return 0, [0, 0, 0, 0]
     #wykreslamy linie szyi
-    firstArmVal = list(firstArmVal)
-    lastArmVal = list(lastArmVal)
+  
     minFirstArmVal = min(firstArmVal[firstArmVal.index(maxFirstArmVal):]) #min z prawej strony max lewego ramienia
     lastArmPeek = lastArmVal.index(maxLastArmVal)
     if lastArmPeek == 0:
@@ -567,6 +575,7 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
     if (lastArmValMin >= evaluateFun(a, b, diff + lastArmVal.index(lastArmValMin)) and lastArmMaxVol < maxLastArmVol):
         return 0, [0, 0, 0, 0]
 
+    result = lastArmMaxVol * 1.0 /maxVol
     if maxMiddleVol > maxFirstArmVol or maxMiddleVol > maxLastArmVol:
         result = result  * 0.5
 
@@ -583,7 +592,7 @@ def lookForTripleTop(values, volumine):
     minVal = min(values)
     maxVol = max(volumine)
 
-    for j in reversed(range(hsDiv - 4, min(2 * hsDiv, len(values)))):
+    for j in reversed(range(tripleDiv - 4, min(2 * tripleDiv, len(values)))):
         val = list(divideArray(values, j))
         vol = list(divideArray(volumine, j))
         size = len(val[0])
@@ -613,7 +622,7 @@ def lookForTripleTop(values, volumine):
                 prev = []
                 if (i > 0):
                     prev = val[i - 1]
-                z[i], neckLine[i] = reversedMiddleAndShoulders(firstArmVal, middleVal, lastArmVal,
+                z[i], neckLine[i] = tripleTop(firstArmVal, middleVal, lastArmVal,
                                                             firstArmVol, middleVol, lastArmVol,
                                                             minFirstArmVal, maxFirstArmVol, minMiddleVal,
                                                             maxMiddleVol, minLastArmVal, maxLastArmVol,
@@ -656,9 +665,12 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
             return 0, [0, 0, 0, 0]
 
 		 #Wartosc szczytow lewego ramienia, glowy i prawego ramienia lezy mniej wiecej na tym samym poziomie
-    if (aInRect([minFirstArmVal, minMiddleVal, minLastArmVal], tripleDiff) == 0):
+    if (aInRect(asarray([minFirstArmVal, minMiddleVal, minLastArmVal]), tripleDiff) == 0):
         return 0, [0, 0, 0, 0]
     #na kolejnych szczytach wolumen zmniejsza sie
+    firstArmVal = list(firstArmVal)
+    lastArmVal = list(lastArmVal)
+    middleVal = list(middleVal)
     firstArmVolPeak = firstArmVol[firstArmVal.index(minFirstArmVal)]
     middleVolPeak = middleVol[middleVal.index(minMiddleVal)]
     lastArmVolPeak = lastArmVol[lastArmVal.index(minLastArmVal)]
@@ -667,8 +679,6 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
 
 
     #wykreslamy linie szyi
-    firstArmVal = list(firstArmVal)
-    lastArmVal = list(lastArmVal)
     maxFirstArmVal = max(firstArmVal[firstArmVal.index(minFirstArmVal):])        #max z prawej strony min lewego ramienia
     lastArmPeek = lastArmVal.index(minLastArmVal)
     if lastArmPeek == 0:
@@ -693,6 +703,7 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
     if (lastArmValMax <= evaluateFun(a, b, lastArmVal.index(lastArmValMax) + diff) and lastArmMaxVol < maxLastArmVol):
         return 0, [0, 0, 0, 0]
 
+    result = lastArmMaxVol * 1.0 /maxVol
     if (maxFirstArmVol < maxMiddleVol or maxLastArmVol < maxMiddleVol):
         result = result  * 0.5
     return result, [firstArmVal.index(maxFirstArmVal), maxFirstArmVal,
@@ -708,7 +719,7 @@ def lookForTripleBottom(values, volumine):
     minVal = min(values)
     maxVol = max(volumine)
 
-    for j in reversed(range(hsDiv - 4, min(2 * hsDiv, len(values)))):
+    for j in reversed(range(tripleDiv - 4, min(2 * tripleDiv, len(values)))):
         val = list(divideArray(values, j))
         vol = list(divideArray(volumine, j))
         size = len(val[0])
@@ -738,7 +749,7 @@ def lookForTripleBottom(values, volumine):
                 prev = []
                 if (i > 0):
                     prev = val[i - 1]
-                z[i], neckLine[i] = reversedMiddleAndShoulders(firstArmVal, middleVal, lastArmVal,
+                z[i], neckLine[i] = tripleBottom(firstArmVal, middleVal, lastArmVal,
                                                             firstArmVol, middleVol, lastArmVol,
                                                             minFirstArmVal, maxFirstArmVol, minMiddleVal,
                                                             maxMiddleVol, minLastArmVal, maxLastArmVol,
@@ -768,14 +779,14 @@ def hornTops(values, volume):
     """Szukamy formacji V - sygnalizuje odwrocenie trendu"""
     if (len(values) < 30):
         return 0
-    values = asarray(values)
+    values = list(values)
     maxVal = max(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
     size = len(values)
     peak = values.index(maxVal)
     avgChange = averageChange(values)
-    length = hornVul * size/2.0
-    for i in (range(5, length)):
+    length = int(ceil(hornVul * size/2))
+    for i in range(5, length):
         if peak + i >= size or peak - i < 0:
             return 0
         hornVal = values[peak - i:peak + i]
@@ -785,7 +796,7 @@ def hornTops(values, volume):
             minLeft = min(hornVal[0:i])
             minRight = min(hornVal[i + 1:])
             #jesli mamy nieduze nachylenie
-            if aInRect([minLeft, minRight], hornDiv):
+            if aInRect(asarray([minLeft, minRight]), hornDiv):
                 #jesli mamy bardzo duzy wzrost
                 if minLeft < maxVal:
                     if minLeft * (1 + avgChange * hornDiff) < maxVal and minRight * (1 + avgChange * hornDiff) < maxVal:
@@ -796,14 +807,14 @@ def hornBottoms(values, volume):
     """Szukamy odwroconej formacji V - sygnalizuje odwrocenie trendu"""
     if (len(values) < 30):
         return 0
-    values = asarray(values)
+    values = list(values)
     minVal = max(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
     size = len(values)
     peak = values.index(minVal)
     avgChange = averageChange(values)
-    length = hornVul * size/2.0
-    for i in (range(5, length)):
+    length = int(ceil(hornVul * size/2))
+    for i in range(5, length):
         if peak + i >= size or peak - i < 0:
             return 0
         hornVal = values[peak - i:peak + i]
@@ -813,9 +824,9 @@ def hornBottoms(values, volume):
             maxLeft = max(hornVal[0:i])
             maxRight = max(hornVal[i + 1:])
             #jesli mamy nieduze nachylenie
-            if aInRect([maxLeft, maxRight], hornDiv):
+            if aInRect(asarray([maxLeft, maxRight]), hornDiv):
                 #jesli mamy bardzo duzy spadek
-                if maxLeft > maxVal:
+                if maxLeft > minVal:
                     if maxLeft * (1 + avgChange * hornDiff) > minVal and maxRight * (1 + avgChange * hornDiff) > minVal:
                         return 1
     return 0
