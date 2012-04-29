@@ -53,7 +53,7 @@ class LightweightChart(FigureCanvas):
         ax=self.plot                
         ax.clear()  
         x=range(len(self.dates))        
-        #rysujemy wykresy           
+        #rysujemy wykres          
         ax.plot(x,self.values,'b-',label=self.name)
         ax.set_xlim(x[0],x[-1])        
         minVal=min(self.values)
@@ -62,7 +62,8 @@ class LightweightChart(FigureCanvas):
         #legenda
         leg = ax.legend(loc='best', fancybox=True)
         leg.get_frame().set_alpha(0.5)
-        self.formatDateAxis(self.plot)                    
+        self.formatDateAxis(self.plot)   
+        self.draw()
     
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu. Ponieważ nie chcemy mieć dni, w których nie było notowań,

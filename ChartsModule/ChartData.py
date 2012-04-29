@@ -7,6 +7,7 @@ import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as parser
+from copy import deepcopy
 
 
 class ChartData:
@@ -14,9 +15,12 @@ class ChartData:
     co daje mi FinancialObject Marcina. Czwarty parametr określa czy obliczamy dane
     do wykresu zwykłego, czy do porównującego. Wersja porównująca wykresy potrzebuje
     znacznie mniej danych (jedynie procentowa zmiana kursów jednego i drugiego instrumentu
-    w czasie), podczas gdy zwykły chart pobiera OHLC + te dane z unicorna"""     
+    w czasie), podczas gdy zwykły chart pobiera OHLC"""     
+    defaultSettings={'avgDur':20, 'RSIDur':10, 'CCIDur':10, 'bollingerD':2.0,
+                        'ROCDur':10, 'momentumDur':10, 'williamsDur': 10}
     
-    def __init__(self, finObj, start=None, end=None, step='monthly',compare=False):
+    def __init__(self, finObj, start=None, end=None, step='monthly', settings=defaultSettings, compare=False):
+        self.settings = settings
         if start>=end:
             self.corrupted=True
             return        
@@ -95,31 +99,37 @@ class ChartData:
                 array.insert(0,self.fullArray[type][startIdx-length+i])
         return array
     
-    def momentum(self, duration=10):
+    def momentum(self):
+        duration=self.settings['momentumDur']
         array=self.getEarlierValues(duration)
         return indicators.momentum(np.array(array), duration)
     
-    def RSI(self, duration=10):
+    def RSI(self):
+        duration=self.settings['RSIDur']        
         array=self.getEarlierValues(duration)        
         return indicators.RSI(np.array(array), duration)
     
-    def CCI(self, duration=10):
+    def CCI(self):
+        duration=self.settings['CCIDur']
         highs=np.array(self.getEarlierValues(duration-1,'high'))
         lows=np.array(self.getEarlierValues(duration-1,'low'))
         closes=np.array(self.getEarlierValues(duration-1,'close'))        
         return indicators.CCI(closes,lows,highs,duration)        
     
-    def ROC(self, duration=10):
+    def ROC(self):
+        duration=self.settings['ROCDur']
         array=self.getEarlierValues(duration)
         return indicators.ROC(np.array(array), duration)
     
-    def williams(self, duration=10):
+    def williams(self):
+        duration=self.settings['williamsDur']
         highs=np.array(self.getEarlierValues(duration,'high'))
         lows=np.array(self.getEarlierValues(duration,'low'))
         closes=np.array(self.getEarlierValues(duration,'close'))        
         return indicators.williamsOscilator(highs,lows,closes,duration)
     
-    def movingAverage(self, type, duration=20):
+    def movingAverage(self, type):
+        duration=self.settings['avgDur']
         if type=='SMA':
             type=1
         elif type=='WMA':
@@ -136,7 +146,9 @@ class ChartData:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.movingAverage(np.array(array),duration,type)[(duration+1)-length/2:]                            
     
-    def bollinger(self, type, duration=20):
+    def bollinger(self, type):
+        duration=self.settings['avgDur']
+        D=self.settings['bollingerD']
         if type=='upper':
             type=1
         elif type=='lower':
@@ -146,27 +158,23 @@ class ChartData:
         length=len(self.close)
         if(length>=2*(duration+1)):
             array=self.getEarlierValues(length)                
-            return indicators.bollingerBands(np.array(array),duration,type,2)
+            return indicators.bollingerBands(np.array(array),duration,type,D)
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
-            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
+            return indicators.bollingerBands(np.array(array),duration,type,D)[(duration+1)-length/2:]                                 
+            
+    def getSettings(self):
+        """Zwraca głęboką kopię słownika settings"""
+        return deepcopy(self.settings)
     
-    #wskaźniki szerokości rynku prawdopodobie znajdą się w innej klasie
-    """
-    def TRIN(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        advVol=self.advDecArray['advv']
-        decVol=self.advDecArray['decv']
-        return indicators.TRIN(advances, declines, advVol, decVol)
-    
-    def mcClellan(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        return indicators.mcClellanOscillator(advances,declines)
-    
-    def adLine(self):
-        advances=self.advDecArray['adv']
-        declines=self.advDecArray['dec']
-        return indicators.adLine(advances,declines)
+    def setSettings(self, settings):
+        """Podstawia pod settings podaną wartość. Oczywiście settings musi być słownikiem
+        o odpowiednich kluczach (patrz init)"""
+        self.settings=settings
+        
+    """Jeśli chcemy np. zmienić długość dla RSI robimy:
+    sett=chart.getData().getSettings()
+    sett['RSIDur']=30
+    chart.getData().setSettings(sett)
+    chart.updatePlot()
     """
