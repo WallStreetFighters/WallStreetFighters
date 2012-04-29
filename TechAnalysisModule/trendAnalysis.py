@@ -490,7 +490,7 @@ def lookForReversedHeadAndShoulders(values, volumine):
 
     # print "nie znaleziono", z
     return [0, 0, 0, 0]
-
+   
 def findWedge(values):  
     """Znajdujemy formację klina. Generalnie sprowadza się to do tego samego co trend,
     tylko sprawdzamy czy linie kanału są zbieżne.
@@ -608,71 +608,6 @@ def findRectFormation(array):
         else:
             # print "Formacja prostokata nie wskazuje na kontynuacje trendu wzrostowego"
             return 0
-
-def findMaxWithIndex(array,ind):
-    size = array.size
-    maximalValue = array[0]
-    index = 0
-    for i in range(ind,size):
-        if(array[i] > maximalValue):
-            maximalValue = array[i]
-            index = i
-    return index,maximalValue
-
-def findMinWithIndex(array,ind):
-    size = array.size
-    minimalValue = array[0]
-    index = 0
-    for i in range(ind,size):
-        if(array[i] < minimalValue):
-            minimalValue = array[i]
-            index = i
-    return index,minimalValue
-
-# Slabo rozwiazane bo wywala jakies dziwne bledy o inicjalizowaniu tablicy w numpy, jednakze to dziala
-# Teraz aby wyznaczyc wachlarz fibonnaciego wstawiamy wartosci scaler1 = 0.38, scaler2 = 0.62
-def rateLines(array,scaler1,scaler2):
-    trend = optimizedTrend(array) #Biore sobie wartosc trendu aby wyznaczac odpowiednia linie
-    if trend == 1:
-        minInd, minimalValue = findMinWithIndex(array,0)
-        maxInd, maximalValue = findMaxWithIndex(array,minInd)
-        diffMaxMin = maximalValue-minimalValue
-        returnTable = zeros((3,4))
-        returnTable[0][0] = minInd
-        returnTable[0][1] = minimalValue
-        returnTable[0][2] = maxInd
-        returnTable[0][3] = maximalValue
-        returnTable[1][0] = minInd
-        returnTable[1][1] = minimalValue
-        returnTable[1][2] = maxInd
-        returnTable[1][3] = minimalValue + diffMaxMin*scaler1
-        returnTable[2][0] = minInd
-        returnTable[2][1] = minimalValue
-        returnTable[2][2] = maxInd
-        returnTable[2][3] = minimalValue + diffMaxMin*scaler2
-        return returnTable
-    if trend == -1:
-        maxInd, maximalValue = findMaxWithIndex(array,0)
-        minInd, minimalValue = findMinWithIndex(array,maxInd)
-        diffMaxMin = maximalValue-minimalValue
-        returnTable = zeros((3,4))
-        returnTable[0][0] = maxInd
-        returnTable[0][1] = maximalValue
-        returnTable[0][2] = minInd
-        returnTable[0][3] = minimalValue
-        returnTable[1][0] = maxInd
-        returnTable[1][1] = maximalValue
-        returnTable[1][2] = minInd
-        returnTable[1][3] = minimalValue + diffMaxMin*scaler1
-        returnTable[2][0] = maxInd
-        returnTable[2][1] = maximalValue
-        returnTable[2][2] = minInd
-        returnTable[2][3] = minimalValue + diffMaxMin*scaler2
-        return returnTable
-    if trend == 0:
-        returnTable = zeros((3,4))
-        return returnTable
-    return 0
         
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]

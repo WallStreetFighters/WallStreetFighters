@@ -226,7 +226,7 @@ class TabA(QtGui.QWidget):
                     fin.updateArchive(self.settings['step'])
             else:
                 self.finObj.updateArchive(self.settings["step"])
-            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])            
+            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -403,9 +403,7 @@ class TabA(QtGui.QWidget):
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'resource',dataParser.FUTURES_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
 
-
         self.chart = Chart(self, self.finObj)        
-
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
@@ -414,8 +412,8 @@ class TabA(QtGui.QWidget):
         self.chart.setDrawingMode(self.settings["painting"])
         if self.settings["indicator"]:
             self.chart.setMainIndicator(self.settings["indicator"][-1])
-        
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])                
+
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         

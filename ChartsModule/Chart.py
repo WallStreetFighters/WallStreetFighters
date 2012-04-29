@@ -15,8 +15,6 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
-import TechAnalysisModule.oscilators as osc
-
     
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
@@ -81,19 +79,14 @@ class Chart(FigureCanvas):
         self.mainType=type
         self.updateMainPlot()
         
-        
     def updatePlot(self):
         """Odświeża wszystkie wykresy"""                
         self.updateMainPlot()
         self.updateVolumeBars()
         self.updateOscPlot()                                
         self.draw()        
-        self.drawGeometricFormation()
-        #self.drawRateLines()
         #self.drawTrend()
         #self.drawCandleFormations()
-        #self.drawGaps()
-		
     
     def addMainPlot(self):
         """Stworzenie głównego wykresu (tzn. kurs w czasie)"""                                            
@@ -104,8 +97,9 @@ class Chart(FigureCanvas):
     def updateMainPlot(self):        
         if(self.mainPlot==None or self.data==None or self.data.corrupted):
             return
+      
         ax=self.mainPlot                
-        ax.clear()  
+        ax.clear()          
         x=range(len(self.data.close))
         if self.mainType=='line' :
             ax.plot(x,self.data.close,'b-',label=self.data.name)
@@ -121,7 +115,9 @@ class Chart(FigureCanvas):
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))                 
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))        
+        print self.additionalLines
+        print self.rectangles        
         for line in self.additionalLines:
             ax.add_line(line)
             line.figure.draw_artist(line)         
@@ -175,7 +171,7 @@ class Chart(FigureCanvas):
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""                
         if self.data==None or self.data.corrupted:
-            return        
+            return                
         ax=self.volumeBars
         ax.clear()
         x=range(len(self.data.close))
@@ -449,26 +445,6 @@ class Chart(FigureCanvas):
           self.additionalLines.append(newLine)
           newLine.figure.draw_artist(newLine)                                        
           self.blit(self.mainPlot.bbox)    #blit to taki redraw       
-   
-    def drawGeometricFormation(self):
-        self.clearLines()
-        form=trend.findGeometricFormations(self.data.close)
-        print form
-        if form!=None:
-            self.drawTrendLine(form[1][0], form[1][1], form[1][2], form[1][3], 'r')
-            self.drawTrendLine(form[2][0], form[2][1], form[2][2], form[2][3], 'r') 
-
-    def drawRateLines(self):
-		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
-        a,b = osc.oscillatorStrategy(array(self.data.close),array(self.data.high),array(self.data.low),10)
-        print a,b
-        self.clearLines()
-        print "Rysuje wachlarze."
-        values = trend.rateLines(array(self.data.close),0.38,0.62)
-        print values
-        self.drawTrendLine(values[0][0],values[0][1],values[0][2],values[0][3],'y')
-        self.drawTrendLine(values[1][0],values[1][1],values[1][2],values[1][3],'y')
-        self.drawTrendLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
           
     def drawCandleFormations(self):
         """Test formacji świecowych. Tak się tego nie będzie używać! Ta funkcja powinna być
@@ -491,36 +467,11 @@ class Chart(FigureCanvas):
             height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
                         -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
             self.drawRectangle(x,y,width,height)        
-            
-    def drawGaps(self):
-        """Test luk. Tak się tego nie będzie używać! Ta funkcja powinna być
-        użyta przez moduł wnioskowania i tylko dla wycinka tablicy z danymi a nie dla całej. 
-        No i kuźwa tego *nie będzie* w charcie podobnie jak wyznaczania trendów."""
-        print "szukam luk"
-        self.clearRectangles()
-        H=self.data.high
-        L=self.data.low
-        C=self.data.close        
-        gaps=findGaps(H,L,C)       
-        print gaps
-        if(gaps!=None):
-            for gap in gaps:            
-                print gap
-                x=gap[1]
-                width=1
-                if("rising" in gap[0]):
-                    y=H[gap[1]]            
-                    height=L[gap[1]+1]-H[gap[1]]
-                else:
-                    y=H[gap[1]+1]            
-                    height=L[gap[1]]-H[gap[1]+1]
-                self.drawRectangle(x,y,width,height)        
           
     def drawTrend(self):
         self.clearLines()
         a, b = trend.regression(self.data.close)
-        trend.optimizedTrend(self.data.close)
-        #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
+        self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
         sup, res = trend.getChannelLines(self.data.close)
         self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
         self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
@@ -531,6 +482,7 @@ class Chart(FigureCanvas):
         neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
             self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
+        
        # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         
      #   min, mindex = trend.findMinLine(asarray(self.data.close))
@@ -541,4 +493,4 @@ class Chart(FigureCanvas):
             sup, res = trend.getChannelLines(self.data.close, 1, 2)
             self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
             self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
-
+        

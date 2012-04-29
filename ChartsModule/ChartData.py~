@@ -7,7 +7,14 @@ import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as parser
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> chart
+>>>>>>> 1633a188e7a16bafbaa92c094cbf9a3a6430080b
 
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
