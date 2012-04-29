@@ -50,7 +50,7 @@ def trend(a, trendVuln=trendVul):
     if (angle > trendVuln and angle < 90):
             return 1 # rosnacy
     if (angle < - trendVuln and angle > -90):
-            return - 1 # malejacy
+            return -1 # malejacy
 
 
 def regression(values):
@@ -386,11 +386,11 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
         headVol   - tablica z wolumenem, ktora podejrzewamy o bycie glowa formacji
         rightArmVol - tablica z wolumenem, ktora podejrzewamy o bycie prawym ramieniem formacji
         minLeftArmVal - minimalna wartosc w lewym ramieniu
-        maxLeftArmVol - minimalna wolumen w lewym ramieniu
+        maxLeftArmVol - minimalny wolumen w lewym ramieniu
         minHeadVal   - minimalna wartosc w glowie (pik)
-        maxHeadVol   - minimalna wolumen w glowie
+        maxHeadVol   - minimalny wolumen w glowie
         minRightArmVal - minimalna wartosc w prawym ramieniu
-        maxRightArmVol - minimalna wolumen w prawym ramieniu
+        maxRightArmVol - minimalny wolumen w prawym ramieniu
         minVal        - globalne minimum wartosci, im bliższa jest wartosc minHeadVal do minVal tym wieksze szanse ze dobrze wykrylismy 
         maxVol        - globalne maksimum wolumenu, im blizsza jest wartosc maxRightArmVol do maxVol - || - 
         prev          - tablica z wartosciami poprzedzajacymi formacje, sluzy do okreslenia trendu przed formacja"""
@@ -670,11 +670,11 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
         middleVol   - tablica z wolumenem, ktora podejrzewamy o bycie glowa formacji
         lastArmVol - tablica z wolumenem, ktora podejrzewamy o bycie prawym ramieniem formacji
         minFirstArmVal - minimalna wartosc w lewym ramieniu
-        maxFirstArmVol - minimalna wolumen w lewym ramieniu
+        maxFirstArmVol - minimalny wolumen w lewym ramieniu
         minMiddleVal   - minimalna wartosc w glowie (pik)
-        maxMiddleVol   - minimalna wolumen w glowie
+        maxMiddleVol   - minimalny wolumen w glowie
         minLastArmVal - minimalna wartosc w prawym ramieniu
-        maxLastArmVol - minimalna wolumen w prawym ramieniu
+        maxLastArmVol - minimalny wolumen w prawym ramieniu
         minVal        - globalne minimum wartosci, im bliższa jest wartosc minMiddleVal do minVal tym wieksze szanse ze dobrze     wykrylismy 
         maxVol        - globalne maksimum wolumenu, im blizsza jest wartosc maxLastArmVol do maxVol - || - 
         prev          - tablica z wartosciami poprzedzajacymi formacje, sluzy do okreslenia trendu przed formacja"""
@@ -865,17 +865,18 @@ trójkąty (zwyżkujący, zniżkujący, symetryczny), prostokąt
 
 def findGeometricFormations(values):   
     """Zwraca "najbardziej wartościową", tzn. największą formację geometryczną jaką uda się
-    znaleźć na danej tablicy. Wynik podobny jak w findWedgeOnArray plus czwarty element
-    oznaczający wartość z przedziału [0, 1] """
+    znaleźć na danej tablicy. To tablica elementów zwracanych przez findGeometricFormationsOnArray 
+    plus czwarty element oznaczający wartość z przedziału [0, 1] """
     intervals=[(0, 1),(1, 4),(1, 2),(3, 4)]
     value=1.0
+    result=[]
     for a, b in intervals:        
-        wedge=findGeometricFormationOnFragment(values, a, b)
-        if(wedge!=None):
-            wedge[3]=value
-            break
+        formation=findGeometricFormationOnFragment(values, a, b)
+        if(formation!=None):
+            formation[3]=value
+            result.append(formation)
         value *= 0.75
-    return wedge
+    return result
    
 
 def findGeometricFormationOnFragment(values, a, b):  
@@ -901,10 +902,11 @@ def findGeometricFormationOnFragment(values, a, b):
     print "supAngle: ", supAngle, "resAngle: ", resAngle
     #prostokąt
     if resAngle < formVul and resAngle > - formVul and supAngle < formVul and supAngle > - formVul:        
-        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1] 
+        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:min(supx0, resx0)]) ] 
     #trójkąt symetryczny
     elif resAngle < - formVul and supAngle > formVul:        
-        return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1] 
+        return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
+        1 * optimizedTrend(values[0:min(supx0, resx0)])] 
     #trójkąt zniżkujący
     elif resAngle < - formVul and abs(supAngle) < formVul and supAngle - resAngle > convergenceVul:        
         return ['falling_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1] 
