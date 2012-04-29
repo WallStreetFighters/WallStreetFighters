@@ -30,6 +30,7 @@ save.wsf
 *.log
 *.sql
 *.sqlite
+*.wsf
 
 # OS generated files #
 ######################

@@ -12,8 +12,8 @@ import cPickle
 import threading
 
 #ZMIENNE GLOBALNE
-
 REMEMBER_COUNT = 15
+
 DATABASE_LAST_UPDATE = datetime.date(2012,3,3)
 INDEX_LIST = []
 STOCK_LIST = []

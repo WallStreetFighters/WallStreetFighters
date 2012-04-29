@@ -32,7 +32,6 @@ class TabA(QtGui.QWidget):
         self.chart =None
         QtGui.QWidget.__init__(self)
         self.initUi()
-
     def initUi(self):
         
         
@@ -139,11 +138,9 @@ class TabA(QtGui.QWidget):
 
         #(przyciski dodajemy na sam koniec okna)wyswietlanie wykresu
         self.optionsLayout.addWidget(addChartButton(self),0,5,4,4)      
-
         if self.qModelIndex != None:
             if isinstance( self.qModelIndex,list):
                 self.paintCompareChart()
-                self.compareButton.setEnabled(False)
                 self.chartTypeComboBox.setEnabled(False)
                 self.volumenCheckBox.setEnabled(False)
             else:
@@ -151,6 +148,7 @@ class TabA(QtGui.QWidget):
             self.dateButton.clicked.connect(self.updateDate)
             self.stepComboBox.currentIndexChanged.connect(self.updateStep)
             self.logRadioButton.toggled.connect(self.updateScale)
+            
             if not isinstance( self.qModelIndex,list):
                 self.chartTypeComboBox.currentIndexChanged.connect(self.updateChartType)
                 self.volumenCheckBox.stateChanged.connect(self.updateHideVolumen)
@@ -163,7 +161,15 @@ class TabA(QtGui.QWidget):
                 self.drawTrendCheckBox.stateChanged.connect(self.updateDrawTrend)
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
             self.startDateEdit.dateChanged.connect(self.checkDate)
-            self.endDateEdit.dateChanged.connect(self.checkDate)    
+            self.endDateEdit.dateChanged.connect(self.checkDate)
+        else:
+            self.compareCheckBox.stateChanged.connect(self.compareChanged)
+            self.indexListView.clicked.connect(self.addSymbolToCompareLine)
+            self.stockListView.clicked.connect(self.addSymbolToCompareLine)
+            self.forexListView.clicked.connect(self.addSymbolToCompareLine)
+            self.bondListView.clicked.connect(self.addSymbolToCompareLine)
+            self.resourceListView.clicked.connect(self.addSymbolToCompareLine)
+            self.futuresListView.clicked.connect(self.addSymbolToCompareLine)
             
     def updateScale(self):
         if self.logRadioButton.isChecked():
@@ -220,7 +226,7 @@ class TabA(QtGui.QWidget):
                     fin.updateArchive(self.settings['step'])
             else:
                 self.finObj.updateArchive(self.settings["step"])
-            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])            
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -272,9 +278,17 @@ class TabA(QtGui.QWidget):
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
-
+            
+    def compareChanged(self,state):
+        print 'xos tam'
+        if state == 0:
+            self.compareLineEdit.setEnabled(False)
+            self.compareButton.setEnabled(False)
+        if state == 2:
+            self.compareLineEdit.setEnabled(True)
+            self.compareButton.setEnabled(True)
+            
     def smaChanged(self,state):
-        print state
         if state == 0:
             self.settings['indicator'].remove('SMA')
         if state == 2:
@@ -318,7 +332,7 @@ class TabA(QtGui.QWidget):
         if self.settings['indicator']:
             name = self.settings['indicator'][-1].lower()
             eval ('self.'+name+'CheckBox.setFont(font)')
-
+            
     def updateDrawTrend(self):
         drawTrend =self.drawTrendCheckBox.isChecked()
         if self.chart !=None and drawTrend:
@@ -340,9 +354,13 @@ class TabA(QtGui.QWidget):
         if self.chart !=None and drawTrend:
             self.chart.drawTrend()
 
+
     def checkDate(self):
         if self.startDateEdit.date() >= self.endDateEdit.date():
             self.endDateEdit.setDate(self.startDateEdit.date())
+    def addSymbolToCompareLine(self,a):
+        if self.compareButton.isEnabled():
+            self.compareLineEdit.setText(self.compareLineEdit.text() +a.data(QtCore.Qt.WhatsThisRole).toStringList()[0]+ ' vs ')
 
     def paint2Chart(self):
         index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
@@ -385,7 +403,9 @@ class TabA(QtGui.QWidget):
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'resource',dataParser.FUTURES_LIST[index][3],self.settings["step"])
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
 
-        self.chart = Chart(self, self.finObj)
+
+        self.chart = Chart(self, self.finObj)        
+
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
@@ -394,7 +414,8 @@ class TabA(QtGui.QWidget):
         self.chart.setDrawingMode(self.settings["painting"])
         if self.settings["indicator"]:
             self.chart.setMainIndicator(self.settings["indicator"][-1])
-        self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
+        
+        self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])                
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         
@@ -409,55 +430,54 @@ class TabA(QtGui.QWidget):
     def paintCompareChart(self):
         self.finObj = []
         print self.qModelIndex
-        if self.listName == "index":
-            for model in self.qModelIndex:
-                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+        k = 0
+        for x in self.listName:
+            print self.qModelIndex[k]
+            print x 
+            if x == "index":
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.INDEX_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
-        if self.listName == "stock":
-            for model in self.qModelIndex:
-                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+            if x == "stock":
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.STOCK_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
-        if self.listName == "forex":
-            for model in self.qModelIndex:
-                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+            if x == "forex":
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.FOREX_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
-        if self.listName == "bond":
-            for model in self.qModelIndex:
-                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+            if x == "bond":
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.BOND_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.BOND_LIST[index][1],dataParser.BOND_LIST[index][0],'bond',dataParser.BOND_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.BOND_LIST[index][1],dataParser.BOND_LIST[index][0],'bond',dataParser.BOND_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
-        if self.listName == "resource":
-            for model in self.qModelIndex:
-                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+            if x == "resource":
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.RESOURCE_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
                 
-        if self.listName == "futures":
-            for model in self.qModelIndex:
-                index = int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+            if x == "futures":
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.FUTURES_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
+            k=k+1
         
         self.chart = CompareChart(self)
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
@@ -479,7 +499,8 @@ class TabA(QtGui.QWidget):
             self.stepComboBox.setCurrentIndex(2)
         if self.settings["painting"]:
             self.paintCheckBox.setCheckState(2)
-	
+
+
     def setOptions(self):
         #przywracamy odpowiednie ustawienia opcji w GUI
         #data
@@ -507,6 +528,8 @@ class TabA(QtGui.QWidget):
         #font.setWeight(75)
         if self.settings["indicator"]:
             name = self.settings["indicator"][-1].lower()
+            eval ('self.'+name+'CheckBox.setFont(font)')
+            
         if self.settings["oscilator"] == "momentum":
             self.momentumCheckBox.setChecked(True)
         elif self.settings["oscilator"] == "CCI":

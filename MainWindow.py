@@ -12,14 +12,15 @@ class MainWindow(QtGui.QMainWindow):
         self.gui = GuiMainWindow()
         self.gui.setupGui(self)
     def closeEvent(self, event):
-	FILE = open('data.wsf','w')
-	dataParser.saveHistory(FILE)
-	FILE.close()
-	valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList]
-	cPickle.dump(valueList, open('save.wsf','w'))
-	ran = range(self.gui.tabs.count())
-	tabHistoryList = []
-	for i in ran:
+
+        FILE = open('data.wsf','w')
+        dataParser.saveHistory(FILE)
+        FILE.close()
+        valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList]
+        cPickle.dump(valueList, open('save.wsf','w'))
+        ran = range(self.gui.tabs.count())
+        tabHistoryList = []
+        for i in ran:
             if i >1:
                 t=  self.gui.tabs.widget(i).getSettings()
                 tabHistoryList.append(t)

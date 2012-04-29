@@ -17,14 +17,16 @@ class Home (QtGui.QWidget):
         self.gridLayout = QtGui.QGridLayout(self)
         #ramka zawierajaca obiekty z góry yahoo 
         self.topFrame = QtGui.QFrame(self)
-        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 120))
+        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 160))
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
-        self.topLayout = QtGui.QHBoxLayout(self.topFrame)
+        self.topLayout = QtGui.QGridLayout(self.topFrame)
         #spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         #self.topLayout.addItem(spacerItem)
+        k = 0
         for objList in self.topList:
-            self.addTopObject(objList)
+            self.addTopObject(objList,k)
+            k=k+2
 
 
         
@@ -82,7 +84,7 @@ class Home (QtGui.QWidget):
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
-    def addTopObject(self,objList):
+    def addTopObject(self,objList,k):
         self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
@@ -110,7 +112,7 @@ class Home (QtGui.QWidget):
             precentLabel.setStyleSheet('QLabel {color: green}')
         precentLabel.setText(objList[3])
         verticalLayout.addWidget(precentLabel)
-        self.topLayout.addWidget(self.frame)
+        self.topLayout.addWidget(self.frame,0,k)
         
                                   
     def addTable(self,objList2):
@@ -193,17 +195,17 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
-        
         self.tableWidget.itemClicked.connect(self.tableClicked)
         self.leftLayout.addWidget(self.tableWidget)
-
+     
     def updateTopList(self):
        
 	self.topList = self.updateThread.topList
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
         for i in ran:
-            self.topLayout.itemAt(i).widget().close()      
+            widget = self.topLayout.itemAt(i).widget().close()
+            
 
         # tworzymy nowe ramki z nowymi wartościami
         for objList in self.topList:
@@ -229,7 +231,7 @@ class Home (QtGui.QWidget):
         self.addTable(self.loserList)
 	
     def updateHome(self):
-	self.updateTopList()
+	#self.updateTopList()
 	self.updateTable()
 
     def startUpdating(self): 
@@ -238,12 +240,12 @@ class Home (QtGui.QWidget):
     def tableClicked(self,a):
         if a.column() ==0:
             self.emit(QtCore.SIGNAL("tabFromHome"),(a.text()))
-        
+            
 class MyFrame(QtGui.QFrame):
     def __init__(self,parent):
         self.parent = parent
         QtGui.QWidget.__init__(self)
-    def mousePressEvent(self,event):
+    def mouseDoubleClickEvent (self,event):
         if self.nameLabel.text() == "Dow":
             self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^DJI'))
         if self.nameLabel.text() == "Nasdaq":
@@ -258,7 +260,20 @@ class MyFrame(QtGui.QFrame):
             self.parent.emit(QtCore.SIGNAL("tabFromHome"),('GCM12.CMX'))
         if self.nameLabel.text() == "Oil":
             self.parent.emit(QtCore.SIGNAL("tabFromHome"),('CLM12.NYM'))
-
+    def mousePressEvent (self,event):
+        if self.nameLabel.text() == "Dow":
+            self.parent.topLayout.itemAtPosition(0,1).widget().show()
+            self.parent.topLayout.itemAtPosition(0,3).widget().close()
+            self.parent.topLayout.itemAtPosition(0,5).widget().close()
+        if self.nameLabel.text() == "Nasdaq":
+            self.parent.topLayout.itemAtPosition(0,3).widget().show()
+            self.parent.topLayout.itemAtPosition(0,1).widget().close()
+            self.parent.topLayout.itemAtPosition(0,5).widget().close()
+        if self.nameLabel.text() == "S&P 500":
+            self.parent.topLayout.itemAtPosition(0,5).widget().show()
+            self.parent.topLayout.itemAtPosition(0,1).widget().close()
+            self.parent.topLayout.itemAtPosition(0,3).widget().close()
+        
 class UpdateThread(QtCore.QThread):
 
     def __init__(self):

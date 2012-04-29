@@ -12,6 +12,8 @@ import cPickle
 import GUIModule.RSSgui as RSSgui
 from GUIModule.home import Home 
 from ChartsModule.Chart import Chart
+from ChartsModule.LightweightChart import *
+import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as dataParser
 
 class GuiMainWindow(object):
@@ -75,19 +77,52 @@ class GuiMainWindow(object):
         self.futuresModel.setDynamicSortFilter(True)
         
         """home """
-	File = open("../GUIModule/save.wsf", 'r')
+	File = open("../GUIModule/save.wsf",'r')
 	valueList = cPickle.load(File)
 	self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2])       
+        
 	self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
+        #os.chdir("../../WallStreetFighters/GUIModule")
         self.home.rssLayout.addWidget(self.rssWidget)
 	self.home.startUpdating()
-	#self.home.tableClic.connect(self.aa)
-	QtCore.QObject.connect(self.home, QtCore.SIGNAL("tabFromHome"), self.tabHome)
+	QtCore.QObject.connect(self.home,QtCore.SIGNAL("tabFromHome"),self.tabHome)
 
-    
-	#self.home.sup.connect(self.sup)
+        #zajebiste Dane
+	nowDate = datetime.datetime.now()
+	nowDate = datetime.date(nowDate.year,nowDate.month,nowDate.day)
+	d = datetime.timedelta(-367)
+	pastDate = nowDate + d
+	d = datetime.timedelta(-322)
+	nowDate = nowDate +d
+	#zajebiste Dane1
+        zajebisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+        dates=zajebisteDane['date']
+        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
+        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
+        zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
+        self.home.topLayout.addWidget(zajebistyWykres,0,1)#zajebiste Dane1
 
+        #zajebiste Dane2
+        zajebisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2004,7,10),datetime.date(2005,2,2),'NASDAQ')
+        dates=zajebisteDane['date']
+        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
+        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
+        zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
+        self.home.topLayout.addWidget(zajebistyWykres,0,3)
+        zajebistyWykres.close()
+        #zajebiste Dane3
+        zajebisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2005,7,10),datetime.date(2006,2,2),'AMEX')
+        dates=zajebisteDane['date']
+        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
+        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
+        zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')
+        
+        self.home.topLayout.addWidget(zajebistyWykres,0,5)#zajebiste Dane1
+        zajebistyWykres.close()
         """Search"""
 	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
         self.tabs.addTab(self.tabA,"Search")
@@ -99,7 +134,6 @@ class GuiMainWindow(object):
         self.tabA.resourceListView.doubleClicked.connect(self.newResourceTab)
         self.tabA.futuresListView.doubleClicked.connect(self.newFuturesTab)
         self.tabA.compareButton.clicked.connect(self.compare)
-
         self.tabA.nasdaqButton.pressed.connect(self.nasdaqFiltre)
         self.tabA.nyseButton.pressed.connect(self.nyseFiltre)
         self.tabA.wigButton.pressed.connect(self.wigFiltre)
@@ -116,7 +150,7 @@ class GuiMainWindow(object):
             tabHistoryList = cPickle.load(tabHistoryFile)
         except:
             tabHistoryList = []
-            
+
         for tabSettings in tabHistoryList:
             if not isinstance(tabSettings['index'],list): #przywracanie taba z pojedynczym instrumentem
                 if tabSettings['finObjType'] == 'index':
@@ -220,7 +254,41 @@ class GuiMainWindow(object):
     
         
     def compare(self):
-        pageIndex = self.tabA.listsToolBox.currentIndex()
+        text = self.tabA.compareLineEdit.text().toUpper()
+        chartList = text.split(' VS ')
+        qModelIndex = []
+        listName = []
+        for x in chartList:
+            t = self.findIndexModel(x)
+            if t:
+                if t[0] == "index":
+                    qModelIndex.append(self.indexModel.index(t[1],0))
+                    listName.append('index')
+                if t[0] == "stock":
+                    qModelIndex.append(self.stockModel.index(t[1],0))
+                    listName.append('stock')
+                if t[0] == "forex":
+                    qModelIndex.append(self.forexModel.index(t[1],0))
+                    listName.append('forex')
+                if t[0] == "bond":
+                    qModelIndex.append(self.bondModel.index(t[1],0))
+                    listName.append('bond')
+                if t[0] =="futures":
+                    qModelIndex.append(self.futuresModel.index(t[1],0))
+                    listName.append('futures')
+                if t[0] == "resource":
+                    qModelIndex.append(self.resourceModel.index(t[1],0))
+                    listName.append('resource')
+        if not qModelIndex :
+            print "pusta list do porównania"
+        else:
+            self.newCompareTab(qModelIndex,"comparison",listName)
+            
+            
+            
+
+      
+        """pageIndex = self.tabA.listsToolBox.currentIndex()
         if pageIndex == 0:
             qModelIndex = self.tabA.indexListView.selectedIndexes()
             qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
@@ -244,9 +312,16 @@ class GuiMainWindow(object):
         if pageIndex == 5:
             qModelIndex = self.tabA.futuresListView.selectedIndexes()
             qModelIndex = map(lambda i: qModelIndex[i],filter(lambda i: i%2 == 0,range(len(qModelIndex))))
-            self.newFuturesTab(qModelIndex,"Furures' comparison")
+            self.newFuturesTab(qModelIndex,"Furures' comparison")"""
         
     #metody otwierajace nowe zakladki po podwójnym kliknięciu
+    def newCompareTab(self,qModelIndex,nameTab,listName):
+        settings = self.settings()
+        tabType = 'compare'
+        self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = listName,showLists = False)
+        if not nameTab:
+            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     def newIndexTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
             settings = self.settings()
@@ -356,8 +431,41 @@ class GuiMainWindow(object):
         if i != 0 and i!=1:
 
             self.tabs.removeTab(i)
+            
+    def findIndexModel(self,name):
+        k = 0
+        for  x in dataParser.INDEX_LIST:
+            if name in x:
+                return ("index",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.STOCK_LIST:
+            if name in x:
+               return ("stock",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.FOREX_LIST:
+            if name in x:
+                return ("forex",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.BOND_LIST:
+            if name in x:
+                return ("bond",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.FUTURES_LIST:
+            if name in x:
+                return ("futures",k)
+            k= k+1
+        k = 0
+        for  x in dataParser.RESOURCE_LIST:
+            if name in x:
+                return ("resource",k)
+            k= k+1
+        return None
+    
     def tabHome(self,name):
-        print name
         k = 0
         for  x in dataParser.INDEX_LIST:
             if name in x:
@@ -400,7 +508,6 @@ class GuiMainWindow(object):
                 self.newResourceTab(qModelIndex,nameTab = name,settings = None,tabType = None)
                 return
             k= k+1
-        
 
     def bigFiltre(self,text):
 

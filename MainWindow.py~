@@ -15,8 +15,16 @@ class MainWindow(QtGui.QMainWindow):
 	FILE = open('data.wsf','w')
 	dataParser.saveHistory(FILE)
 	FILE.close()
+<<<<<<< HEAD
 	valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList]
 	cPickle.dump(valueList, open('save.wsf','w'))
+=======
+<<<<<<< HEAD
+	valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.loserList,self.gui.gainerList]
+	cPickle.dump(valueList, open('save.wsf','w'))
+=======
+>>>>>>> techAnalysis
+>>>>>>> GUI
 
 <<<<<<< HEAD
 =======

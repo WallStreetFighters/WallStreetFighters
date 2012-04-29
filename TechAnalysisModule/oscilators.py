@@ -4,60 +4,60 @@ from numpy import *
 
 # funkcja liczy zwyczajna srednia artmetyczna z podanej jej tablicy, przekazywac tablice jednowymiarowa!
 def simpleArthmeticAverage(array):
-	result = 0
-	for i in range(array.size):
-		result += array[i]
-	result /= array.size
-	return result
+        result = 0
+        for i in range(array.size):
+                result += array[i]
+        result /= array.size
+        return result
 
 # liczy srednia wazona gdzie najmniejsza wage = 1 ma pierwszy element, najwieksza wage element ostatni z waga rowna dlugosci tablicy
 def weightedAverage(array):
-	result = 0
-	tableSum = arange(1,array.size+1,1)
-	divisor = tableSum.sum()
-	for i in range(array.size):
-		result += array[i]*(i+1)
-	result /= divisor
-	return result
+        result = 0
+        tableSum = arange(1,array.size+1,1)
+        divisor = tableSum.sum()
+        for i in range(array.size):
+                result += array[i]*(i+1)
+        result /= divisor
+        return result
 
 # liczy srednia expotencjalna gdzie alfa = 2/(1+N)
 # Najwiekszy 'potencjal' ma wartosc ostatnia, pierwsza wartosc ma potencjal (1-alfa)^N
 def expotentialAverage(array):
-	result = 0
-	divisor = 0
-	factor = 2.0/(array.size+1)
-	for i in range(array.size):
-		result += array[i]*((1-factor)**(array.size-i-1))
-		divisor += (1-factor)**(array.size-i-1)
-	result /= divisor
-	return result
+        result = 0
+        divisor = 0
+        factor = 2.0/(array.size+1)
+        for i in range(array.size):
+                result += array[i]*((1-factor)**(array.size-i-1))
+                divisor += (1-factor)**(array.size-i-1)
+        result /= divisor
+        return result
 
 # Indeks new High/new Low. Zwraca pojedyncza wartosc, przekazujemy zazwyczaj tablice zamkniec gieldy.
 def highLowIndex(array):
-	size = array.size
-	highest = array[0]
-	lowest = array[0]
-	numberOfHighest = 1.0
-	numberOfLowest = 1.0
-	for i in range(1,size):
-		if array[i] > highest:
-			highest = array[i]
-			numberOfHighest += 1.0
-		if array[i] < lowest:
-			lowest = array[i]
-			numberOfLowest += 1.0
-	return (numberOfHighest/(numberOfHighest+numberOfLowest))*100
+        size = array.size
+        highest = array[0]
+        lowest = array[0]
+        numberOfHighest = 1.0
+        numberOfLowest = 1.0
+        for i in range(1,size):
+                if array[i] > highest:
+                        highest = array[i]
+                        numberOfHighest += 1.0
+                if array[i] < lowest:
+                        lowest = array[i]
+                        numberOfLowest += 1.0
+        return (numberOfHighest/(numberOfHighest+numberOfLowest))*100
 
 # Standardowe odchylenie dla tablicy array, koniecznie jednowymiarowa
 def standardDeviation(array):
-	size = array.size
-	average = simpleArthmeticAverage(array)
-	total = 0
-	for i in range(0,size):
-		total += (array[i] - average)**2
-	total /= size
-	total = math.sqrt(total)
-	return total
+        size = array.size
+        average = simpleArthmeticAverage(array)
+        total = 0
+        for i in range(0,size):
+                total += (array[i] - average)**2
+        total /= size
+        total = math.sqrt(total)
+        return total
 
 # Oblicza tablice wartosci Wsteg Bollingera :
 # array - wartosci gieldowe(najlepiej kolejne zamkniecia gield)
@@ -66,18 +66,18 @@ def standardDeviation(array):
 # D - stala uzywana do odchylania wsteg, domyslnie 2
 def bollingerBands(array,duration,mode,D):
         if(duration>array.size/2):
-            return None
-	values = zeros(array.size/2)
-	size = array.size
-	j = 0
-	for i in range(size/2,size):
-		tempTable = array[i-duration+1:i+1]
-		if mode == 1:
-			values[j] = simpleArthmeticAverage(tempTable)+(D*standardDeviation(tempTable))
-		if mode == 2:
-			values[j] = simpleArthmeticAverage(tempTable)-(D*standardDeviation(tempTable))
-		j += 1
-	return values
+                return None
+        values = zeros(array.size/2)
+        size = array.size
+        j = 0
+        for i in range(size/2,size):
+                tempTable = array[i-duration+1:i+1]
+                if mode == 1:
+                        values[j] = simpleArthmeticAverage(tempTable)+(D*standardDeviation(tempTable))
+                if mode == 2:
+                        values[j] = simpleArthmeticAverage(tempTable)-(D*standardDeviation(tempTable))
+                j += 1
+        return values
 
 # array - tablica z wartosciami cen zamkniec itp, duration - czas trwania liczonej sredniej krokowej
 # Zwraca tablice jednowymiarowa z wartosciami sredniej krokowej dla przedzialu [size/2,size-1], aby obliczyc wartosci tablica wejsciowa musi byc 2x wieksza od zakresu(duration)
@@ -101,52 +101,52 @@ def movingAverage(array,duration,mode):
 
 # Zwraca tablice wartosci wskaznika Impetu(Momentum) dla danej tablicy. Co wazne, ilosc obliczonych wartosci to rozmiar tablicy - duration
 def momentum(array,duration):
-	values = zeros(array.size-duration)
-	size = array.size
-	j = 0
-	for i in range(duration,size):
-		values[j] = array[i] - array[i-duration]
-		j += 1
-	return values
+        values = zeros(array.size-duration)
+        size = array.size
+        j = 0
+        for i in range(duration,size):
+                values[j] = array[i] - array[i-duration]
+                j += 1
+        return values
 
 # Jak wyzej
 def ROC(array, duration):
-	values = zeros(array.size-duration)
-	size = array.size
-	j = 0
-	for i in range(duration,size):
-		values[j] = ((array[i] - array[i-duration])/(array[i-duration]))*100
-		j += 1
-	return values
+        values = zeros(array.size-duration)
+        size = array.size
+        j = 0
+        for i in range(duration,size):
+                values[j] = ((array[i] - array[i-duration])/(array[i-duration]))*100
+                j += 1
+        return values
 
 # Srednie odchylenie tablicy
 def meanDeviation(array):
-	result = 0
-	average = simpleArthmeticAverage(array)
-	for i in range(0,array.size):
-		temp = array[i] - average
-		if temp<0:
-			temp = -1*temp
-		result += temp
-	result /= array.size
-	return result
+        result = 0
+        average = simpleArthmeticAverage(array)
+        for i in range(0,array.size):
+                temp = array[i] - average
+                if temp<0:
+                        temp = -1*temp
+                result += temp
+        result /= array.size
+        return result
 
 # Funkcja zwraca tablice z wartosciami wskaznika Comodity Index Channel, dlugosc tablicy jest rowna
 # closeTable.size-duration
 def CCI(closeTable,lowTable,highTable,duration):
-	size = closeTable.size
-	typicalPricesTable = zeros(size)
-	for i in range(0,size):
-		typicalPricesTable[i] = (closeTable[i]+lowTable[i]+highTable[i])/3
-	values = zeros(size-duration+1)
-	j = 0
-	for i in range(duration-1,size):
-		tempTypical = typicalPricesTable[i-duration+1:i+1]
-		average = simpleArthmeticAverage(tempTypical)
-		deviation = meanDeviation(tempTypical)
-		values[j] = (typicalPricesTable[i] - average)/(0.015*deviation)
-		j += 1
-	return values
+        size = closeTable.size
+        typicalPricesTable = zeros(size)
+        for i in range(0,size):
+                typicalPricesTable[i] = (closeTable[i]+lowTable[i]+highTable[i])/3
+        values = zeros(size-duration+1)
+        j = 0
+        for i in range(duration-1,size):
+                tempTypical = typicalPricesTable[i-duration+1:i+1]
+                average = simpleArthmeticAverage(tempTypical)
+                deviation = meanDeviation(tempTypical)
+                values[j] = (typicalPricesTable[i] - average)/(0.015*deviation)
+                j += 1
+        return values
 
 # Korzysta z niej RSI, sumuje elementy tablicy i w zaleznosci od mode, zmienia znak lub nie :)
 def sumUnderCondition(array,mode):
@@ -262,3 +262,120 @@ def TRIN(advances, declines, advVol, decVol):
     numerator=advances.astype(float)/declines.astype(float)
     denominator=advVol.astype(float)/decVol.astype(float)
     return numerator/denominator
+
+# Funkcja zwracajaca wartosci sygnalu kupna lub sprzedazy dla oscylatorow
+# Zwraca sume wskaznikow oraz tablice z wartosciami dla poszczegolnych wskaznikow
+# W tablicy po kolei dla indeksow mamy :
+# 0 - New High New Low Index
+# 1 - Bollinger Bands
+# 2 - Momentum Oscillator
+# 3 - ROC
+# 4 - CCI
+# 5 - RSI
+# 6 - Williams Oscillator
+def oscillatorStrategy(array,high,low,duration):
+        size = array.size-1
+        result = zeros(7)
+        score = 0
+        highLowInd = highLowIndex(array)
+        higherBand = bollingerBands(array,duration,1,2)
+        lowerBand = bollingerBands(array,duration,2,2)
+        SMALine = (higherBand[higherBand.size-1] - lowerBand[lowerBand.size-1])/2.0
+        average = simpleArthmeticAverage(array)
+        momentumIndex = momentum(array,duration)
+        rocIndex = ROC(array,duration)
+        cciIndex = CCI(array,low,high,duration)
+        rsiIndex = RSI(array,duration)
+        williamsIndex = williamsOscilator(high,low,array,duration)
+        if highLowInd < 25:
+                score = score - 1
+                result[0] = -1
+        if highLowInd >= 25 and highLowInd < 50:
+                score = score - 0.4
+                result[0] = -0.4
+        if highLowInd >= 50 and highLowInd < 75:
+                score = score + 0.4
+                result[0] = 0.4
+        if highLowInd >= 75:
+                score = score + 1
+                result[0] = 1
+        if array[size] > (SMALine+higherBand[higherBand.size-1])/2:
+                score = score - 1
+                result[1] = -1
+        if array[size] > SMALine and array[size] < (SMALine+higherBand[higherBand.size-1])/2:
+                score = score - 0.4
+                result[1] = -0.4
+        if array[size] < SMALine and array[size] > (SMALine+lowerBand[lowerBand.size-1])/2:
+                score = score + 0.4
+                result[1] = 0.4
+        if array[size] < (SMALine+lowerBand[lowerBand.size-1])/2:
+                score = score + 1
+                result[1] = 1
+        if momentumIndex[momentumIndex.size-1] > (5/100)*average:
+                score = score +1
+                result[2] = 1
+        if momentumIndex[momentumIndex.size-1] > 0 and momentumIndex[momentumIndex.size-1] < (5/100)*average:
+                score = score + 0.4
+                result[2] = 0.4
+        if momentumIndex[momentumIndex.size-1] < 0 and momentumIndex[momentumIndex.size-1] > -1*(5/100)*average:
+                score = score - 0.4
+                result[2] = -0.4
+        if momentumIndex[momentumIndex.size-1] < -1*(5/100)*average:
+                score = score - 1
+                result[2] = -1
+        if rocIndex[rocIndex.size-1] >= 3:
+                score = score + 1
+                result[3] = 1
+        if rocIndex[rocIndex.size-1] < 3 and rocIndex[rocIndex.size-1] >= 0:
+                score = score + 0.4
+                result[3] = 0.4
+        if rocIndex[rocIndex.size-1] < 0 and rocIndex[rocIndex.size-1] > -3:
+                score = score - 0.4
+                result[3] = -0.4
+        if rocIndex[rocIndex.size-1] <= -3:
+                score = score - 1
+                result[3] = -1
+        if cciIndex[cciIndex.size-1] > 50:
+                score = score + 1
+                result[4] = 1
+        if cciIndex[cciIndex.size-1] <= 50 and cciIndex[cciIndex.size-1] > 0:
+                score = score + 0.4
+                result[4] = 0.4
+        if cciIndex[cciIndex.size-1] > -50 and cciIndex[cciIndex.size-1] < 0:
+                score = score - 0.4
+                result[4] = -0.4
+        if cciIndex[cciIndex.size-1] <= -50:
+                score = score - 1
+                result[4] = -1
+        if rsiIndex[rsiIndex.size-1] >= 70:
+                score = score - 1
+                result[5] = -1
+        if rsiIndex[rsiIndex.size-1] < 70 and rsiIndex[rsiIndex.size-1] >= 50:
+                score = score - 0.4
+                result[5] = -0.4
+        if rsiIndex[rsiIndex.size-1] < 50 and rsiIndex[rsiIndex.size-1] >= 30:
+                score = score + 0.4
+                result[5] = 0.4
+        if rsiIndex[rsiIndex.size-1] < 30:
+                score = score + 1
+                result[5] = 1
+        if williamsIndex[williamsIndex.size-1] > -20:
+                score = score - 1
+                result[6] = -1
+        if williamsIndex[williamsIndex.size-1] <= -20 and williamsIndex[williamsIndex.size-1] > -50:
+                score = score - 0.4
+                result[6] = -0.4
+        if williamsIndex[williamsIndex.size-1] <= -50 and williamsIndex[williamsIndex.size-1] > -80:
+                score = score + 0.4
+                result[6] = 0.4
+        if williamsIndex[williamsIndex.size-1] < -80:
+                score = score + 1
+                result[6] = 1
+        return score, result
+        
+                
+
+
+
+
+

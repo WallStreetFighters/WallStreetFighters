@@ -27,7 +27,11 @@ class ChartData:
         if(end==None):
             end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
+<<<<<<< HEAD
         dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
+=======
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]                              
+>>>>>>> chart
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -41,7 +45,11 @@ class ChartData:
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
+<<<<<<< HEAD
             self.volume=dataArray['open'].tolist()   
+=======
+            self.volume=dataArray['volume'].tolist()   
+>>>>>>> chart
             if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
                     ==len(self.volume)==len(self.date))):
                 self.corrupted=True
@@ -135,6 +143,7 @@ class ChartData:
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.movingAverage(np.array(array),duration,type)[(duration+1)-length/2:]                            
+<<<<<<< HEAD
     
     def bollinger(self, type, duration=20):
         if type=='upper':
@@ -170,3 +179,20 @@ class ChartData:
         declines=self.advDecArray['dec']
         return indicators.adLine(advances,declines)
     """
+=======
+    
+    def bollinger(self, type, duration=20):
+        if type=='upper':
+            type=1
+        elif type=='lower':
+            type=2        
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.bollingerBands(np.array(array),duration,type,2)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                                 
+>>>>>>> chart

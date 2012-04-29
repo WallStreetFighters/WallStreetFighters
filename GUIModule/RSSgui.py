@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-from PyQt4 import QtGui ,QtCore,Qt
+
+from PyQt4 import QtGui ,QtCore
 from RSS import *
+
 
 class RSSSite:
     """An RSS Site"""
