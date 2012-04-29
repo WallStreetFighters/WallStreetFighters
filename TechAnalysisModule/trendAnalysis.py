@@ -311,7 +311,7 @@ def smartLookForHeadAndShoulders(values, volumine):
     return [0], [0]
 
 
-def lookForHeadAndShoulders(values, volumine):
+def lookForHeadAndShoulders(values, volumine, analyze=0):
     """Szukamy formacji glowy i ramion"""
     # print "Szukamy formacji glowy i ramion"
     if (len(values) < 15):
@@ -360,10 +360,16 @@ def lookForHeadAndShoulders(values, volumine):
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
                 neckLine[index][2] += diff + shift
-                return neckLine[index]
-    
+                if analyze == 0:
+                    return neckLine[index]
+                else:
+                    return z[index]
+                
     # print "nie znaleziono"
-    return [0, 0, 0, 0]
+    if analyze ==0:
+        return [0, 0, 0, 0]
+    else:
+        return 0
 
 
 
@@ -457,7 +463,7 @@ def smartLookForReversedHeadAndShoulders(values, volumine):
     return [0], [0]
 
 
-def lookForReversedHeadAndShoulders(values, volumine):
+def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
     """Szukamy odwroconej formacji glowy i ramion"""
     # print "Szukamy odwroconej formacji glowy i ramion"
     if (len(values) < 15):
@@ -509,10 +515,16 @@ def lookForReversedHeadAndShoulders(values, volumine):
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
                 neckLine[index][2] += diff + shift
-                return neckLine[index]
+                if analyze == 0:
+                    return neckLine[index]
+                else:
+                    return z[index]
 
     # print "nie znaleziono", z
-    return [0, 0, 0, 0]
+    if analyze ==0:
+        return [0, 0, 0, 0]
+    else:
+        return 0
  
 
 def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastArmVol, maxFirstArmVal, maxFirstArmVol, maxMiddleVal,
@@ -583,7 +595,7 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
                     len(lastArmVal) + diff, evaluateFun(a, b, len(lastArmVal) + diff)]
 
 
-def lookForTripleTop(values, volumine):
+def lookForTripleTop(values, volumine, analyze=0):
     """Szukamy formacji potrojnego szczytu"""
     if (len(values) < 15):
          return [0, 0, 0, 0]
@@ -634,10 +646,17 @@ def lookForTripleTop(values, volumine):
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
                 neckLine[index][2] += diff + shift
-                return neckLine[index]
+                if analyze == 0:
+                    return neckLine[index]
+                else:
+                    return z[index]
+                
 
     # print "nie znaleziono", z
-    return [0, 0, 0, 0]
+    if analyze ==0:
+        return [0, 0, 0, 0]
+    else:
+        return 0
     
 
 def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastArmVol, minFirstArmVal, maxFirstArmVol, minMiddleVal,
@@ -710,7 +729,7 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
                     len(lastArmVal) + diff, evaluateFun(a, b, len(lastArmVal) + diff)] 
 
 
-def lookForTripleBottom(values, volumine):
+def lookForTripleBottom(values, volumine, analyze=0):
     """Szukamy formacji potrojnego dna"""
     if (len(values) < 15):
          return [0, 0, 0, 0]
@@ -761,10 +780,17 @@ def lookForTripleBottom(values, volumine):
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
                 neckLine[index][2] += diff + shift
-                return neckLine[index]
+                if analyze == 0:
+                    return neckLine[index]
+                else:
+                    return z[index]
+                
 
     # print "nie znaleziono", z
-    return [0, 0, 0, 0]
+    if analyze ==0:
+        return [0, 0, 0, 0]
+    else:
+        return 0
 
 def averageChange(values):
     """ srednia zmiana kursu wyrazona w procentach, moze byc ujemna"""
