@@ -220,6 +220,7 @@ def addChartButton(self):
         self.chartTypeComboBox.addItem('line')
         self.chartTypeComboBox.addItem('point')
         self.chartTypeComboBox.addItem('candlestick')
+        self.chartTypeComboBox.addItem('bar')
         self.gridLayout.addWidget(self.chartTypeComboBox,1,1,1,1)
         # Scale Type
         self.scaleTypeLabel = QtGui.QLabel('Scale',self.optionsFrame)
