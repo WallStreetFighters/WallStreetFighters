@@ -25,5 +25,23 @@ oscilatorsVal = 50
 # rsiVal - RSI
 # williamsVal - Williams Oscillator
 """Luki"""
+#sygnał kupna
+risingBreakawayGapVal = 50
+risingContinuationGapVal = 30
+fallingExhaustionGapVal = 10 
+
+#sygnał sprzedaży
+fallingBreakawayGapVal = -50
+risingExhaustionGapVal = -50
+fallongContinuationGapVal = -30
 
 """Formacje swiecowe"""
+#sygnał kupna
+bull3Val = 15
+mornigStarVal = 10
+piercingVal = 5
+
+#sygnał sprzedaży
+bear3Val= -15
+eveningStarVal = -10
+darkCloudVal = -5 

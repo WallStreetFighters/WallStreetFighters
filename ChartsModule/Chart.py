@@ -92,11 +92,11 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.updateOscPlot()                                
         self.draw()        
-        #self.drawGeometricFormation()
+        self.drawGeometricFormation()
         #self.drawRateLines()
         #self.drawTrend()
-        #self.drawCandleFormations()
-        self.drawGaps()
+        self.drawCandleFormations()
+        #self.drawGaps()
 		
     
     def addMainPlot(self):
@@ -449,11 +449,12 @@ class Chart(FigureCanvas):
    
     def drawGeometricFormation(self):
         self.clearLines()
-        form=trend.findGeometricFormations(self.data.close)
-        print form
-        if form!=None:
-            self.drawTrendLine(form[1][0], form[1][1], form[1][2], form[1][3], 'r')
-            self.drawTrendLine(form[2][0], form[2][1], form[2][2], form[2][3], 'r') 
+        formations=trend.findGeometricFormations(self.data.close)
+        print formations
+        for form in formations:
+            if form!=None:
+                self.drawTrendLine(form[1][0], form[1][1], form[1][2], form[1][3], 'r')
+                self.drawTrendLine(form[2][0], form[2][1], form[2][2], form[2][3], 'r') 
 
     def drawRateLines(self):
 		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
@@ -475,8 +476,8 @@ class Chart(FigureCanvas):
         H=self.data.high
         L=self.data.low
         C=self.data.close        
-        formation=findCandleFormations(O,H,L,C)                
-        if formation!=None:
+        formations=findCandleFormations(O,H,L,C)                
+        for formation in formations:
             print formation                    
             x=formation[1]-0.5
             y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])

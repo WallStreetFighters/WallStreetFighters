@@ -839,17 +839,18 @@ trójkąty (zwyżkujący, zniżkujący, symetryczny), prostokąt
 
 def findGeometricFormations(values):   
     """Zwraca "najbardziej wartościową", tzn. największą formację geometryczną jaką uda się
-    znaleźć na danej tablicy. Wynik podobny jak w findWedgeOnArray plus czwarty element
-    oznaczający wartość z przedziału [0, 1] """
+    znaleźć na danej tablicy. To tablica elementów zwracanych przez findGeometricFormationsOnArray 
+    plus czwarty element oznaczający wartość z przedziału [0, 1] """
     intervals=[(0, 1),(1, 4),(1, 2),(3, 4)]
     value=1.0
+    result=[]
     for a, b in intervals:        
-        wedge=findGeometricFormationOnFragment(values, a, b)
-        if(wedge!=None):
-            wedge[3]=value
-            break
+        formation=findGeometricFormationOnFragment(values, a, b)
+        if(formation!=None):
+            formation[3]=value
+            result.append(formation)
         value *= 0.75
-    return wedge
+    return result
    
 
 def findGeometricFormationOnFragment(values, a, b):  

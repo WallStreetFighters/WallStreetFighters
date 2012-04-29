@@ -28,6 +28,7 @@ def findCandleFormations(O,H,L,C):
     trend=trendA.optimizedTrend(C)
     if not (len(O)==len(H)==len(L)==len(C)):        
         return None
+    result=[]
     if len(O)>CANDLE_MAX_LEN:
         offset=len(O)-CANDLE_MAX_LEN
         O=O[-CANDLE_MAX_LEN::1]
@@ -39,29 +40,27 @@ def findCandleFormations(O,H,L,C):
     print "trend= ",trend
     print "offset= ", offset
     if trend==1:
-        result=findBull3(O,H,L,C)
-        if result==None:
-            result=findEveningStar(O,C)        
-            if result==None:
-                result=findDarkCloud(O,C)        
+        result.append(findBull3(O,H,L,C))
+        result.append(findEveningStar(O,C))
+        result.append(findDarkCloud(O,C))        
     else:
-        result=findBear3(O,H,L,C)                
-        if result==None:
-            result=findMorningStar(O,C)                         
-            if result==None:
-                result=findPiercing(O,C)        
-    if result!=None:
+        result.append(findBear3(O,H,L,C))
+        result.append(findMorningStar(O,C))
+        result.append(findPiercing(O,C))        
+    if result!=[]:
         #wartość jest odwrotnie proporcjonalna do tego, jak dawno wystąpiła formacja
         #żeby dawne wartości nie były zbyt małe, dzielimy przez 0.8*min(długość tablicy, CANDLE_MAX_LEN)
-        if offset==0:
-            factor=len(O)
-        else:
-            factor=CANDLE_MAX_LEN
-        value=result[2]/(0.8*factor)
-        if value>1:
-            value=1
-        result=(result[0],result[1]+offset,result[2]+offset,value)
-        return result
+        result=[value for value in result if value != None]
+        for formation in result:
+            if offset==0:
+                factor=len(O)
+            else:
+                factor=CANDLE_MAX_LEN
+            value=formation[2]/(0.8*factor)
+            if value>1:
+                value=1
+            formation=(formation[0],formation[1]+offset,formation[2]+offset,value)
+    return result
 
 """Algorytm szukania każdej formacji jest identyczny: lecimy od końca i sprawdzamy po kolei
 świeczki czy są takie jak formacja nakazuje. Jeśli znajdziemy coś dobrego to kończymy 
