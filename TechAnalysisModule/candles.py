@@ -37,8 +37,8 @@ def findCandleFormations(O,H,L,C):
         C=C[-CANDLE_MAX_LEN::1]        
     else:
         offset=0       
-    print "trend= ",trend
-    print "offset= ", offset
+    #print "trend= ",trend
+    #print "offset= ", offset
     if trend==1:
         result.append(findBull3(O,H,L,C))
         result.append(findEveningStar(O,C))

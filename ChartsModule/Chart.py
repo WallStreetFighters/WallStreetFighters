@@ -16,6 +16,7 @@ from matplotlib.patches import Rectangle
 from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
 import TechAnalysisModule.oscilators as osc
+from TechAnalysisModule.strategy import Strategy
 
     
 class Chart(FigureCanvas):
@@ -484,7 +485,8 @@ class Chart(FigureCanvas):
             width=formation[2]-formation[1]+1
             height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
                         -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
-            self.drawRectangle(x,y,width,height)        
+            self.drawRectangle(x,y,width,height)     
+        self.drawTrend()   
             
     def drawGaps(self):
         """Test luk."""
@@ -511,6 +513,8 @@ class Chart(FigureCanvas):
         
     def drawTrend(self):
         self.clearLines()
+        strategy = Strategy(self.data.open, self.data.close, self.data.low, self.data.high, self.data.volume)
+        strategy.analyze()
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)
         #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)

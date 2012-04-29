@@ -77,13 +77,13 @@ def optimizedTrend(values):
     
 # x = [1] + [1 for i in range(90)]
 # x = x + [2 for i in range()]
-# # print "x = ", x
-# # print "\n", optimizedTrend(x)
-# # print "\n"
+# print "x = ", x
+# print "\n", optimizedTrend(x)
+# print "\n"
 # x = [1 + randint(1, 10) / 100.0 for i in range(365)]
 # x = x + [1.1]
-# # print x
-# # print optimizedTrend(x)
+# print x
+# print optimizedTrend(x)
 
 
 def linearFun(x1, y1, x2, y2):
@@ -197,9 +197,9 @@ def getChannelLines(array, a=3, b=4):
         return findMaxMin(q[a * size / b:])
 
 #a = [random.randint(0, 100) for i in range(160)]
-## print a
+# print a
 #a = arange(40)
-## print getChannelLines(a)
+# print getChannelLines(a)
 
 
 def convertValuesToHeadAndShoulders(values, volumine, maxVal, maxVol):
@@ -315,7 +315,10 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
     """Szukamy formacji glowy i ramion"""
     # print "Szukamy formacji glowy i ramion"
     if (len(values) < 15):
-        return [0, 0, 0, 0]
+        if analyze == 0:
+            return [0, 0, 0, 0]
+        else:
+            return 0
     values = asarray(values)
     volumine = asarray(volumine)
     maxVal = max(values)
@@ -366,7 +369,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
                     return z[index]
                 
     # print "nie znaleziono"
-    if analyze ==0:
+    if analyze == 0:
         return [0, 0, 0, 0]
     else:
         return 0
@@ -467,7 +470,10 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
     """Szukamy odwroconej formacji glowy i ramion"""
     # print "Szukamy odwroconej formacji glowy i ramion"
     if (len(values) < 15):
-         return [0, 0, 0, 0]
+        if analyze == 0:
+            return [0, 0, 0, 0]
+        else:
+            return 0
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -508,9 +514,9 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
                                                             minLeftArmVal, maxLeftArmVol, minHeadVal,
                                                             maxHeadVol, minRightArmVal, maxRightArmVol,
                                                             minVal, maxVol, prev)
-            print j, k, shift, size
+            ##print j, k, shift, size
             if max(z) > 0:
-                #print "znaleziono odwrocona glowe i ramiona", z
+                ##print "znaleziono odwrocona glowe i ramiona", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -598,7 +604,10 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
 def lookForTripleTop(values, volumine, analyze=0):
     """Szukamy formacji potrojnego szczytu"""
     if (len(values) < 15):
-         return [0, 0, 0, 0]
+        if analyze == 0:
+            return [0, 0, 0, 0]
+        else:
+            return 0
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -639,9 +648,9 @@ def lookForTripleTop(values, volumine, analyze=0):
                                                             minFirstArmVal, maxFirstArmVol, minMiddleVal,
                                                             maxMiddleVol, minLastArmVal, maxLastArmVol,
                                                             minVal, maxVol, prev)
-            print j, k, shift, size
+            ##print j, k, shift, size
             if max(z) > 0:
-                #print "znaleziono potrojny szczyt", z
+                ##print "znaleziono potrojny szczyt", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -732,7 +741,10 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
 def lookForTripleBottom(values, volumine, analyze=0):
     """Szukamy formacji potrojnego dna"""
     if (len(values) < 15):
-         return [0, 0, 0, 0]
+        if analyze == 0:
+            return [0, 0, 0, 0]
+        else:
+            return 0
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -773,9 +785,9 @@ def lookForTripleBottom(values, volumine, analyze=0):
                                                             minFirstArmVal, maxFirstArmVol, minMiddleVal,
                                                             maxMiddleVol, minLastArmVal, maxLastArmVol,
                                                             minVal, maxVol, prev)
-            print j, k, shift, size
+            #print j, k, shift, size
             if max(z) > 0:
-                #print "znaleziono potrojne dno", z
+                ##print "znaleziono potrojne dno", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -899,14 +911,16 @@ def findGeometricFormationOnFragment(values, a, b):
     scaledResLine=lineFrom2Points(factorX * resx0, factorY * (resy0 - minY),factorX * resx1, factorY * (resy1 - minY))
     supAngle = arctan(scaledSupLine[0]) * (180.0 / pi)
     resAngle = arctan(scaledResLine[0]) * (180.0 / pi)
-    print "supAngle: ", supAngle, "resAngle: ", resAngle
+    #print "supAngle: ", supAngle, "resAngle: ", resAngle
     #prostokąt
     if resAngle < formVul and resAngle > - formVul and supAngle < formVul and supAngle > - formVul:        
-        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:min(supx0, resx0)]) ] 
+        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1] 
+#        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:int(min(supx0, resx0))]) ] 
     #trójkąt symetryczny
     elif resAngle < - formVul and supAngle > formVul:        
-        return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
-        1 * optimizedTrend(values[0:min(supx0, resx0)])] 
+        return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1]
+#         return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
+#        1 * optimizedTrend(values[0:min(supx0, resx0)])] 
     #trójkąt zniżkujący
     elif resAngle < - formVul and abs(supAngle) < formVul and supAngle - resAngle > convergenceVul:        
         return ['falling_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1] 
@@ -921,7 +935,7 @@ def findGeometricFormationOnFragment(values, a, b):
         return ['falling_wedge',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1]        
     return None    
    
-## print findMaxMin(arange(1000))
+# print findMaxMin(arange(1000))
 #lookForHeadAndShoulders(arange(100), arange(100))
 #lookForReversedHeadAndShoulders(arange(100), arange(100)) 
 
@@ -1090,8 +1104,8 @@ def rateLines(array, scaler1, scaler2):
 #values = asarray(values)
 #volumin = [[1, 2, 10], [1, 1, 1], [1, 1, 1]]
 #volumin = asarray(volumin)
-## print values
-## print volumin
-## print headAndShoulders(values, volumin, 21, 10)
+# print values
+# print volumin
+# print headAndShoulders(values, volumin, 21, 10)
 #lookForHeadAndShoulders(arange(10), arange(10))
 #lookForReversedHeadAndShoulders(arange(10), arange(10))

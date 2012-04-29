@@ -288,6 +288,7 @@ def HPI(volume, high, low, openInterest, smoothFactor=10, centValue=250):
 # 4 - CCI
 # 5 - RSI
 # 6 - Williams Oscillator
+#### WHAT THE FUCK IS DURATION? WHY THERE IS NO CHECK FOR DURATION? FUCK FUCK FUCK
 def oscillatorStrategy(array,high,low,duration):
         size = array.size-1
         result = zeros(7)
