@@ -8,6 +8,8 @@ import os
 from ChartsModule.Chart import Chart
 from ChartsModule.CompareChart import CompareChart
 import DataParserModule.dataParser as dataParser
+from TechAnalysisModule.strategy import Strategy
+from GUIModule.analyze import Analyze
 
 class TabA(QtGui.QWidget):
     def __init__(self,finObjType = None, indexModel=None,stockModel=None,forexModel=None,bondModel= None,
@@ -160,9 +162,11 @@ class TabA(QtGui.QWidget):
                 self.wmaCheckBox.stateChanged.connect(self.wmaChanged)
                 self.drawTrendCheckBox.stateChanged.connect(self.updateDrawTrend)
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
+                self.analyzeButton.pressed.connect(self.newAnalyzeTab)
             self.startDateEdit.dateChanged.connect(self.checkDate)
             self.endDateEdit.dateChanged.connect(self.checkDate)
         else:
+            self.analyzeButton.setCheckable(False)
             self.compareCheckBox.stateChanged.connect(self.compareChanged)
             self.indexListView.clicked.connect(self.addSymbolToCompareLine)
             self.stockListView.clicked.connect(self.addSymbolToCompareLine)
@@ -172,7 +176,14 @@ class TabA(QtGui.QWidget):
             self.futuresListView.clicked.connect(self.addSymbolToCompareLine)
             
 
-
+    def newAnalyzeTab(self):
+        strategy = Strategy(self.chart.data.open, self.chart.data.close, self.chart.data.low, self.chart.data.high, self.chart.data.volume)
+        text = strategy.analyze()
+        self.analyzeTab = Analyze()
+        nameTab = str(self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+        nameTab = "Analyze " + nameTab
+        self.parent().parent().parent().parent().gui.tabs.setCurrentIndex(self.parent().parent().parent().parent().gui.tabs.addTab(self.analyzeTab,nameTab))
+        self.analyzeTab.textBrowser.setText(text)
     def updateScale(self):
         if self.logRadioButton.isChecked():
             self.settings["scale"] = 'log'

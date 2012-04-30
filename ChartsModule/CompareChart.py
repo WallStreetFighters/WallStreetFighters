@@ -54,7 +54,7 @@ class CompareChart(FigureCanvas):
         self.data=[]        
         for finObj in data:
             #sprawdzmy czy wszystkie dane są poprawne i tej samej długości
-            newData=ChartData(finObj, start, end, step,True)
+            newData=ChartData(finObj, start, end, step,compare = True)
             if(self.data==[]):
                 length=len(newData.date)
             newlength=len(newData.date)
