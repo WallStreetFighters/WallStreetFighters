@@ -218,11 +218,9 @@ class Strategy:
 
 	  flags = findFlagsAndPennants(self.close,self.volume)
 	  if flags != None:
-		overallScore += defFlagPennantVal * flags[1]
+		overallScore += self.rectangleVal * formation[3]
 		if flags[1] < 0:
-			print "(-) falling-trend flag/pennant
-		else:
-			print "(+) rising-trend flag/pennant
+			print
 
           # gaps = candles.findGaps(self.high,self.low,self.close) 
           # for formation in gaps:
