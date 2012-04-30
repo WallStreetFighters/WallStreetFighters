@@ -10,7 +10,8 @@ from PyQt4 import QtGui, QtCore
 from TabA import TabA
 import cPickle
 import GUIModule.RSSgui as RSSgui
-from GUIModule.home import Home 
+from GUIModule.home import Home
+from GUIModule.settings import Settings 
 from ChartsModule.Chart import Chart
 from ChartsModule.LightweightChart import *
 import TechAnalysisModule.oscilators as indicators
@@ -142,6 +143,17 @@ class GuiMainWindow(object):
         self.tabA.wig20Button.pressed.connect(self.wig20Filtre)
         self.tabA.amexButton.pressed.connect(self.amexFiltre)
         self.tabA.allButton.pressed.connect(self.allFiltre)
+
+        """Setings"""
+        settingsFile = open('settingsList.wsf','rb')
+        try:
+            settingsList = cPickle.load(settingsFile)
+        except:
+            settingsList = []
+        self.settings = Settings(settingsList)
+        self.tabs.addTab(self.settings,"Settings")
+        
+        
 
         self.tabA.filterLineEdit.textChanged.connect(self.bigFiltre)
 
@@ -427,7 +439,7 @@ class GuiMainWindow(object):
              "painting":painting,"scale":scale,"oscilator":oscilator,"drawTrend":drawTrend,'lineWidth':lineWidth}
         return t
     def closeTab(self,i):
-        if i != 0 and i!=1:
+        if i != 0 and i!=1 and i !=2:
 
             self.tabs.removeTab(i)
             
