@@ -1115,8 +1115,7 @@ def checkValuesForFlagsAndPennants(period, values):
 	diff = maxs - mins
 	raiseproposals = []
 	fallproposals = []
-	print 0.25*diff
-	while i < values.size - period:
+	while i < len(values) - period:
 		if values[i] + 0.25*diff < values[i+period]:
 			if raiseproposals == []:
 				raiseproposals.append(i)
@@ -1141,34 +1140,39 @@ def checkVolumeForFlagsAndPennants(proposals,volume,values):
 	downs = []
 	for x in proposals[0]:
 		i = x
-		while (volume[i+1] < 2.5*volume[i] and i+1 < volume.size):
+		while (i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
 			i = i+1
 		diff = i - x
 		if diff > 2 and diff < 28 and values[i+1] > values[i]:
-			temp = volume[x:i:1].tolist()
+			temp = volume[x:i:1]
 			average = float(sum(temp)) / len(temp)
 			if average < volume[x]:
 				ups.append([x,i])
 
 	for x in proposals[1]:
 		i = x
-		while (volume[i+1] < 2.5*volume[i] and i+1 < volume.size):
+		while ( i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
 			i = i+1
 		diff = i - x
-		if diff > 2 and diff < 28 and values[i+1] < values[i]:
-			temp = volume[x:i:1].tolist()
+		if  values[i+1] < values[i] and diff > 2 and diff < 28:
+			temp = volume[x:i:1]
 			average = float(sum(temp)) / len(temp)
 			if average < volume[x]:
 				downs.append([x,i])
-	tmp = reduce(lambda x,y: x+y,ups)
-	maxR = max(tmp)
-	tmp = reduce(lambda x,y: x+y,downs)
-	maxL = max(tmp)
-	if maxR > MaxL:
-		scale = maxR/volume.size
+	maxR = 0
+	maxL = 0	
+	try:
+		tmp = reduce(lambda x,y: x+y,ups)
+		maxR = max(tmp)
+		tmp = reduce(lambda x,y: x+y,downs)
+		maxL = max(tmp)
+	except TypeError: 
+		pass
+	if maxR > maxL:
+		scale = maxR/len(volume)
 		return ['risingTrendFlagOrPennant', scale]
-	elif maxR < MaxL:
-		scale = -1*(maxL/volume.size)
+	elif maxR < maxL:
+		scale = -1*(maxL/len(volume))
 		return ['fallingTrendFlagOrPennant', scale]
 	else:
 		return None

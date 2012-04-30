@@ -78,6 +78,7 @@ class GuiMainWindow(object):
         self.futuresModel.setDynamicSortFilter(True)
         
         """home """
+
 	File = open("../GUIModule/save.wsf",'r')
 	valueList = cPickle.load(File)
 	self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2])       

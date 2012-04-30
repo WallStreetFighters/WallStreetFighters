@@ -234,8 +234,8 @@ class Strategy:
                       if self.fallingWedgeVal * formation[3] != 0:
                           print " (+) falling wedge\n"
                           resultText = resultText + " (+) falling wedge\n"
-          flags = None
-	  #flags = findFlagsAndPennants(self.close,self.volume)
+     
+	  flags = trend.findFlagsAndPennants(self.close,self.volume)
 	  if flags != None:
 		overallScore += defFlagPennantVal * flags[1]
 		if flags[1] < 0:
@@ -244,6 +244,7 @@ class Strategy:
 		else:
 			print "(+) rising-trend flag/pennant"
 			resultText = resultText + "(+) rising-trend flag/pennant"
+
           # gaps = candles.findGaps(self.high,self.low,self.close) 
           # for formation in gaps:
           #     if formation != None:
