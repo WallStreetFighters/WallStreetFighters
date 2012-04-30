@@ -18,6 +18,7 @@ class Home (QtGui.QWidget):
         #ramka zawierajaca obiekty z góry yahoo 
         self.topFrame = QtGui.QFrame(self)
         self.topFrame.setMaximumSize(QtCore.QSize(16777215, 160))
+        self.topFrame.setMinimumSize(QtCore.QSize(0, 160))
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.topLayout = QtGui.QGridLayout(self.topFrame)
@@ -46,8 +47,8 @@ class Home (QtGui.QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
         self.scrollArea.setSizePolicy(sizePolicy)
-        self.scrollArea.setMinimumSize(QtCore.QSize(340, 0))
-        self.scrollArea.setMaximumSize(QtCore.QSize(340, 16777215))
+        self.scrollArea.setMinimumSize(QtCore.QSize(255, 0))
+        self.scrollArea.setMaximumSize(QtCore.QSize(255, 16777215))
         self.scrollArea.setWidgetResizable(True)
         self.leftFrame = QtGui.QWidget()
         self.leftLayout = QtGui.QVBoxLayout(self.leftFrame)
@@ -123,8 +124,8 @@ class Home (QtGui.QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
         self.tableWidget.setSizePolicy(sizePolicy)
-        self.tableWidget.setMinimumSize(QtCore.QSize(0, 180))
-        self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 180))
+        self.tableWidget.setMinimumSize(QtCore.QSize(220, 180))
+        self.tableWidget.setMaximumSize(QtCore.QSize(220, 180))
         font = QtGui.QFont()
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferDefault)
@@ -141,15 +142,15 @@ class Home (QtGui.QWidget):
         self.tableWidget.setWordWrap(True)
         self.tableWidget.setCornerButtonEnabled(True)
         self.tableWidget.setRowCount(5)
-        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setColumnCount(3)
         item = QtGui.QTableWidgetItem("Name")
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem("Prize")
         self.tableWidget.setHorizontalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem('Change')
-        self.tableWidget.setHorizontalHeaderItem(2, item)
+        #item = QtGui.QTableWidgetItem('Change')
+        #self.tableWidget.setHorizontalHeaderItem(2, item)
         item = QtGui.QTableWidgetItem('%Chg')
-        self.tableWidget.setHorizontalHeaderItem(3, item)
+        self.tableWidget.setHorizontalHeaderItem(2, item)
         k = 0
         for objList in objList2:
             item = QtGui.QTableWidgetItem(objList[0])
@@ -165,18 +166,18 @@ class Home (QtGui.QWidget):
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
             self.tableWidget.setItem(k, 1, item)
             #Change
-            item = QtGui.QTableWidgetItem(objList[2])
-            item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            if objList[2][0] =='-':
-                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
-            else:
-                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
-            brush.setStyle(QtCore.Qt.NoBrush)
-            item.setForeground(brush)
-            item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-            self.tableWidget.setItem(k, 2, item)
+            #item = QtGui.QTableWidgetItem(objList[2])
+            #item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
+            #if objList[2][0] =='-':
+                #brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            #else:
+                #brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
+            #brush.setStyle(QtCore.Qt.NoBrush)
+            #item.setForeground(brush)
+            #item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+            #self.tableWidget.setItem(k, 2, item)
             #%chg
-            item = QtGui.QTableWidgetItem(objList[3])
+            item = QtGui.QTableWidgetItem(objList[2])
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
             if objList[2][0] == '-':
                 brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
@@ -185,7 +186,7 @@ class Home (QtGui.QWidget):
             brush.setStyle(QtCore.Qt.NoBrush)
             item.setForeground(brush)
             item.setFlags(QtCore.Qt.ItemIsEnabled)
-            self.tableWidget.setItem(k, 3, item)
+            self.tableWidget.setItem(k, 2, item)
             k+=1
         
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)

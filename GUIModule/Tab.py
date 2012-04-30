@@ -251,6 +251,9 @@ def addChartButton(self):
         #wlacznie możliwości rysowania na wykeresie
         self.paintCheckBox = QtGui.QCheckBox('Enable painting',self.optionsFrame)
         self.gridLayout.addWidget(self.paintCheckBox,1,3,1,1)
+        #przycisk do analizy
+        self.analyzeButton = QtGui.QPushButton('Analyze',self.optionsFrame)
+        self.gridLayout.addWidget(self.analyzeButton,2,3,1,1)
 	#Spacer
         #self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
         #self.gridLayout.addItem(self.spacer,0,5,1,3)

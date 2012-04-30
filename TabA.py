@@ -171,6 +171,8 @@ class TabA(QtGui.QWidget):
             self.resourceListView.clicked.connect(self.addSymbolToCompareLine)
             self.futuresListView.clicked.connect(self.addSymbolToCompareLine)
             
+
+
     def updateScale(self):
         if self.logRadioButton.isChecked():
             self.settings["scale"] = 'log'
