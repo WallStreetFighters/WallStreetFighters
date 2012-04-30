@@ -38,10 +38,11 @@ class Strategy:
     #Kontynuacja trendu
     symetricTriangleVal = 50
     rectangleVal = 30
+
+    defFlagPennantVal = 20
     
     defSymetricTriangleVal = 50
     defRectangleVal = 30
-
     """Wskazniki i oscylatory"""
     oscilatorsVal = 50
     newHighNewLowVal = 50
@@ -215,6 +216,13 @@ class Strategy:
                       if self.fallingWedgeVal * formation[3] != 0:
                           print " (+) falling wedge\n"
 
+	  flags = findFlagsAndPennants(self.close,self.volume)
+	  if flags != None:
+		overallScore += defFlagPennantVal * flags[1]
+		if flags[1] < 0:
+			print "(-) falling-trend flag/pennant
+		else:
+			print "(+) rising-trend flag/pennant
           # gaps = candles.findGaps(self.high,self.low,self.close) 
           # for formation in gaps:
           #     if formation != None:
@@ -327,6 +335,3 @@ class Strategy:
               print " technical analysis generated neutral signal\n"
           print "\n Remember that authors of this software DO NOT TAKE ANY RESPONSIBILITY for possible financial loss\n"
 
-
-
-    
