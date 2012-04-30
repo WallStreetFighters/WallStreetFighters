@@ -10,7 +10,9 @@ from PyQt4 import QtGui, QtCore
 from TabA import TabA
 import cPickle
 import GUIModule.RSSgui as RSSgui
-from GUIModule.home import Home 
+from GUIModule.home import Home
+from GUIModule.analyze import Analyze
+from GUIModule.settings import Settings 
 from ChartsModule.Chart import Chart
 from ChartsModule.LightweightChart import *
 import TechAnalysisModule.oscilators as indicators
@@ -140,6 +142,18 @@ class GuiMainWindow(object):
         self.tabA.wig20Button.pressed.connect(self.wig20Filtre)
         self.tabA.amexButton.pressed.connect(self.amexFiltre)
         self.tabA.allButton.pressed.connect(self.allFiltre)
+        
+
+        """Setings"""
+        settingsFile = open('settingsList.wsf','rb')
+        try:
+            settingsList = cPickle.load(settingsFile)
+        except:
+            settingsList = []
+        self.settingsTab = Settings(settingsList)
+        self.tabs.addTab(self.settingsTab,"Settings")
+        
+        
 
         self.tabA.filterLineEdit.textChanged.connect(self.bigFiltre)
 
@@ -251,8 +265,12 @@ class GuiMainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-    
+
         
+    def newAnalyzeTab(self):
+        print 'ddd'
+        self.analyzeTab = Analyze()
+        self.tabs.setCurrentIndex(self.tabs.addTab(self.analyzeTab,"dd"))
     def compare(self):
         text = self.tabA.compareLineEdit.text().toUpper()
         chartList = text.split(' VS ')
@@ -319,6 +337,7 @@ class GuiMainWindow(object):
         settings = self.settings()
         tabType = 'compare'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = listName,showLists = False)
+        self.tabA1.analyzeButton.enabled(False)
         if not nameTab:
             nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -327,6 +346,7 @@ class GuiMainWindow(object):
             settings = self.settings()
             tabType = 'index'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "index",showLists = False)
+        self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
             nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -337,6 +357,7 @@ class GuiMainWindow(object):
         if tabType == None:
             tabType = 'stock'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "stock",showLists = False)
+        self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
             nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -346,6 +367,7 @@ class GuiMainWindow(object):
         if tabType == None:
             tabType = 'forex'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "forex",showLists = False)
+        self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
             nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -356,6 +378,7 @@ class GuiMainWindow(object):
         if tabType == None:
             tabType = 'bond'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "bond",showLists = False)
+        self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
             nameTab = self.tabA.bondListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -366,6 +389,7 @@ class GuiMainWindow(object):
         if tabType == None:
             tabType = 'resources'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "resource",showLists = False)
+        self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
             nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
@@ -375,10 +399,11 @@ class GuiMainWindow(object):
         if tabType == None:
             tabType = 'futures'
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "futures",showLists = False)
+        self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
             nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
-
+    
     def settings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tabA
         dateStart = self.tabA.startDateEdit.date()  # początek daty
@@ -428,7 +453,7 @@ class GuiMainWindow(object):
              "painting":painting,"scale":scale,"oscilator":oscilator,"drawTrend":drawTrend,'lineWidth':lineWidth}
         return t
     def closeTab(self,i):
-        if i != 0 and i!=1:
+        if i != 0 and i!=1 and i !=2:
 
             self.tabs.removeTab(i)
             
