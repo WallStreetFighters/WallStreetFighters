@@ -98,55 +98,55 @@ class Strategy:
     defBear3Val = -15
     defEveningStarVal = -10
     defDarkCloudVal = -5
-    open = []
-    close = []
-    low = []
-    high = []
-    volume = []
-    def __init__(self, open, close, low, high, volume):
-        self.setData(open, close, low, high, volume)
+    data = None
     
-    def setData(self, open, close, low, high, volume):
-        self.open = open
-        self.close = close
-        self.low = low
-        self.high = high
-        self.volume = volume
+    
+    def __init__(self, data):
+        self.setData(open, data)
+    
+    
+    def setData(self, data):
+        self.data = data
         
+    def setStrategyCoefficients(self, positiveSignal, negativeSignal):
+        self.positiveSignal = positiveSignal
+        self.negativeSignal = negativeSignal
+    
+    
     def resetCoefficients(self):
-        positiveSignal = defPositiveSignal  
-        negativeSignal = defNegativeSignal
-        trendVal = defTrendVal
-        headAndShouldersVal = defHeadAndShouldersVal
-        tripleTopVal = defTripleTopVal
-        risingWedgeVal = defRisingWedgeVal
-        fallingTriangleVal = defFallingTriangleVal
-        reversedHeadAndShouldersVal = defReversedHeadAndShouldersVal
-        tripleBottomVal = defTripleBottomVal
-        fallingWedgeVal = defFallingWedgeVal
-        risingTriangleVal = defRisingTriangleVal
-        symetricTriangleVal = defSymetricTriangleVal
-        rectangleVal = defRectangleVal
-        oscilatorsVal = defOscilatorsVal
-        newHighNewLowVal = defNewHighNewLowVal
-        bollignerVal = defBollignerVal
-        momentumVal = defMomentumVal
-        rocVal = defRocVal
-        cciVal = defCciVal
-        rsiVal = defRsiVal
-        williamsVal = defWilliamsVal
-        risingBreakawayGapVal = defRisingBreakawayGapVal
-        risingContinuationGapVal = defRisingContinuationGapVal
-        fallingExhaustionGapVal = defFallingExhaustionGapVal 
-        fallingBreakawayGapVal = defFallingBreakawayGapVal
-        risingExhaustionGapVal = defRisingExhaustionGapVal
-        fallingContinuationGapVal = defFallingContinuationGapVal
-        bull3Val = defBull3Val
-        mornigStarVal = defMornigStarVal
-        piercingVal = defPiercingVal
-        bear3Val = defBear3Val
-        eveningStarVal = defEveningStarVal
-        darkCloudVal = defDarkCloudVal
+        self.positiveSignal = self.defPositiveSignal  
+        self.negativeSignal = self.defNegativeSignal
+        self.trendVal = self.defTrendVal
+        self.headAndShouldersVal = self.defHeadAndShouldersVal
+        self.tripleTopVal = self.defTripleTopVal
+        self.risingWedgeVal = self.defRisingWedgeVal
+        self.fallingTriangleVal = self.defFallingTriangleVal
+        self.reversedHeadAndShouldersVal = self.defReversedHeadAndShouldersVal
+        self.tripleBottomVal = self.defTripleBottomVal
+        self.fallingWedgeVal = self.defFallingWedgeVal
+        self.risingTriangleVal = self.defRisingTriangleVal
+        self.symetricTriangleVal = self.defSymetricTriangleVal
+        self.rectangleVal = self.defRectangleVal
+        self.oscilatorsVal = self.defOscilatorsVal
+        self.newHighNewLowVal = self.defNewHighNewLowVal
+        self.bollignerVal = self.defBollignerVal
+        self.momentumVal = self.defMomentumVal
+        self.rocVal = self.defRocVal
+        self.cciVal = self.defCciVal
+        self.rsiVal = self.defRsiVal
+        self.williamsVal = self.defWilliamsVal
+        self.risingBreakawayGapVal = self.defRisingBreakawayGapVal
+        self.risingContinuationGapVal = self.defRisingContinuationGapVal
+        self.fallingExhaustionGapVal = self.defFallingExhaustionGapVal 
+        self.fallingBreakawayGapVal = self.defFallingBreakawayGapVal
+        self.risingExhaustionGapVal = self.defRisingExhaustionGapVal
+        self.fallingContinuationGapVal = self.defFallingContinuationGapVal
+        self.bull3Val = self.defBull3Val
+        self.mornigStarVal = self.defMornigStarVal
+        self.piercingVal = self.defPiercingVal
+        self.bear3Val = self.defBear3Val
+        self.eveningStarVal = self.defEveningStarVal
+        self.darkCloudVal = self.defDarkCloudVal
             
     def analyze(self):
           resultText = ''
@@ -155,7 +155,7 @@ class Strategy:
           resultText = resultText + "The program will now analyse trends, selected chart patterns, candle patterns, indicators, oscillators and gaps\n"
           print "   (+) -> positive\n\t(0) -> neutral\n\t(-) -> negative signal\n"
           resultText = resultText + "   (+) -> positive\n   (0) -> neutral\n   (-) -> negative signal\n"
-          overallScore += self.trendVal * trend.optimizedTrend(self.close)
+          overallScore += self.trendVal * trend.optimizedTrend(self.data.close)
           resultText = resultText + "\nResults of trend analysis\n"
           
           if overallScore > 0:
@@ -170,31 +170,31 @@ class Strategy:
 
           print "\nThe program has identified the following chart patterns:\n"
           resultText = resultText + "\nThe program has identified the following chart patterns:\n"
-          form = trend.lookForHeadAndShoulders(self.close, self.volume, 1)
+          form = trend.lookForHeadAndShoulders(self.data.close, self.volume, 1)
           overallScore += form * self.headAndShouldersVal
           if form * self.headAndShouldersVal != 0:
               print "   (-) head and shoulders\n"
               resultText = resultText + "   (-) head and shoulders\n"
 
-          form = trend.lookForReversedHeadAndShoulders(self.close, self.volume, 1)
+          form = trend.lookForReversedHeadAndShoulders(self.data.close, self.volume, 1)
           overallScore += form * self.reversedHeadAndShouldersVal
           if form * self.reversedHeadAndShouldersVal != 0:
               print "   (+) reversed head and shoulders\n"
               resultText = resultText + "   (+) reversed head and shoulders\n"
 
-          form = trend.lookForTripleTop(self.close, self.volume, 1)
+          form = trend.lookForTripleTop(self.data.close, self.volume, 1)
           overallScore += form * self.tripleTopVal
           if form * self.tripleTopVal != 0:
               print "   (-) triple top\n"
               resultText = resultText + "   (-) triple top\n"
 
-          form = trend.lookForTripleBottom(self.close, self.volume, 1)
+          form = trend.lookForTripleBottom(self.data.close, self.volume, 1)
           overallScore += form * self.tripleBottomVal
           if form * self.tripleBottomVal != 0:
               print "   (+) triple bottom\n"
               resultText = resultText + "   (+) triple bottom\n"
 
-          geometricFormations = trend.findGeometricFormations(self.close)
+          geometricFormations = trend.findGeometricFormations(self.data.close)
           for formation in geometricFormations:
               if formation != None:
                   if formation[0] == 'rect':
@@ -234,7 +234,7 @@ class Strategy:
                           print "   (+) falling wedge\n"
                           resultText = resultText + "   (+) falling wedge\n"
            
-          flags = trend.findFlagsAndPennants(self.close, self.volume)
+          flags = trend.findFlagsAndPennants(self.data.close, self.volume)
           if flags != None:
               overallScore += defFlagPennantVal * flags[1]
               if flags[1] < 0:
@@ -244,7 +244,7 @@ class Strategy:
                   print "(+) rising-trend flag/pennant"
                   resultText = resultText + "(+) rising-trend flag/pennant"
 
-          gaps = candles.findGaps(self.high,self.low,self.close)
+          gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)
           for formation in gaps:
               if formation != None:
                   if formation[0][0] == 'rising_breakaway_gap':
@@ -272,7 +272,7 @@ class Strategy:
                       if self.fallingExhaustionGapVal * formation[1] != 0:
                           print "   (+) falling exhaustion gap\n"
 
-          candleFormations = candles.findCandleFormations(self.open, self.high, self.low, self.close)
+          candleFormations = candles.findCandleFormations(self.data.open, self.data.high, self.data.low, self.data.close)
           for formation in candleFormations:
               if formation != None:
                   if formation[0][0] == 'bull3':
@@ -307,7 +307,7 @@ class Strategy:
                           resultText = resultText + "   (-) dark cloud candle pattern\n"
 
                           
-          # score, oscilatorsAndIndicators = oscilators.oscillatorStrategy(array(self.close), array(self.high), array(self.low), min(10, len(self.close)))
+          # score, oscilatorsAndIndicators = oscilators.oscillatorStrategy(array(self.data.close), array(self.data.high), array(self.data.low), min(10, len(self.data.close)))
           #           overallScore += self.newHighNewLowVal * oscilatorsAndIndicators[0]
           #           if self.newHighNewLowVal * oscilatorsAndIndicators[0] > 0:
           #               print "   (+) new high - new low index\n"
