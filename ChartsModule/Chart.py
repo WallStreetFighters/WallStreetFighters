@@ -93,9 +93,9 @@ class Chart(FigureCanvas):
         self.updateVolumeBars()
         self.updateOscPlot()                                
         self.draw()        
-        self.drawGeometricFormation()
+        #self.drawGeometricFormation()
         #self.drawRateLines()
-        #self.drawTrend()
+        self.drawTrend()
         #self.drawCandleFormations()
         #self.drawGaps()
 		
