@@ -9,21 +9,22 @@ import datetime
 import urllib2
 import cStringIO
 import cPickle
+import threading
 
 #ZMIENNE GLOBALNE
-
 REMEMBER_COUNT = 15
+
 DATABASE_LAST_UPDATE = datetime.date(2012,3,3)
 INDEX_LIST = []
 STOCK_LIST = []
 FOREX_LIST = []
 RESOURCE_LIST = []
 BOND_LIST = []
+FUTURES_LIST = []
 HISTORY_LIST = []
 AMEX_HIST = []
 NYSE_HIST = []
 NASDAQ_HIST = []
-
 UPDATE_FLAG = False
 
 
@@ -66,94 +67,97 @@ class FinancialObject(object):
 		lastUpdate = self.lastUpdate + day		
 
 		global UPDATE_FLAG
+		try:
 		
-		
-		if self.dataSource == "Yahoo":
-			if timePeriod == 'daily' and self.dailyUpdate != datetime.date.today():
-				UPDATE_FLAG = True
-				self.dailyUpdate = datetime.date.today()
-				if self.valuesDaily == []: 
-					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-				elif self.valuesDaily[0][0] == datetime.date.today():
-					return
-				else:
-					date = self.valuesDaily[0][0]+day
-					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-				self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
-				self.dailyUpdate = tmpObj.dailyUpdate
-			elif timePeriod == 'weekly' and self.weeklyUpdate != datetime.date.today():
-				UPDATE_FLAG = True
-				self.weeklyUpdate = datetime.date.today()	
-				if self.valuesWeekly == []: 
-					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-				elif self.valuesWeekly[0][0] == datetime.date.today():
-					return
-				else:
-					date = self.valuesWeekly[0][0]+day
-					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-				self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
-				self.weeklyUpdate = tmpObj.weeklyUpdate
-			elif timePeriod == 'monthly' and self.monthlyUpdate != datetime.date.today():
-				UPDATE_FLAG = True
-				self.monthlyUpdate = datetime.date.today()
-				if self.valuesMonthly == []: 
-					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-				elif self.valuesMonthly[0][0] == datetime.date.today():
-					return
-				else:
-					date = self.valuesMonthly[0][0]+day
-					tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-				self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
-				self.monthlyUpdate = tmpObj.monthlyUpdate
-		elif self.dataSource == "Stooq":
-			if timePeriod == 'daily' and self.dailyUpdate != datetime.date.today():
-				UPDATE_FLAG = True
-				if self.valuesDaily == []: 
-					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-				elif self.valuesDaily[0][0] == datetime.date.today():
-					return
-				else:
-					date = self.valuesDaily[0][0]+day
-					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-				self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
-				self.dailyUpdate = tmpObj.dailyUpdate
-			elif timePeriod == 'weekly' and self.weeklyUpdate != datetime.date.today():
-				UPDATE_FLAG = True
-				if self.valuesWeekly == []: 
-					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-				elif self.valuesWeekly[0][0] == datetime.date.today():
-					return
-				else:
-					date = self.valuesWeekly[0][0]+day
-					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-				self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
-				self.weeklyUpdate = tmpObj.weeklyUpdate
-			elif timePeriod == 'monthly' and self.monthlyUpdate != datetime.date.today():
-				UPDATE_FLAG = True
-				if self.valuesMonthly == []: 
-					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-				elif self.valuesMonthly[0][0] == datetime.date.today():
-					return
-				else:
-					date = self.valuesMonthly[0][0]+day
-					tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)				
-				self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
-				self.monthlyUpdate = tmpObj.monthlyUpdate
+			if self.dataSource == "Yahoo":
+				if timePeriod == 'daily' and self.dailyUpdate != datetime.date.today():
+					UPDATE_FLAG = True
+					self.dailyUpdate = datetime.date.today()
+					if self.valuesDaily == []: 
+						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
+					elif self.valuesDaily[0][0] == datetime.date.today():
+						return
+					else:
+						date = self.valuesDaily[0][0]+day
+						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
+					self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
+					self.dailyUpdate = tmpObj.dailyUpdate
+				elif timePeriod == 'weekly' and self.weeklyUpdate != datetime.date.today():
+					UPDATE_FLAG = True
+					self.weeklyUpdate = datetime.date.today()	
+					if self.valuesWeekly == []: 
+						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
+					elif self.valuesWeekly[0][0] == datetime.date.today():
+						return
+					else:
+						date = self.valuesWeekly[0][0]+day
+						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
+					self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
+					self.weeklyUpdate = tmpObj.weeklyUpdate
+				elif timePeriod == 'monthly' and self.monthlyUpdate != datetime.date.today():
+					UPDATE_FLAG = True
+					self.monthlyUpdate = datetime.date.today()
+					if self.valuesMonthly == []: 
+						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
+					elif self.valuesMonthly[0][0] == datetime.date.today():
+						return
+					else:
+						date = self.valuesMonthly[0][0]+day
+						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
+					self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
+					self.monthlyUpdate = tmpObj.monthlyUpdate
+			elif self.dataSource == "Stooq":
+				if timePeriod == 'daily' and self.dailyUpdate != datetime.date.today():
+					UPDATE_FLAG = True
+					if self.valuesDaily == []: 
+						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
+					elif self.valuesDaily[0][0] == datetime.date.today():
+						return
+					else:
+						date = self.valuesDaily[0][0]+day
+						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
+					self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
+					self.dailyUpdate = tmpObj.dailyUpdate
+				elif timePeriod == 'weekly' and self.weeklyUpdate != datetime.date.today():
+					UPDATE_FLAG = True
+					if self.valuesWeekly == []: 
+						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
+					elif self.valuesWeekly[0][0] == datetime.date.today():
+						return
+					else:
+						date = self.valuesWeekly[0][0]+day
+						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
+					self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
+					self.weeklyUpdate = tmpObj.weeklyUpdate
+				elif timePeriod == 'monthly' and self.monthlyUpdate != datetime.date.today():
+					UPDATE_FLAG = True
+					if self.valuesMonthly == []: 
+						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
+					elif self.valuesMonthly[0][0] == datetime.date.today():
+						return
+					else:
+						date = self.valuesMonthly[0][0]+day
+						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)				
+					self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
+					self.monthlyUpdate = tmpObj.monthlyUpdate
+		except DataAPIException:
+			UPDATE_FLAG = True
+			return
 
 	def getArray(self, time):
 		"""Funkcja zwracająca rekordowaną tablicę (numpy.recarray) dla informacji w odstępie czasu przekazanym jako parametr funkcji. Pozwala to dostać się do poszczególnych tablic używając odpowiednich rekordów: 'date' 'open' etc."""
-		if self.financialType == 'forex' or self.financialType == 'bond' or self.financialType == 'resource':
+		if self.financialType == 'forex' or self.financialType == 'bond' or self.financialType == 'resource' or self.financialType == 'future':
 			tmplist = []
 			if time == 'daily':
 				for x in self.valuesDaily:
-					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],0))
 			if time == 'weekly':
 				for x in self.valuesWeekly:
-					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],0))
 			if time == 'monthly':
 				for x in self.valuesMonthly:
-					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
-			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float)])
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],0))
+			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float),('volume',float)])
 		else:
 			tmplist = []
 			if time == 'daily':
@@ -237,7 +241,7 @@ class DataAPIException(Exception):
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
 	
-	
+	"""
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
@@ -245,6 +249,7 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 		if finObj != None:
 			finObj.getCurrentValue()
 			return finObj
+	"""
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail)
 
@@ -254,7 +259,7 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 		print url
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
-		return
+		raise DataAPIException('Connection Error!')
 	pageSource = site.read()
 	if abbreviation[0] == '^':
 		pattern = '\\'+abbreviation.lower()+'">([0-9]*,*[0-9]+\.*[0-9]+)<'
@@ -264,7 +269,15 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	m = re.search(pattern,pageSource)
 	
 	timeNow = datetime.datetime.now()
+
+	pattern = 'Bid:</th>.*?>([0-9.]+)</span><small> x <.*?>([0-9]+)</span></sma.*?Ask:</th>.*?>([0-9.]+)</span><small> x <.*?>([0-9]+)'
+	pattern = re.compile(pattern)
+	
+	
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	m = re.search(pattern,pageSource)
+
+	"""
 	if UPDATE_FLAG == False:
 		if len(HISTORY_LIST) == REMEMBER_COUNT:
 			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
@@ -272,12 +285,12 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 		else:
 			HISTORY_LIST = [finObj] + HISTORY_LIST
 	UPDATE_FLAG = False	
+	"""
 	return finObj
 
 def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
-	
-	
+	"""
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
@@ -285,21 +298,27 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 		if finObj != None:
 			finObj.getCurrentValue()
 			return finObj
+	"""
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
 	
-	url = "http://stooq.pl/q/g/?s="+abbreviation.lower()
+	url = "http://stooq.pl/q/?s="+abbreviation.lower()
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
-		return
+		raise DataAPIException('Connection Error!')
 	pageSource = site.read()
 	pattern = '_c[0-9]>([0-9]*,*[0-9]+\.*[0-9]+)<'
 	pattern = re.compile(pattern)
 	m = re.search(pattern,pageSource)
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	pattern = '>Bid<.*?>([0-9.]*)</span></font>.*?>x([0-9.mgk]*)</span></font>.*?>Ask<.*?>([0-9.mgk]*)</span>.*?>x([0-9.mgk]*)</span>.*?Wolumen<br>.*?>([0-9.mgk]*)</span>.*?>Obrót<br>.*?>([0-9.mgk]*)</.*?>Transakcje<br><.*?>([0-9.mgk]*)<'
+	pattern = re.compile(pattern)
+	m = re.search(pattern,pageSource)
+
+	"""
 	if UPDATE_FLAG == False:
 		if len(HISTORY_LIST) == REMEMBER_COUNT:
 			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
@@ -307,6 +326,7 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 		else:
 			HISTORY_LIST = [finObj] + HISTORY_LIST
 	UPDATE_FLAG = False	
+	"""
 	return finObj
 
 def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
@@ -338,7 +358,7 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
-		return
+		raise DataAPIException('Connection Error!')
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
 	dataCsv = csv.reader(csvString)
@@ -401,7 +421,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
-		return
+		raise DataAPIException('Connection Error!')
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
 	dataCsv = csv.reader(csvString)
@@ -470,7 +490,7 @@ def updateDatabase():
 			site = urllib2.urlopen(url)
 		except urllib2.URLError, ex:
 			print "Something wrong happend! Check your internet connection!"
-			return
+			raise DataAPIException('Connection Error!')
 		pageSource = site.read()
 		pattern = '(?s)Prev(.*)Prev'
 		pattern = re.compile(pattern)
@@ -492,6 +512,7 @@ def loadData():
 	global FOREX_LIST
 	global RESOURCE_LIST
 	global BOND_LIST
+	global FUTURES_LIST
 	global DATABASE_LAST_UPDATE
 	global HISTORY_LIST
 	global AMEX_HIST
@@ -510,7 +531,7 @@ def loadData():
 			DATABASE_LAST_UPDATE = parserStringToDate(row[1])
 			flag = False
 		else:	
-			STOCK_LIST = STOCK_LIST + [[row[0],row[1],row[2],row[3]]]
+			STOCK_LIST.append([row[0],row[1],row[2],row[3]])
 	
 	csvFile  = open('data3.wsf', "rb")
 	dataCsv = csv.reader(csvFile)
@@ -527,6 +548,11 @@ def loadData():
 	dataCsv.next()
 	for row in dataCsv:
 		BOND_LIST = BOND_LIST + [[row[0],row[1],row[2],row[3]]]	
+	csvFile  = open('data6.wsf', "rb")
+	dataCsv = csv.reader(csvFile)
+	dataCsv.next()
+	for row in dataCsv:
+		FUTURES_LIST = FUTURES_LIST + [[row[0],row[1],row[2],row[3]]]	
 	csvFile  = open('AMEX.csv', "rb")
 	dataCsv = csv.reader(csvFile)
 	for row in dataCsv:
@@ -551,11 +577,11 @@ def getAdvDec(date):
 	except urllib2.HTTPError, ex:
 		if ex.code == 404:
 			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
-			return
+			raise DataAPIException('Connection Error!')
 		return
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
-		return
+		raise DataAPIException('Connection Error!')
 	pageSource = site.read()
 	pageSource = pageSource.replace(' ','')
 	csvString = cStringIO.StringIO(pageSource)
@@ -627,11 +653,17 @@ def saveHistory(file):
 		print x.abbreviation
 	cPickle.dump(HISTORY_LIST, file)
 
-def loadHistory(file):
+class loadHistory(threading.Thread):
 	"""Funkcja zapisująca bierzącą historie w pliku"""
-	global HISTORY_LIST
-	HISTORY_LIST = cPickle.load(file)
-	
+    	def __init__(self, File):
+        	threading.Thread.__init__(self)
+		self.file = File
+
+	def run(self):
+		global HISTORY_LIST
+		HISTORY_LIST = cPickle.load(self.file)
+		self.file.close()
+
 def top5Volume():
 	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
 	TOP_VOLUME = []
@@ -640,15 +672,20 @@ def top5Volume():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	#pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?"color:(.*?);.*?>([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_VOLUME.append([m.group(1),m.group(2),m.group(3),m.group(4)])
-			i += 1
+			if m.group(3) == '#cc0000':
+				TOP_VOLUME.append([m.group(1),m.group(2),'-' + m.group(4), '-' + m.group(5)])
+				i += 1
+			else:
+				TOP_VOLUME.append([m.group(1),m.group(2),m.group(4),m.group(5)])
+				i += 1
 	return TOP_VOLUME
 
 def top5Gainers():
@@ -659,8 +696,9 @@ def top5Gainers():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
@@ -677,13 +715,14 @@ def top5Losers():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*)%\)</b>'
+	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
 	pattern = re.compile(pattern)
 	i = 0
 	for m in re.finditer(pattern,pageSource):
 		if i < 5:
-			TOP_LOSERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
+			TOP_LOSERS.append([m.group(1),m.group(2),'-' + m.group(3),'-' + m.group(4)])
 			i += 1
 	return TOP_LOSERS
 
@@ -696,6 +735,7 @@ def getMostPopular():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()	
 	
 	mostPopular.append(mostPopularIndicesSearch('Dow', pageSource))
@@ -707,6 +747,7 @@ def getMostPopular():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 
 	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
@@ -743,13 +784,14 @@ def getMostPopularCurrencies():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	
 	mostPopular = []
 	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
 	mostPopular.append(mostPopularPatternSearch('USD/JPY',pageSource))
 	mostPopular.append(mostPopularPatternSearch('GBP/USD',pageSource))
-	
+
 	return mostPopular
 
 def getMostPopularCommodities():
@@ -760,6 +802,7 @@ def getMostPopularCommodities():
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
 		print "Something wrong happend! Check your internet connection!"
+		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	
 	mostPopular = []
@@ -769,13 +812,6 @@ def getMostPopularCommodities():
 	
 	return mostPopular
 
-def loadStats():
-	"""Funkcja zwracajaca pobierajaca do globalnych tabel statystyki (5 najwiekszych spadkow/wzrostow/wolumenow)"""
-	top5Losers()
-	top5Volume()
-	top5Gainers()
-
 
 ########################################################################################################
-
 

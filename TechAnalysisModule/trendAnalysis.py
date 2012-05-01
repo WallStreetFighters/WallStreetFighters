@@ -40,6 +40,9 @@ hornVul = 0.1
 hornDiv = 0.1
 """ile razy wzrost procentowy na formacji przekracza sredni wzrost """
 hornDiff = 5
+"""ile jednostek czasu trwa formowanie się podstawy flagi/chorągiewki"""
+flagBaseTime = 3
+
 
 def trend(a, trendVuln=trendVul):
     """Na podstawie wskaznika kierunkowego prostej wyznaczamy trend"""
@@ -321,7 +324,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     maxVal = max(values)
@@ -375,7 +378,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
     if analyze == 0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
 
 
 
@@ -476,7 +479,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -533,7 +536,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
  
 
 def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastArmVol, maxFirstArmVal, maxFirstArmVol, maxMiddleVal,
@@ -610,7 +613,7 @@ def lookForTripleTop(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -668,7 +671,7 @@ def lookForTripleTop(values, volumine, analyze=0):
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
     
 
 def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastArmVol, minFirstArmVal, maxFirstArmVol, minMiddleVal,
@@ -747,7 +750,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -805,7 +808,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
 
 def averageChange(values):
     """ srednia zmiana kursu wyrazona w procentach, moze byc ujemna"""
@@ -956,8 +959,8 @@ def findMinLine(array):
         temp = arraySorted[i]
         for j in range(0, size):
             if array[j] == temp:
-                numberOfSimilarValues +=1
-        if numberOfSimilarValues <2:
+                numberOfSimilarValues += 1
+        if numberOfSimilarValues < 2:
             numberOfSimilarValues = 0
         else:
             z = 0
@@ -984,8 +987,8 @@ def findMaxLine(array):
         temp = arraySorted[i]
         for j in range(0, size):
             if array[j] == temp:
-                numberOfSimilarValues +=1
-        if numberOfSimilarValues <2:
+                numberOfSimilarValues += 1
+        if numberOfSimilarValues < 2:
             numberOfSimilarValues = 0
         else:
             z = 0
@@ -1176,13 +1179,13 @@ def checkVolumeForFlagsAndPennants(proposals,volume,values):
         return ['fallingTrendFlagOrPennant', scale]
     else:
         return None
-
-
+    proposals = checkValuesForFlagsAndPennants(3,values)
+    return checkVolumeForFlagsAndPennants(proposals,volume,values)
 
 """
 def checkChannelForFlagsAndPennants(proposals,values):      
 """
-
+        
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)

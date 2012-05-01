@@ -513,7 +513,7 @@ class Chart(FigureCanvas):
         
     def drawTrend(self):
         self.clearLines()
-        strategy = Strategy(self.data.open, self.data.close, self.data.low, self.data.high, self.data.volume)
+        strategy = Strategy(self.data)
         strategy.analyze()
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)

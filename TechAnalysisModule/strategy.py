@@ -102,7 +102,7 @@ class Strategy:
     
     
     def __init__(self, data):
-        self.setData(open, data)
+        self.setData(data)
     
     
     def setData(self, data):
@@ -419,71 +419,84 @@ class Strategy:
 
           print "\nThe program has identified the following chart patterns:\n"
           resultText = resultText + "\nThe program has identified the following chart patterns:\n"
-          form = trend.lookForHeadAndShoulders(self.data.close, self.volume, 1)
-          overallScore += form * self.headAndShouldersVal
+          form = trend.lookForHeadAndShoulders(self.data.close, self.data.volume, 1)
+          overallScore += form[0] * self.headAndShouldersVal
           if form[0] * self.headAndShouldersVal != 0:
-              print "   (-) head and shoulders\n" + self.data.date[form[1][0]].strftime("%Y-%m-%d")+self.data.date[form[1][2]].strftime("%Y-%m-%d")
-              resultText = resultText + "   (-) head and shoulders " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
+              print "   (-) head and shoulders\n" + self.data.date[int(form[1][0])].strftime("%Y-%m-%d")+self.data.date[int(form[1][2])].strftime("%Y-%m-%d")
+              resultText = resultText + "   (-) head and shoulders                    " + self.data.date[int(form[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(form[1][2])].strftime("%Y-%m-%d") + "\n"
 
-          form = trend.lookForReversedHeadAndShoulders(self.data.close, self.volume, 1)
-          overallScore += form * self.reversedHeadAndShouldersVal
+          form = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume, 1)
+          overallScore += form[0] * self.reversedHeadAndShouldersVal
           if form[0] * self.reversedHeadAndShouldersVal != 0:
               print "   (+) reversed head and shoulders\n"
-              resultText = resultText + "   (+) reversed head and shoulders " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
+              resultText = resultText + "   (+) reversed head and shoulders     " + self.data.date[int(form[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(form[1][2])].strftime("%Y-%m-%d") + "\n"
 
-          form = trend.lookForTripleTop(self.data.close, self.volume, 1)
-          overallScore += form * self.tripleTopVal
+          form = trend.lookForTripleTop(self.data.close, self.data.volume, 1)
+          overallScore += form[0] * self.tripleTopVal
           if form[0] * self.tripleTopVal != 0:
               print "   (-) triple top\n"
-              resultText = resultText + "   (-) triple top " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
+              resultText = resultText + "   (-) triple top                                   " + self.data.date[int(form[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(form[1][2])].strftime("%Y-%m-%d") + "\n"
 
-          form = trend.lookForTripleBottom(self.data.close, self.volume, 1)
-          overallScore += form * self.tripleBottomVal
+          form = trend.lookForTripleBottom(self.data.close, self.data.volume, 1)
+          overallScore += form[0] * self.tripleBottomVal
           if form[0] * self.tripleBottomVal != 0:
               print "   (+) triple bottom\n"
-              resultText = resultText + "   (+) triple bottom " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
-
+              resultText = resultText + "   (+) triple bottom                             " + self.data.date[int(form[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(form[1][2])].strftime("%Y-%m-%d") + "\n"
+          
+          
           geometricFormations = trend.findGeometricFormations(self.data.close)
           for formation in geometricFormations:
+              hasFound = 0
               if formation != None:
                   if formation[0] == 'rect':
                       overallScore += self.rectangleVal * formation[3]
                       if self.rectangleVal * formation[3] > 0:
                           print "   (+)  rising rectangle\n"
-                          resultText = resultText + "   (+)  rising rectangle\n"
+                          resultText = resultText + "   (+)  rising rectangle                      "
+                          hasFound = 1
                       elif self.rectangleVal * formation[3] < 0:
                           print "   (-) falling rectangle\n"
-                          resultText = resultText + "   (-) falling rectangle\n"
+                          resultText = resultText + "   (-) falling rectangle                      "
+                          hasFound = 1
                   elif formation[0] == 'symmetric_triangle':
                       overallScore += self.symetricTriangleVal * formation[3]
                       if self.symetricTriangleVal * formation[3] > 0:
                           print "   (+) symmetric triangle - continuation of rising trend\n"
-                          resultText = resultText + "   (+) symmetric triangle - continuation of rising trend\n"
+                          resultText = resultText + "   (+) symmetric triangle - continuation of rising trend     "
+                          hasFound = 1
                       elif self.symetricTriangleVal * formation[3] < 0:
                           print "   (-) symmetric triangle - continuation of falling trend\n"
-                          resultText = resultText + "   (-) symmetric triangle - continuation of falling trend\n"
+                          resultText = resultText + "   (-) symmetric triangle - continuation of falling trend     "
+                          hasFound = 1
                   elif formation[0] == 'falling_triangle':
                       overallScore += self.fallingTriangleVal * formation[3]
                       if self.fallingTriangleVal * formation[3] != 0:
                           print "   (-) falling triangle\n"
-                          resultText = resultText + "   (-) falling triangle\n"
+                          resultText = resultText + "   (-) falling triangle                           "
+                          hasFound = 1
                   elif formation[0] == 'rising_triangle':
                       overallScore += self.risingTriangleVal * formation[3]
                       if self.risingTriangleVal * formation[3] != 0:
                           print "   (+) rising triangle\n"
-                          resultText = resultText + "   (+) rising triangle\n"
+                          hasFound = 1
+                          resultText = resultText + "   (+) rising triangle                           "
                   elif formation[0] == 'rising_wedge':
                       overallScore += self.risingWedgeVal * formation[3]
                       if self.risingWedgeVal * formation[3] != 0:
                           print "   (-) rising wedge\n"
-                          resultText = resultText + "   (-) rising wedge\n"
+                          resultText = resultText + "   (-) rising wedge     "
+                          hasFound = 1
                   elif formation[0] == 'falling_wedge':
                       overallScore += self.fallingWedgeVal * formation[3]
                       if self.fallingWedgeVal * formation[3] != 0:
                           print "   (+) falling wedge\n"
-                          resultText = resultText + "   (+) falling wedge\n"
+                          resultText = resultText + "   (+) falling wedge     "
+                          hasFound = 1
+                  if hasFound:
+                      resultText = resultText + self.data.date[int(formation[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(formation[1][2])].strftime("%Y-%m-%d") + "\n"   
+                      
            
-          flags = trend.findFlagsAndPennants(self.data.close, self.volume)
+          flags = trend.findFlagsAndPennants(self.data.close, self.data.volume)
           if flags != None:
               overallScore += defFlagPennantVal * flags[1]
               if flags[1] < 0:

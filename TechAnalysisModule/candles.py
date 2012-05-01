@@ -321,4 +321,4 @@ def findGapsOnFragment(H,L,C,a,b):
             gaps.append(exhaustion_gap)
         return gaps
     else: 
-        return []                
+        return []
