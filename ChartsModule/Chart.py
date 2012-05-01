@@ -97,8 +97,7 @@ class Chart(FigureCanvas):
     def updateMainPlot(self):        
         if(self.mainPlot==None or self.data==None or self.data.corrupted):
             return
-        else:
-            print "updateuje ", self.data.name
+      
         ax=self.mainPlot                
         ax.clear()          
         x=range(len(self.data.close))

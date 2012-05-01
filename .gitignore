@@ -7,6 +7,8 @@
 *.o
 *.so
 *.pyc
+data.wsf
+
 
 # Packages #
 ############
@@ -20,12 +22,15 @@
 *.rar
 *.tar
 *.zip
-
+data.wsf
+data.wsf~
+save.wsf
 # Logs and databases #
 ######################
 *.log
 *.sql
 *.sqlite
+*.wsf
 
 # OS generated files #
 ######################
