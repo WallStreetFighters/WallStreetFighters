@@ -8,7 +8,8 @@
 *.so
 *.pyc
 data.wsf
-
+data.wsf~
+save.wsf
 
 # Packages #
 ############
@@ -28,7 +29,6 @@ data.wsf
 *.log
 *.sql
 *.sqlite
-*.wsf
 
 # OS generated files #
 ######################
