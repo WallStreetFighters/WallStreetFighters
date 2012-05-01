@@ -217,17 +217,17 @@ def isStraightTrend(array):
 
 def findGaps(H,L,C):   
     """Szuka luk na fragmentach tablicy o różnej wielkości, zwraca te, które znalazł
-    na największym. Zwraca parę, której pierwszy element to
+    na największym. Zwraca listę par, których pierwszy element to
     lista luk, każda opisana tak jak w findGapsOnFragment, a drugi to wartość."""
     intervals=[(0,1),(1,4),(1,2),(3,4)][-1::-1]
     value=1
+    gapsList=[]
     for a,b in intervals:        
         gaps=findGapsOnFragment(H,L,C,a,b)
         if(gaps!=[]):
-            gaps=(gaps,value)
-            break
+            gapsList.append((gaps,value))            
         value*=0.75
-    return gaps
+    return gapsList
 
 def findGapsOnFragment(H,L,C,a,b):
     """Znajduje na danym wycinku wykresu lukę startową, ucieczki i wyczerpania.     
@@ -321,4 +321,4 @@ def findGapsOnFragment(H,L,C,a,b):
             gaps.append(exhaustion_gap)
         return gaps
     else: 
-        return []                
+        return []
