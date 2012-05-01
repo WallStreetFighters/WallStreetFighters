@@ -7,33 +7,20 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
 from matplotlib.ticker import *
+from matplotlib.textpath import TextPath
+from matplotlib.text import Text
 from numpy import *
 from PyQt4 import QtGui
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
+from TechAnalysisModule.candles import *
 import TechAnalysisModule.trendAnalysis as trend
     
 class Chart(FigureCanvas):
     """Klasa (widget Qt) odpowiedzialna za rysowanie wykresu. Zgodnie z tym, co zasugerował
     Paweł, na jednym wykresie wyświetlam jeden wskaźnik i jeden oscylator, a jak ktoś
     będzie chciał więcej, to kliknie sobie jakiś guzik, który mu pootwiera kilka wykresów
-    w nowym oknie."""
-    data = None #obiekt klasy Data przechowujący dane    
-    
-    fig = None #rysowany wykres (tzn. obiekt klasy Figure)
-    mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
-    volumeBars = None #wykres wolumenu
-    oscPlot = None #wykres oscylatora    
-    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)    
-    
-    mainType = None #typ głównego wykresu
-    oscType = None #typ oscylatora (RSI, momentum, ...)
-    mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
-    
-    x0, y0 = None,None      #współrzędne początku linii        
-    drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
-    
-    scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
-    
+    w nowym oknie."""        
     num_ticks = 8 #tyle jest etykiet pod wykresem
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
@@ -43,7 +30,19 @@ class Chart(FigureCanvas):
     
     def __init__(self, parent, finObj=None, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
-        dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
+        dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                                                                            
+        self.mainPlot=None
+        self.volumeBars=None
+        self.oscPlot=None
+        self.additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
+        self.rectangles = [] #lista prostokątów (do zaznaczania świec)
+        self.mainType = None #typ głównego wykresu
+        self.oscType = None #typ oscylatora (RSI, momentum, ...)
+        self.mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
+        self.x0, self.y0 = None,None      #współrzędne początku linii        
+        self.drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
+        self.scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
+        self.grid = True #czy rysujemy grida        
         self.setData(finObj)
         self.mainType='line'                
         self.fig = Figure(figsize=(width, height), dpi=dpi)        
@@ -57,38 +56,50 @@ class Chart(FigureCanvas):
         self.addVolumeBars()                                        
         self.mpl_connect('button_press_event', self.onClick)        
            
-    def setData(self, finObj, start=None, end=None, step='daily'):
+    def setData(self, finObj, start=None, end=None, step='daily', settings=ChartData.defaultSettings):
         """Ustawiamy model danych, który ma reprezentować wykres. Następnie
         konieczne jest jego ponowne odrysowanie"""
         if(finObj==None):
             return;
-        self.data=ChartData(finObj, start, end, step)
+        self.data=ChartData(finObj, start, end, step, settings)
         if(self.mainPlot!=None):
             self.updatePlot()
-        
+            
+    def getData(self):
+        """Zwraca obiekt klasy ChartData, będący modelem danych do aktualnego wykresu."""
+        return self.data
+    
+    def setGrid(self, grid):
+        """Włącza (True) lub wyłącza (False) rysowanie grida"""
+        self.grid=grid
+        self.updateMainPlot()
+            
     def setMainType(self, type):
         """Ustawiamy typ głównego wykresu ('point','line','candlestick','none')"""
         self.mainType=type
         self.updateMainPlot()
         
     def updatePlot(self):
-        """Odświeża wszystkie wykresy"""
+        """Odświeża wszystkie wykresy"""                
         self.updateMainPlot()
         self.updateVolumeBars()
-        self.updateOscPlot()
+        self.updateOscPlot()                                
         self.draw()        
+        #self.drawTrend()
+        #self.drawCandleFormations()
     
     def addMainPlot(self):
-        """Rysowanie głównego wykresu (tzn. kurs w czasie)"""                                            
+        """Stworzenie głównego wykresu (tzn. kurs w czasie)"""                                            
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
         self.mainPlot=self.fig.add_axes(bounds)                        
         self.updateMainPlot()
     
-    def updateMainPlot(self):
+    def updateMainPlot(self):        
         if(self.mainPlot==None or self.data==None or self.data.corrupted):
             return
+      
         ax=self.mainPlot                
-        ax.clear()  
+        ax.clear()          
         x=range(len(self.data.close))
         if self.mainType=='line' :
             ax.plot(x,self.data.close,'b-',label=self.data.name)
@@ -96,16 +107,30 @@ class Chart(FigureCanvas):
             ax.plot(x,self.data.close,'b.',label=self.data.name)
         elif self.mainType=='candlestick':
             self.drawCandlePlot()
+        elif self.mainType=='bar':
+            self.drawBarPlot()
         else:            
             return
         if self.mainIndicator != None:
             self.updateMainIndicator()       
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
-        ax.set_ylim(0.9*min(self.data.low),1.1*max(self.data.high))
+        ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))        
+        print self.additionalLines
+        print self.rectangles        
+        for line in self.additionalLines:
+            ax.add_line(line)
+            line.figure.draw_artist(line)         
+        for rect in self.rectangles:
+            ax.add_patch(rect)
+            rect.figure.draw_artist(rect)        
         if(self.scaleType=='log'):            
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))            
             ax.yaxis.set_minor_formatter(FormatStrFormatter('%.2f'))            
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label2On=True
+            if(self.grid):
+                tick.gridOn=True        
         for label in (ax.get_yticklabels() + ax.get_yminorticklabels()):
             label.set_size(8)
         #legenda
@@ -113,16 +138,16 @@ class Chart(FigureCanvas):
         leg.get_frame().set_alpha(0.5)
         self.formatDateAxis(self.mainPlot)        
         self.fixTimeLabels()
+        if(self.grid):
+            for tick in ax.xaxis.get_major_ticks():                
+                tick.gridOn=True
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
         #tworzymy nowy wykres tylko za pierwszym razem, potem tylko pokazujemy i odświeżamy                
         if(self.volumeBars==None):
             volBounds=[self.margin, self.margin, self.maxSize, self.volHeight]
-            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                    
-            #usuwamy etykiety y dla wolumenu (zakomentujcie, to zobaczycie czemu)
-            for label in self.volumeBars.get_yticklabels():
-                label.set_visible(False)                                               
+            self.volumeBars=self.fig.add_axes(volBounds, sharex=self.mainPlot)                                                                               
         self.updateVolumeBars()
         self.volumeBars.set_visible(True)
         self.fixPositions()
@@ -146,14 +171,18 @@ class Chart(FigureCanvas):
     def updateVolumeBars(self):
         """Odświeża rysowanie wolumenu"""                
         if self.data==None or self.data.corrupted:
-            return
+            return                
         ax=self.volumeBars
         ax.clear()
         x=range(len(self.data.close))
-        ax.vlines(x,0,self.data.volume)
-        for label in self.volumeBars.get_yticklabels():
-            label.set_visible(False)
+        ax.vlines(x,0,self.data.volume)        
         ax.set_xlim(x[0],x[-1])
+        if(max(self.data.volume)>0):
+            ax.set_ylim(0,1.2*max(self.data.volume))
+        for label in self.volumeBars.get_yticklabels():
+            label.set_visible(False)                                
+        for o in ax.findobj(Text):
+            o.set_visible(False)
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -169,10 +198,7 @@ class Chart(FigureCanvas):
         lines, patches = candlestick(self.mainPlot,self.data.quotes,
                                     width=0.7,colorup='w',colordown='k')                
         #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.name) 
-        #poniższe dwie linie są po to, żeby wykres wypełniał całą szerokość
-        #self.mainPlot.xaxis_date()                
-        #self.mainPlot.autoscale_view()   
+        lines[0].set_label(self.data.name)         
         """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
         stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
         Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
@@ -180,7 +206,19 @@ class Chart(FigureCanvas):
         for line in lines:                        
             line.set_zorder(line.get_zorder()-2)
         for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})        
+            rect.update({'edgecolor':'k','linewidth':0.5})     
+    
+    def drawBarPlot(self):
+        if self.data==None or self.data.corrupted:
+            return                        
+        ax=self.mainPlot
+        x=range(len(self.data.close))
+        lines=ax.vlines(x,self.data.low,self.data.high,label=self.data.name)
+        for i in x:
+            newLine=Line2D([i-0.3,i],[self.data.open[i],self.data.open[i]],color='k')                
+            ax.add_line(newLine)
+            newLine=Line2D([i,i+0.3],[self.data.close[i],self.data.close[i]],color='k')                
+            ax.add_line(newLine)
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -213,23 +251,23 @@ class Chart(FigureCanvas):
         ax.hold(False) #hold off        
     
     def setOscPlot(self, type):
-        """Dodaje pod głównym wykresem wykres oscylatora danego typu"""
-        self.oscType=type                
-        if self.oscPlot==None:
-            oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
-            self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
-        self.updateOscPlot()
-        self.oscPlot.set_visible(True)
-        self.fixPositions()
-        self.fixTimeLabels()
-    
-    def rmOscPlot(self):
-        """Ukrywa wykres oscylatora"""
-        if self.oscPlot==None:
-            return
-        self.oscPlot.set_visible(False)        
-        self.fixPositions()                            
-        self.fixTimeLabels()
+        """Dodaje pod głównym wykresem wykres oscylatora danego typu lub ukrywa"""
+        if type not in ['momentum','CCI','RSI','ROC','williams']:
+            """Ukrywa wykres oscylatora"""
+            if self.oscPlot==None:
+                return
+            self.oscPlot.set_visible(False)        
+            self.fixPositions()                            
+            self.fixTimeLabels()
+        else:
+            self.oscType=type                
+            if self.oscPlot==None:
+                oscBounds=[self.margin, self.margin, self.maxSize, self.oscHeight]
+                self.oscPlot=self.fig.add_axes(oscBounds, sharex=self.mainPlot)                                            
+            self.updateOscPlot()
+            self.oscPlot.set_visible(True)
+            self.fixPositions()
+            self.fixTimeLabels()                
                                     
     def updateOscPlot(self):
         """Odrysowuje wykres oscylatora"""
@@ -247,13 +285,7 @@ class Chart(FigureCanvas):
         elif type == 'RSI':
             oscData=self.data.RSI()
         elif type == 'williams':
-            oscData=self.data.williams()
-        elif type == 'TRIN':
-            oscData=self.data.TRIN()
-        elif type == 'mcClellan':
-            oscData=self.data.mcClellan()
-        elif type == 'adLine':
-            oscData=self.data.adLine()
+            oscData=self.data.williams()        
         else:            
             return
         if oscData!=None:
@@ -286,9 +318,13 @@ class Chart(FigureCanvas):
 
     def formatDateAxis(self,ax):
         """Formatuje etykiety osi czasu."""
+        chartWidth=int(self.fig.get_figwidth()*self.fig.get_dpi()*self.maxSize)        
+        t = TextPath((0,0), '9999-99-99', size=7)
+        labelWidth = int(t.get_extents().width)    
+        num_ticks=chartWidth/labelWidth/2          
         length=len(self.data.date)
-        if(length>self.num_ticks):
-            step=length/self.num_ticks        
+        if(length>num_ticks):
+            step=length/num_ticks        
         else:
             step=1
         x=range(0,length,step)
@@ -351,7 +387,7 @@ class Chart(FigureCanvas):
     def setDrawingMode(self, mode):
         """Włączamy (True) lub wyłączamy (False) tryb rysowania po wykresie"""
         self.drawingMode=mode            
-        x0, y0 = None,None
+        self.x0, self.y0 = None,None
     
     def drawLine(self, x0,y0,x1,y1):
         """Dodaje linię (trend) do wykresu."""
@@ -366,6 +402,22 @@ class Chart(FigureCanvas):
         for line in self.additionalLines:            
             line.remove()
         self.additionalLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
+    
+    def drawRectangle(self, x, y, width, height, colour='blue', lwidth = 2.0, lstyle = 'dashed'):
+        """Zaznacza prostokątem lukę/formację świecową czy coś tam jeszcze"""
+        newRect=Rectangle((x,y),width,height,facecolor='none',edgecolor=colour,linewidth=lwidth,linestyle=lstyle)                
+        self.mainPlot.add_patch(newRect)
+        self.rectangles.append(newRect)
+        newRect.figure.draw_artist(newRect)                                        
+        self.blit(self.mainPlot.bbox)    #blit to taki redraw        
+    
+    def clearRectangles(self):
+        """Usuwa prostokąty"""
+        for rect in self.rectangles:            
+            rect.remove()
+        self.rectangles = []
         self.draw()
         self.blit(self.mainPlot.bbox)
 
@@ -386,28 +438,59 @@ class Chart(FigureCanvas):
                 self.drawLine(self.x0,self.y0,x1,y1)                
                 self.x0, self.y0 = None,None
                 
-    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0):
+    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0, lstyle = '--'):
           """Rysuje linie trendu opcja wyboru koloru i grubosci linii """
-          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle='--', color=colour)                
+          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=colour)                
           self.mainPlot.add_line(newLine)
           self.additionalLines.append(newLine)
           newLine.figure.draw_artist(newLine)                                        
           self.blit(self.mainPlot.bbox)    #blit to taki redraw       
-             
+          
+    def drawCandleFormations(self):
+        """Test formacji świecowych. Tak się tego nie będzie używać! Ta funkcja powinna być
+        użyta przez moduł wnioskowania po rozpoznaniu odpowiedniego trendu (a nie dla obu) 
+        i tylko dla małego wycinka tablicy z danymi a nie dla całej. No i kuźwa tego *nie będzie* w
+        charcie podobnie jak wyznaczania trendów."""
+        print "szukam formacji świecowych"
+        self.clearRectangles()
+        O=self.data.open
+        H=self.data.high
+        L=self.data.low
+        C=self.data.close        
+        formations1=findCandleFormations(O,H,L,C,-1)
+        formations2=findCandleFormations(O,H,L,C,1)        
+        for formation in formations1+formations2:            
+            print formation                    
+            x=formation[1]-0.5
+            y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
+            width=formation[2]-formation[1]+1
+            height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
+                        -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
+            self.drawRectangle(x,y,width,height)        
+          
     def drawTrend(self):
+        self.clearLines()
         a, b = trend.regression(self.data.close)
         self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
-        dataPart, sup, res = trend.getChannelLines(self.data.close)
-        diff = len(self.data.close) - len(dataPart)
-        self.drawTrendLine(dataPart.index(sup[0]) + diff, sup[0], dataPart.index(sup[len(sup)-1])+diff, sup[len(sup)-1], 'g')
-        self.drawTrendLine(dataPart.index(res[0]) + diff, res[0], dataPart.index(res[len(res)-1])+diff, res[len(res)-1], 'r')
-            
-def getBoundsAsRect(axes):
-    """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
-        tzn. tablicy."""
-    bounds=axes.get_position().get_points()
-    left=bounds[0][0]
-    bottom=bounds[0][1]
-    width=bounds[1][0]-left
-    height=bounds[1][0]-bottom
-    return [left, bottom, width, height]
+        sup, res = trend.getChannelLines(self.data.close)
+        self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
+        self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
+        neckLine = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
+        
+        neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
+        
+       # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
+        
+     #   min, mindex = trend.findMinLine(asarray(self.data.close))
+     #   self.drawTrendLine(mindex[0], min[0], mindex[len(min)-1], min[len(sup)-1], 'b', 1.0)
+     #   max, mindex = trend.findMaxLine(asarray(self.data.close))
+     #   self.drawTrendLine(mindex[0], max[0], mindex[len(min)-1], max[len(sup)-1], 'b', 1.0)
+        if len(self.data.close) > 30:
+            sup, res = trend.getChannelLines(self.data.close, 1, 2)
+            self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
+            self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
+        

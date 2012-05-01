@@ -1,0 +1,74 @@
+(lp1
+(dp2
+S'finObjType'
+p3
+S'index'
+p4
+sS'drawTrend'
+p5
+I01
+sS'step'
+p6
+csip
+_unpickle_type
+p7
+(S'PyQt4.QtCore'
+p8
+S'QString'
+(Vdaily
+p9
+ttRp10
+sS'chartType'
+p11
+g7
+(g8
+S'QString'
+(Vline
+p12
+ttRp13
+sg4
+<<<<<<< HEAD
+I4
+=======
+I5
+>>>>>>> chart
+sS'indicator'
+p14
+(lp15
+sS'scale'
+p16
+S'linear'
+p17
+sS'end'
+p18
+cdatetime
+datetime
+p19
+<<<<<<< HEAD
+(S'\x07\xdc\x04\x17\x00\x00\x00\x00\x00\x00'
+=======
+(S'\x07\xdc\x04\x15\x00\x00\x00\x00\x00\x00'
+>>>>>>> chart
+tRp20
+sS'hideVolumen'
+p21
+I00
+sS'oscilator'
+p22
+S''
+sS'start'
+p23
+g19
+<<<<<<< HEAD
+(S'\x07\xd4\x04\x07\x00\x00\x00\x00\x00\x00'
+=======
+(S'\x07\xdc\x02\x01\x00\x00\x00\x00\x00\x00'
+>>>>>>> chart
+tRp24
+sS'lineWidth'
+p25
+F1
+sS'painting'
+p26
+I00
+sa.

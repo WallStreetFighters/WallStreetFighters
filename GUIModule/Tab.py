@@ -40,10 +40,9 @@ def tabUi(self,showLists=True):
                 self.indexListView = QtGui.QTableView(self.listsFrame)
                 self.indexListView.setAlternatingRowColors(True)
                 self.indexListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.indexListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+                self.indexListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
                 tableStyle(self,self.indexListView) #ustawiamy styl tabeli
                 self.indexPageLayout.addWidget(self.indexListView)
-        
 
                 #Stock
                 self.stockPage = QtGui.QWidget(self.listsFrame)
@@ -80,7 +79,7 @@ def tabUi(self,showLists=True):
                 self.stockListView = QtGui.QTableView(self.listsFrame)
                 self.stockListView.setAlternatingRowColors(True)
                 self.stockListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.stockListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+                #self.stockListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.stockListView)#ustawiamy styl tabeli
                 self.stockPageLayout.addWidget(self.stockListView,2,0,1,3)
 
@@ -91,7 +90,7 @@ def tabUi(self,showLists=True):
                 self.forexListView = QtGui.QTableView(self.listsFrame)
                 self.forexListView.setAlternatingRowColors(True)
                 self.forexListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.forexListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+                #self.forexListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.forexListView)#ustawiamy styl tabeli
                 self.forexPageLayout.addWidget(self.forexListView)
 
@@ -102,7 +101,7 @@ def tabUi(self,showLists=True):
                 self.bondListView = QtGui.QTableView(self.listsFrame)
                 self.bondListView.setAlternatingRowColors(True)
                 self.bondListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.bondListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+                #self.bondListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.bondListView)
                 self.bondPageLayout.addWidget(self.bondListView)
 
@@ -113,7 +112,7 @@ def tabUi(self,showLists=True):
                 self.resourceListView = QtGui.QTableView(self.listsFrame)
                 self.resourceListView.setAlternatingRowColors(True)
                 self.resourceListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.resourceListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+                #self.resourceListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.resourceListView)
                 self.resourcePageLayout.addWidget(self.resourceListView)
 
@@ -125,12 +124,28 @@ def tabUi(self,showLists=True):
                 self.futuresListView = QtGui.QTableView(self.listsFrame)
                 self.futuresListView.setAlternatingRowColors(True)
                 self.futuresListView.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-                self.futuresListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+                #self.futuresListView.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
                 tableStyle(self,self.futuresListView)
                 self.futuresContractPageLayout.addWidget(self.futuresListView)
         
                 self.listsLayout.addWidget(self.listsToolBox)
                 # koniec Tool Box
+
+                #compare
+                self.compareWidget = QtGui.QWidget(self.listsFrame)
+                self.compareLayout = QtGui.QHBoxLayout(self.compareWidget)
+                self.compareCheckBox = QtGui.QCheckBox("Enable Compare",self.listsFrame)
+                self.compareLayout.addWidget(self.compareCheckBox)
+                self.compareLineEdit = QtGui.QLineEdit(self.listsFrame)
+                self.compareLineEdit.setEnabled(False)
+                self.compareLineEdit.setToolTip("e.g. ^DJI vs FLWS vs ...")
+                self.compareLayout.addWidget(self.compareLineEdit)
+                self.compareButton = QtGui.QPushButton("Compare",self.listsFrame)
+                self.compareButton.setEnabled(False)
+                self.compareButton.setToolTip("Click to Compare")
+                self.compareLayout.addWidget(self.compareButton)
+                self.listsLayout.addWidget(self.compareWidget)
+
                 self.horizontalLayout.addWidget(self.listsFrame)
         # koniec ramki przechowywyjącej listy
         
@@ -221,6 +236,7 @@ def addChartButton(self):
         self.chartTypeComboBox.addItem('line')
         self.chartTypeComboBox.addItem('point')
         self.chartTypeComboBox.addItem('candlestick')
+        self.chartTypeComboBox.addItem('bar')
         self.gridLayout.addWidget(self.chartTypeComboBox,1,1,1,1)
         # Scale Type
         self.scaleTypeLabel = QtGui.QLabel('Scale',self.optionsFrame)
@@ -236,11 +252,9 @@ def addChartButton(self):
         #wlacznie możliwości rysowania na wykeresie
         self.paintCheckBox = QtGui.QCheckBox('Enable painting',self.optionsFrame)
         self.gridLayout.addWidget(self.paintCheckBox,1,3,1,1)
-        #przycisk rysowania wykresu
-        self.compareButton = QtGui.QPushButton('Compare',self.optionsFrame)
-        self.compareButton.resize(self.compareButton.sizeHint())
-        #self.compareButton.setEnabled(False)
-        self.gridLayout.addWidget(self.compareButton,2,3,1,1)
+        #przycisk do analizy
+        self.analyzeButton = QtGui.QPushButton('Analyze',self.optionsFrame)
+        self.gridLayout.addWidget(self.analyzeButton,2,3,1,1)
 	#Spacer
         #self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
         #self.gridLayout.addItem(self.spacer,0,5,1,3)

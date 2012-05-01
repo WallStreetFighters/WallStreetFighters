@@ -6,50 +6,15 @@ import datetime
 import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
+import DataParserModule.dataParser as parser
 <<<<<<< HEAD
 
-class ChartData:
-    """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
-    co daje mi FinancialObject Marcina"""     
-    
-    def __init__(self, finObj, start=None, end=None, step='monthly'):
-        if start>=end:
-            self.corrupted=True
-            return
-        self.step=(step)
-				self.fullArray=finObj.getArray(step)[::-1]
-        #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
-        if(start==None):
-            start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
-        if(end==None):
-            end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
-        indexes=finObj.getIndex(start.date(),end.date(),step)
-        #potrzebujemy też pełnej tabeli do obliczania wskaźników
-        
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]
-        if(len(self.fullArray)==0 or len(dataArray)==0):
-            self.corrupted=True
-            return
-        self.name=finObj.name
-        self.open=dataArray['open'].tolist()
-        self.close=dataArray['close'].tolist()
-        self.low=dataArray['low'].tolist()
-        self.high=dataArray['high'].tolist()
-        self.volume=dataArray['open'].tolist()        
-        self.date = []                    
-        for date in dataArray['date']:
-            self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))        
-        #dane w formacie dla candlesticka
-        self.quotes=[]
-        for i in range(len(dataArray)):
-            time=float(i)
-            open=self.open[i]
-            close=self.close[i]
-            high=self.high[i]
-            low=self.low[i]
-            self.quotes.append((time, open, close, high, low))
 =======
-import DataParserModule.dataParser as parser
+<<<<<<< HEAD
+
+=======
+>>>>>>> chart
+>>>>>>> 1633a188e7a16bafbaa92c094cbf9a3a6430080b
 
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
@@ -63,47 +28,39 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
+	self.fullArray=finObj.getArray(step)
         if(start==None):
-	    a = datetime.datetime.now()
-            start=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")
-	    b = datetime.datetime.now() - a
-	    print "Szukanie daty: %s" %b
+            start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
-            end=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
-        a = datetime.datetime.now()        
+            end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=finObj.getArray(step)[indexes[0]:indexes[1]:1]
-        b = datetime.datetime.now() - a
-	print "Znajdowanie indeksów: %s" %b
-                
+<<<<<<< HEAD
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
+=======
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]                              
+>>>>>>> chart
         if(len(dataArray)==0):
             self.corrupted=True
             return
         self.name=finObj.name
         self.date = []
-        a = datetime.datetime.now()
         self.close=dataArray['close'].tolist()
-        b = datetime.datetime.now() - a
-	print "Przechodzenie z array do listy %s" %b
-	a = datetime.datetime.now()
         for date in dataArray['date']:
             self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
-	b = datetime.datetime.now() - a
-	print "Dopisywanie daty: %s" %b
         if(compare==False):                        
-            #potrzebujemy pełnej tabeli do obliczania wskaźników
-	    a = datetime.datetime.now()
-            self.fullArray=finObj.getArray(step)                      
+            #potrzebujemy pełnej tabeli do obliczania wskaźników                      
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
+<<<<<<< HEAD
             self.volume=dataArray['open'].tolist()   
+=======
+            self.volume=dataArray['volume'].tolist()   
+>>>>>>> chart
             if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
                     ==len(self.volume)==len(self.date))):
                 self.corrupted=True
                 return
-	    b = datetime.datetime.now() - a
-	    print "Zamiana na listy: %s" %b
             #dane w formacie dla candlesticka
             self.quotes=[]
 	    a = datetime.datetime.now()
@@ -113,9 +70,7 @@ class ChartData:
                 close=self.close[i]
                 high=self.high[i]
                 low=self.low[i]
-                self.quotes.append((time, open, close, high, low))
-	    b = datetime.datetime.now() - a
-	    print "Candle stick: %s" %b                 
+                self.quotes.append((time, open, close, high, low))               
         else:
             self.percentChng=[]
             firstValue=self.close[0]
@@ -125,7 +80,6 @@ class ChartData:
             if(len(self.date)!=len(self.percentChng)):
                 self.corrupted=True
                 return
->>>>>>> dataAPI
         self.corrupted=False
     
     def getEarlierValues(self, length, type='close'):
@@ -180,30 +134,6 @@ class ChartData:
         closes=np.array(self.getEarlierValues(duration,'close'))        
         return indicators.williamsOscilator(highs,lows,closes,duration)
     
-<<<<<<< HEAD
-    def SMA(self, duration=20):        
-        array=self.getEarlierValues(len(self.close))        
-        return indicators.movingAverage(np.array(array),duration,1)
-    
-    def WMA(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        return indicators.movingAverage(np.array(array),duration,2)
-    
-    def EMA(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        return indicators.movingAverage(np.array(array),duration,3)
-    
-    def bollingerUpper(self, duration=20):
-        array=self.getEarlierValues(len(self.close))
-        print len(array)
-        print len(indicators.bollingerBands(np.array(array),duration,2,2))
-        return indicators.bollingerBands(np.array(array),duration,1,2)
-    
-    def bollingerLower(self, duration=20):
-        array=self.getEarlierValues(len(self.close))        
-        return indicators.bollingerBands(np.array(array),duration,2,2)    
-
-=======
     def movingAverage(self, type, duration=20):
         if type=='SMA':
             type=1
@@ -220,6 +150,7 @@ class ChartData:
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
             return indicators.movingAverage(np.array(array),duration,type)[(duration+1)-length/2:]                            
+<<<<<<< HEAD
     
     def bollinger(self, type, duration=20):
         if type=='upper':
@@ -255,4 +186,20 @@ class ChartData:
         declines=self.advDecArray['dec']
         return indicators.adLine(advances,declines)
     """
->>>>>>> dataAPI
+=======
+    
+    def bollinger(self, type, duration=20):
+        if type=='upper':
+            type=1
+        elif type=='lower':
+            type=2        
+        else:
+            return None
+        length=len(self.close)
+        if(length>=2*(duration+1)):
+            array=self.getEarlierValues(length)                
+            return indicators.bollingerBands(np.array(array),duration,type,2)
+        else:
+            array=self.getEarlierValues(2*(duration+1)+length%2)
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                                 
+>>>>>>> chart

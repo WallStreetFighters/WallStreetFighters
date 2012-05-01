@@ -2,12 +2,13 @@
 from PyQt4 import QtGui, QtCore
 from Chart import Chart
 from CompareChart import CompareChart
-from LightweightChart import LightweightChart
+from TechAnalysisModule.candles import *
+from TechAnalysisModule.trendAnalysis import *
 import WallStreetFighters.DataParserModule.dataParser as parser
-import TechAnalysisModule.oscilators as indicators
 import sys
 import os
 import datetime
+import time
 
 class ApplicationWindow(QtGui.QMainWindow):
     """Klasa demonstrująca jak przykładowo można osadzić wykres w Qt."""
@@ -20,8 +21,28 @@ class ApplicationWindow(QtGui.QMainWindow):
 
         l = QtGui.QVBoxLayout(self.main_widget)
         parser.loadData()         
-
-<<<<<<< HEAD
+        finObj1 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[71][1],
+        parser.STOCK_LIST[71][0],'stock',parser.STOCK_LIST[71][3])         
+        finObj1.updateArchive('daily')         
+        chart = Chart(self.main_widget,finObj1)
+        chart.setMainType('bar')
+        chart.setData(finObj1,datetime.datetime(2009,11,1),datetime.datetime(2010,3,22),'daily')                                   
+        l.addWidget(chart)                                      
+        chart.drawTrend()
+        #wedge=findWedge(chart.data.close)
+        #if(wedge!=None):
+        #    print wedge
+        #    chart.drawLine(wedge[1][0],wedge[1][1],wedge[1][2],wedge[1][3])
+        #    chart.drawLine(wedge[2][0],wedge[2][1],wedge[2][2],wedge[2][3])
+        #else:
+        #    print "nie ma klina :("
+        #chart.setMainType('candlestick')
+        #gaps=findGaps(chart.data.high,chart.data.low,1)        
+        #print gaps        
+        self.main_widget.setFocus()
+        self.setCentralWidget(self.main_widget)            
+        self.setWindowTitle("Wykresik")
+        self.show()        
         finObj1 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[2][1],
         parser.STOCK_LIST[2][0],'stock',parser.STOCK_LIST[2][3]) 
         finObj2 = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[6][1],
@@ -62,36 +83,13 @@ class ApplicationWindow1(QtGui.QMainWindow):
         l.addWidget(zajebistyWykres)                        
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)                
-=======
-        finObj = parser.createWithCurrentValueFromYahoo(parser.STOCK_LIST[2][1],
-        parser.STOCK_LIST[2][0],'stock',parser.STOCK_LIST[2][3]) 
-        finObj.updateArchive() 
-        chart = Chart(self.main_widget, finObj)                
-        l.addWidget(chart)                        
-        self.main_widget.setFocus()
-        self.setCentralWidget(self.main_widget)
-        chart.setOscPlot('RSI')        
-        chart.setDrawingMode(True)                
-        chart.setMainIndicator('SMA')
-        chart.setData(finObj,datetime.datetime(2011,2,1),datetime.datetime(2011,3,1),'daily')                                     
-        chart.setScaleType('log')          
-        chart.setMainType('candlestick')       
-        chart.setScaleType('linear')       
-        chart.formatDateAxis(chart.volumeBars)
-        print "strorzyłem wykresa"
->>>>>>> dataAPI
+
         
 qApp = QtGui.QApplication(sys.argv)
-
+print os.getcwd()
 os.chdir("..") #zmieniamy katalog roboczy żeby pliki .wsf się ładowały
 
 aw = ApplicationWindow()
-aw.setWindowTitle("Wykresik Porównawczy")
-aw.show()
-
-aw1 = ApplicationWindow1()
-aw1.setWindowTitle("Wykresik Lekki")
-aw1.show()
 sys.exit(qApp.exec_())
 
 

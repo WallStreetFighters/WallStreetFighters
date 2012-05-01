@@ -4,11 +4,12 @@ import DataParserModule.dataParser as dataParser
 import time
 
 class Home (QtGui.QWidget):
-    def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None):
+    def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None, finObjList = None):
         self.topList = topList
         self.mostList = mostList
         self.loserList = loserList
         self.gainerList = gainerList
+	self.finObjList = finObjList
 	self.updateThread = UpdateThread()
 	self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
         QtGui.QWidget.__init__(self)
@@ -17,14 +18,17 @@ class Home (QtGui.QWidget):
         self.gridLayout = QtGui.QGridLayout(self)
         #ramka zawierajaca obiekty z góry yahoo 
         self.topFrame = QtGui.QFrame(self)
-        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 120))
+        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 160))
+        self.topFrame.setMinimumSize(QtCore.QSize(0, 160))
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
-        self.topLayout = QtGui.QHBoxLayout(self.topFrame)
+        self.topLayout = QtGui.QGridLayout(self.topFrame)
         #spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         #self.topLayout.addItem(spacerItem)
+        k = 0
         for objList in self.topList:
-            self.addTopObject(objList)
+            self.addTopObject(objList,k)
+            k=k+2
 
 
         
@@ -44,8 +48,8 @@ class Home (QtGui.QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
         self.scrollArea.setSizePolicy(sizePolicy)
-        self.scrollArea.setMinimumSize(QtCore.QSize(340, 0))
-        self.scrollArea.setMaximumSize(QtCore.QSize(340, 16777215))
+        self.scrollArea.setMinimumSize(QtCore.QSize(255, 0))
+        self.scrollArea.setMaximumSize(QtCore.QSize(255, 16777215))
         self.scrollArea.setWidgetResizable(True)
         self.leftFrame = QtGui.QWidget()
         self.leftLayout = QtGui.QVBoxLayout(self.leftFrame)
@@ -82,7 +86,7 @@ class Home (QtGui.QWidget):
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
-    def addTopObject(self,objList):
+    def addTopObject(self,objList,k):
         self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
@@ -110,7 +114,7 @@ class Home (QtGui.QWidget):
             precentLabel.setStyleSheet('QLabel {color: green}')
         precentLabel.setText(objList[3])
         verticalLayout.addWidget(precentLabel)
-        self.topLayout.addWidget(self.frame)
+        self.topLayout.addWidget(self.frame,0,k)
         
                                   
     def addTable(self,objList2):
@@ -121,8 +125,8 @@ class Home (QtGui.QWidget):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
         self.tableWidget.setSizePolicy(sizePolicy)
-        self.tableWidget.setMinimumSize(QtCore.QSize(0, 180))
-        self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 180))
+        self.tableWidget.setMinimumSize(QtCore.QSize(220, 180))
+        self.tableWidget.setMaximumSize(QtCore.QSize(220, 180))
         font = QtGui.QFont()
         font.setKerning(True)
         font.setStyleStrategy(QtGui.QFont.PreferDefault)
@@ -139,15 +143,15 @@ class Home (QtGui.QWidget):
         self.tableWidget.setWordWrap(True)
         self.tableWidget.setCornerButtonEnabled(True)
         self.tableWidget.setRowCount(5)
-        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setColumnCount(3)
         item = QtGui.QTableWidgetItem("Name")
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem("Prize")
         self.tableWidget.setHorizontalHeaderItem(1, item)
-        item = QtGui.QTableWidgetItem('Change')
-        self.tableWidget.setHorizontalHeaderItem(2, item)
+        #item = QtGui.QTableWidgetItem('Change')
+        #self.tableWidget.setHorizontalHeaderItem(2, item)
         item = QtGui.QTableWidgetItem('%Chg')
-        self.tableWidget.setHorizontalHeaderItem(3, item)
+        self.tableWidget.setHorizontalHeaderItem(2, item)
         k = 0
         for objList in objList2:
             item = QtGui.QTableWidgetItem(objList[0])
@@ -163,18 +167,18 @@ class Home (QtGui.QWidget):
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
             self.tableWidget.setItem(k, 1, item)
             #Change
-            item = QtGui.QTableWidgetItem(objList[2])
-            item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            if objList[2][0] =='-':
-                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
-            else:
-                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
-            brush.setStyle(QtCore.Qt.NoBrush)
-            item.setForeground(brush)
-            item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-            self.tableWidget.setItem(k, 2, item)
+            #item = QtGui.QTableWidgetItem(objList[2])
+            #item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
+            #if objList[2][0] =='-':
+                #brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+            #else:
+                #brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
+            #brush.setStyle(QtCore.Qt.NoBrush)
+            #item.setForeground(brush)
+            #item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+            #self.tableWidget.setItem(k, 2, item)
             #%chg
-            item = QtGui.QTableWidgetItem(objList[3])
+            item = QtGui.QTableWidgetItem(objList[2])
             item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
             if objList[2][0] == '-':
                 brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
@@ -183,7 +187,7 @@ class Home (QtGui.QWidget):
             brush.setStyle(QtCore.Qt.NoBrush)
             item.setForeground(brush)
             item.setFlags(QtCore.Qt.ItemIsEnabled)
-            self.tableWidget.setItem(k, 3, item)
+            self.tableWidget.setItem(k, 2, item)
             k+=1
         
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
@@ -193,15 +197,17 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
+        self.tableWidget.itemClicked.connect(self.tableClicked)
         self.leftLayout.addWidget(self.tableWidget)
-
+     
     def updateTopList(self):
        
 	self.topList = self.updateThread.topList
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
         for i in ran:
-            self.topLayout.itemAt(i).widget().close()      
+            widget = self.topLayout.itemAt(i).widget().close()
+            
 
         # tworzymy nowe ramki z nowymi wartościami
         for objList in self.topList:
@@ -212,6 +218,7 @@ class Home (QtGui.QWidget):
 	self.mostList = self.updateThread.mostList
 	self.loserList = self.updateThread.loserList
 	self.gainerList = self.updateThread.gainerList
+	self.finObjList = self.updateThread.finObjList
 
         ran = range(self.leftLayout.count())
         for i in ran:
@@ -227,19 +234,49 @@ class Home (QtGui.QWidget):
         self.addTable(self.loserList)
 	
     def updateHome(self):
-	self.updateTopList()
+	#self.updateTopList()
 	self.updateTable()
 
     def startUpdating(self): 
 	self.updateThread.start()
-	
+
+    def tableClicked(self,a):
+        if a.column() ==0:
+            self.emit(QtCore.SIGNAL("tabFromHome"),(a.text()))
+            
 class MyFrame(QtGui.QFrame):
     def __init__(self,parent):
+        self.parent = parent
         QtGui.QWidget.__init__(self)
-    def mousePressEvent(self,event):
-        print self.nameLabel.text()
+    def mouseDoubleClickEvent (self,event):
+        if self.nameLabel.text() == "Dow":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^DJI'))
+        if self.nameLabel.text() == "Nasdaq":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^IXIC'))
+        if self.nameLabel.text() == "S&P 500":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^GSPC'))
+        if self.nameLabel.text() == "EUR/USD":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('EURUSD'))
+        if self.nameLabel.text() == "10-Year Bond":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^TNX'))
+        if self.nameLabel.text() == "Gold":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('GCM12.CMX'))
+        if self.nameLabel.text() == "Oil":
+            self.parent.emit(QtCore.SIGNAL("tabFromHome"),('CLM12.NYM'))
+    def mousePressEvent (self,event):
+        if self.nameLabel.text() == "Dow":
+            self.parent.topLayout.itemAtPosition(0,1).widget().show()
+            self.parent.topLayout.itemAtPosition(0,3).widget().close()
+            self.parent.topLayout.itemAtPosition(0,5).widget().close()
+        if self.nameLabel.text() == "Nasdaq":
+            self.parent.topLayout.itemAtPosition(0,3).widget().show()
+            self.parent.topLayout.itemAtPosition(0,1).widget().close()
+            self.parent.topLayout.itemAtPosition(0,5).widget().close()
+        if self.nameLabel.text() == "S&P 500":
+            self.parent.topLayout.itemAtPosition(0,5).widget().show()
+            self.parent.topLayout.itemAtPosition(0,1).widget().close()
+            self.parent.topLayout.itemAtPosition(0,3).widget().close()
         
-
 class UpdateThread(QtCore.QThread):
 
     def __init__(self):
@@ -248,6 +285,7 @@ class UpdateThread(QtCore.QThread):
 	self.topList = []
 	self.loserList = []
 	self.gainerList = []
+	self.finObjList = []
 
     def __del__(self):
         self.wait()
@@ -260,11 +298,22 @@ class UpdateThread(QtCore.QThread):
 			self.loserList = dataParser.top5Losers()
 			self.gainerList = dataParser.top5Gainers()
 			self.topList = dataParser.getMostPopular()
-			self.emit(QtCore.SIGNAL("Update"))
+			self.emit(QtCore.SIGNAL("Update"))	
 			
+			self.finObjList = []
+			self.finObjList.append(dataParser.getDataToLightWeightChart("^DJI","index","Yahoo"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("^IXIC","index","Yahoo"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("^GSPC","index","Yahoo"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("EURUSD","forex","Stooq"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("10USY.B","bond","Stooq"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("XAUUSD","resource","Stooq"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("CL.F","resource","Stooq"))
+
+			array  = self.finObjList[1].getArray('daily')
+			print array["date"]
+		 			
 		except dataParser.DataAPIException:
 			pass
-
         
         
         

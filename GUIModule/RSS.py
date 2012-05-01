@@ -3,6 +3,7 @@
 import urllib2
 from xml.dom import minidom, Node
 
+
 class RSSItem:
 	def __init__(self,title="",description="", link="",pubDate = ""):
                 self.title = title
@@ -67,10 +68,11 @@ class RSSReader:
 	
 	def GetItems(self):
 		"""Generator to get items"""
+		print("ddd")
                 if not self.xmldoc == None:
                         for itemNode in self.xmldoc.documentElement.childNodes:
                                 for itemNode in itemNode.childNodes:
                                         if (itemNode.nodeName == "item"):
                                                 """Allright we have an item"""
                                                 rssItem = self.CreateRSSItem(itemNode)
-                                                yield rssItem
+                                                yield rssItem       
