@@ -107,11 +107,260 @@ class Strategy:
     
     def setData(self, data):
         self.data = data
-        
-    def setStrategyCoefficients(self, positiveSignal, negativeSignal):
-        self.positiveSignal = positiveSignal
-        self.negativeSignal = negativeSignal
     
+    #Potega wyrazen regularnych i textmate'a nie ma to jak wygenerowac 251 linii kodu
+    
+    def setPositiveSignal(self, positiveSignal):
+        self.positiveSignal = positiveSignal
+    def disablePositiveSignal(self):
+        self.positiveSignal = 0
+    def enablePositiveSignal(self):
+        self.positiveSignal = self.defPositiveSignal
+
+    def setNegativeSignal(self, negativeSignal):
+        self.negativeSignal = negativeSignal
+    def disableNegativeSignal(self):
+        self.negativeSignal = 0
+    def enableNegativeSignal(self):
+        self.negativeSignal = self.defNegativeSignal
+
+    def setTrendVal(self, trendVal):
+        self.trendVal = trendVal
+    def disableTrendVal(self):
+        self.trendVal = 0
+    def enableTrendVal(self):
+        self.trendVal = self.defTrendVal
+
+    """Formacje"""
+    #Odwrocenie trendu wzrostowego
+
+    def setHeadAndShouldersVal(self, headAndShouldersVal):
+        self.headAndShouldersVal = headAndShouldersVal
+    def disableHeadAndShouldersVal(self):
+        self.headAndShouldersVal = 0
+    def enableHeadAndShouldersVal(self):
+        self.headAndShouldersVal = self.defHeadAndShouldersVal
+
+    def setTripleTopVal(self, tripleTopVal):
+        self.tripleTopVal = tripleTopVal
+    def disableTripleTopVal(self):
+        self.tripleTopVal = 0
+    def enableTripleTopVal(self):
+        self.tripleTopVal = self.defTripleTopVal
+
+    def setRisingWedgeVal(self, risingWedgeVal):
+        self.risingWedgeVal = risingWedgeVal
+    def disableRisingWedgeVal(self):
+        self.risingWedgeVal = 0
+    def enableRisingWedgeVal(self):
+        self.risingWedgeVal = self.defRisingWedgeVal
+
+    def setFallingTriangleVal(self, fallingTriangleVal):
+        self.fallingTriangleVal = fallingTriangleVal
+    def disableFallingTriangleVal(self):
+        self.fallingTriangleVal = 0
+    def enableFallingTriangleVal(self):
+        self.fallingTriangleVal = self.defFallingTriangleVal
+
+    #Odwrocenie trendu spadkowego
+
+    def setReversedHeadAndShouldersVal(self, reversedHeadAndShouldersVal):
+        self.reversedHeadAndShouldersVal = reversedHeadAndShouldersVal
+    def disableReversedHeadAndShouldersVal(self):
+        self.reversedHeadAndShouldersVal = 0
+    def enableReversedHeadAndShouldersVal(self):
+        self.reversedHeadAndShouldersVal = self.defReversedHeadAndShouldersVal
+
+    def setTripleBottomVal(self, tripleBottomVal):
+        self.tripleBottomVal = tripleBottomVal
+    def disableTripleBottomVal(self):
+        self.tripleBottomVal = 0
+    def enableTripleBottomVal(self):
+        self.tripleBottomVal = self.defTripleBottomVal
+
+    def setFallingWedgeVal(self, fallingWedgeVal):
+        self.fallingWedgeVal = fallingWedgeVal
+    def disableFallingWedgeVal(self):
+        self.fallingWedgeVal = 0
+    def enableFallingWedgeVal(self):
+        self.fallingWedgeVal = self.defFallingWedgeVal
+
+    def setRisingTriangleVal(self, risingTriangleVal):
+        self.risingTriangleVal = risingTriangleVal
+    def disableRisingTriangleVal(self):
+        self.risingTriangleVal = 0
+    def enableRisingTriangleVal(self):
+        self.risingTriangleVal = self.defRisingTriangleVal
+
+    #Kontynuacja trendu
+
+    def setSymetricTriangleVal(self, symetricTriangleVal):
+        self.symetricTriangleVal = symetricTriangleVal
+    def disableSymetricTriangleVal(self):
+        self.symetricTriangleVal = 0
+    def enableSymetricTriangleVal(self):
+        self.symetricTriangleVal = self.defSymetricTriangleVal
+
+    def setRectangleVal(self, rectangleVal):
+        self.rectangleVal = rectangleVal
+    def disableRectangleVal(self):
+        self.rectangleVal = 0
+    def enableRectangleVal(self):
+        self.rectangleVal = self.defRectangleVal
+
+    """Wskazniki i oscylatory"""
+
+    def setOscilatorsVal(self, oscilatorsVal):
+        self.oscilatorsVal = oscilatorsVal
+    def disableOscilatorsVal(self):
+        self.oscilatorsVal = 0
+    def enableOscilatorsVal(self):
+        self.oscilatorsVal = self.defOscilatorsVal
+
+    def setNewHighNewLowVal(self, newHighNewLowVal):
+        self.newHighNewLowVal = newHighNewLowVal
+    def disableNewHighNewLowVal(self):
+        self.newHighNewLowVal = 0
+    def enableNewHighNewLowVal(self):
+        self.newHighNewLowVal = self.defNewHighNewLowVal
+
+    def setBollignerVal(self, bollignerVal):
+        self.bollignerVal = bollignerVal
+    def disableBollignerVal(self):
+        self.bollignerVal = 0
+    def enableBollignerVal(self):
+        self.bollignerVal = self.defBollignerVal
+
+    def setMomentumVal(self, momentumVal):
+        self.momentumVal = momentumVal
+    def disableMomentumVal(self):
+        self.momentumVal = 0
+    def enableMomentumVal(self):
+        self.momentumVal = self.defMomentumVal
+
+    def setRocVal(self, rocVal):
+        self.rocVal = rocVal
+    def disableRocVal(self):
+        self.rocVal = 0
+    def enableRocVal(self):
+        self.rocVal = self.defRocVal
+
+    def setCciVal(self, cciVal):
+        self.cciVal = cciVal
+    def disableCciVal(self):
+        self.cciVal = 0
+    def enableCciVal(self):
+        self.cciVal = self.defCciVal
+
+    def setRsiVal(self, rsiVal):
+        self.rsiVal = rsiVal
+    def disableRsiVal(self):
+        self.rsiVal = 0
+    def enableRsiVal(self):
+        self.rsiVal = self.defRsiVal
+
+    def setWilliamsVal(self, williamsVal):
+        self.williamsVal = williamsVal
+    def disableWilliamsVal(self):
+        self.williamsVal = 0
+    def enableWilliamsVal(self):
+        self.williamsVal = self.defWilliamsVal
+
+    """Luki"""
+    #Wzrostowe
+
+    def setRisingBreakawayGapVal(self, risingBreakawayGapVal):
+        self.risingBreakawayGapVal = risingBreakawayGapVal
+    def disableRisingBreakawayGapVal(self):
+        self.risingBreakawayGapVal = 0
+    def enableRisingBreakawayGapVal(self):
+        self.risingBreakawayGapVal = self.defRisingBreakawayGapVal
+
+    def setRisingContinuationGapVal(self, risingContinuationGapVal):
+        self.risingContinuationGapVal = risingContinuationGapVal
+    def disableRisingContinuationGapVal(self):
+        self.risingContinuationGapVal = 0
+    def enableRisingContinuationGapVal(self):
+        self.risingContinuationGapVal = self.defRisingContinuationGapVal
+
+    def setFallingExhaustionGapVal(self, fallingExhaustionGapVal):
+        self.fallingExhaustionGapVal = fallingExhaustionGapVal
+    def disableFallingExhaustionGapVal(self):
+        self.fallingExhaustionGapVal = 0
+    def enableFallingExhaustionGapVal(self):
+        self.fallingExhaustionGapVal = self.defFallingExhaustionGapVal
+
+    #Spadkowe
+
+    def setFallingBreakawayGapVal(self, fallingBreakawayGapVal):
+        self.fallingBreakawayGapVal = fallingBreakawayGapVal
+    def disableFallingBreakawayGapVal(self):
+        self.fallingBreakawayGapVal = 0
+    def enableFallingBreakawayGapVal(self):
+        self.fallingBreakawayGapVal = self.defFallingBreakawayGapVal
+
+    def setRisingExhaustionGapVal(self, risingExhaustionGapVal):
+        self.risingExhaustionGapVal = risingExhaustionGapVal
+    def disableRisingExhaustionGapVal(self):
+        self.risingExhaustionGapVal = 0
+    def enableRisingExhaustionGapVal(self):
+        self.risingExhaustionGapVal = self.defRisingExhaustionGapVal
+
+    def setFallingContinuationGapVal(self, fallingContinuationGapVal):
+        self.fallingContinuationGapVal = fallingContinuationGapVal
+    def disableFallingContinuationGapVal(self):
+        self.fallingContinuationGapVal = 0
+    def enableFallingContinuationGapVal(self):
+        self.fallingContinuationGapVal = self.defFallingContinuationGapVal
+
+    """Formacje swiecowe"""
+    #sygnal kupna
+
+    def setBull3Val(self, bull3Val):
+        self.bull3Val = bull3Val
+    def disableBull3Val(self):
+        self.bull3Val = 0
+    def enableBull3Val(self):
+        self.bull3Val = self.defBull3Val
+
+    def setMornigStarVal(self, mornigStarVal):
+        self.mornigStarVal = mornigStarVal
+    def disableMornigStarVal(self):
+        self.mornigStarVal = 0
+    def enableMornigStarVal(self):
+        self.mornigStarVal = self.defMornigStarVal
+
+    def setPiercingVal(self, piercingVal):
+        self.piercingVal = piercingVal
+    def disablePiercingVal(self):
+        self.piercingVal = 0
+    def enablePiercingVal(self):
+        self.piercingVal = self.defPiercingVal
+
+
+    #sygnal sprzedazy
+
+    def setBear3Val(self, bear3Val):
+        self.bear3Val = bear3Val
+    def disableBear3Val(self):
+        self.bear3Val = 0
+    def enableBear3Val(self):
+        self.bear3Val = self.defBear3Val
+
+    def setEveningStarVal(self, eveningStarVal):
+        self.eveningStarVal = eveningStarVal
+    def disableEveningStarVal(self):
+        self.eveningStarVal = 0
+    def enableEveningStarVal(self):
+        self.eveningStarVal = self.defEveningStarVal
+
+    def setDarkCloudVal(self, darkCloudVal):
+        self.darkCloudVal = darkCloudVal
+    def disableDarkCloudVal(self):
+        self.darkCloudVal = 0
+    def enableDarkCloudVal(self):
+        self.darkCloudVal = self.defDarkCloudVal
+
     
     def resetCoefficients(self):
         self.positiveSignal = self.defPositiveSignal  
@@ -172,27 +421,27 @@ class Strategy:
           resultText = resultText + "\nThe program has identified the following chart patterns:\n"
           form = trend.lookForHeadAndShoulders(self.data.close, self.volume, 1)
           overallScore += form * self.headAndShouldersVal
-          if form * self.headAndShouldersVal != 0:
-              print "   (-) head and shoulders\n"
-              resultText = resultText + "   (-) head and shoulders\n"
+          if form[0] * self.headAndShouldersVal != 0:
+              print "   (-) head and shoulders\n" + self.data.date[form[1][0]].strftime("%Y-%m-%d")+self.data.date[form[1][2]].strftime("%Y-%m-%d")
+              resultText = resultText + "   (-) head and shoulders " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
 
           form = trend.lookForReversedHeadAndShoulders(self.data.close, self.volume, 1)
           overallScore += form * self.reversedHeadAndShouldersVal
-          if form * self.reversedHeadAndShouldersVal != 0:
+          if form[0] * self.reversedHeadAndShouldersVal != 0:
               print "   (+) reversed head and shoulders\n"
-              resultText = resultText + "   (+) reversed head and shoulders\n"
+              resultText = resultText + "   (+) reversed head and shoulders " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
 
           form = trend.lookForTripleTop(self.data.close, self.volume, 1)
           overallScore += form * self.tripleTopVal
-          if form * self.tripleTopVal != 0:
+          if form[0] * self.tripleTopVal != 0:
               print "   (-) triple top\n"
-              resultText = resultText + "   (-) triple top\n"
+              resultText = resultText + "   (-) triple top " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
 
           form = trend.lookForTripleBottom(self.data.close, self.volume, 1)
           overallScore += form * self.tripleBottomVal
-          if form * self.tripleBottomVal != 0:
+          if form[0] * self.tripleBottomVal != 0:
               print "   (+) triple bottom\n"
-              resultText = resultText + "   (+) triple bottom\n"
+              resultText = resultText + "   (+) triple bottom " + self.data.date[form[1][0]].strftime("%Y-%m-%d") + " - " + self.data.date[form[1][2]].strftime("%Y-%m-%d") + "\n"
 
           geometricFormations = trend.findGeometricFormations(self.data.close)
           for formation in geometricFormations:

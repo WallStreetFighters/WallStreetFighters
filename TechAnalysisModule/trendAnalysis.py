@@ -369,7 +369,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
                 
     # print "nie znaleziono"
     if analyze == 0:
@@ -527,7 +527,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
 
     # print "nie znaleziono", z
     if analyze ==0:
@@ -661,7 +661,7 @@ def lookForTripleTop(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
                 
 
     # print "nie znaleziono", z
@@ -798,7 +798,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
                 
 
     # print "nie znaleziono", z
