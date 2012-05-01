@@ -12,20 +12,8 @@ import cPickle
 import threading
 
 #ZMIENNE GLOBALNE
-<<<<<<< HEAD
+REMEMBER_COUNT = 15
 
-REMEMBER_COUNT = 15
-=======
-<<<<<<< HEAD
-REMEMBER_COUNT = 10
-=======
-<<<<<<< HEAD
-REMEMBER_COUNT = 5
-=======
-REMEMBER_COUNT = 15
->>>>>>> GUI
->>>>>>> techAnalysis
->>>>>>> GUI
 DATABASE_LAST_UPDATE = datetime.date(2012,3,3)
 INDEX_LIST = []
 STOCK_LIST = []
@@ -162,14 +150,14 @@ class FinancialObject(object):
 			tmplist = []
 			if time == 'daily':
 				for x in self.valuesDaily:
-					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],0))
 			if time == 'weekly':
 				for x in self.valuesWeekly:
-					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],0))
 			if time == 'monthly':
 				for x in self.valuesMonthly:
-					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4]))
-			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float)])
+					tmplist.append((str(x[0]),x[1],x[2],x[3],x[4],0))
+			return np.array(tmplist,dtype = [('date','S10'),('open',float),('high',float),('low',float),('close',float),('volume',float)])
 		else:
 			tmplist = []
 			if time == 'daily':
@@ -253,7 +241,7 @@ class DataAPIException(Exception):
 def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
 	
-	
+	"""
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
@@ -261,6 +249,7 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 		if finObj != None:
 			finObj.getCurrentValue()
 			return finObj
+	"""
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail)
 
@@ -280,7 +269,15 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	m = re.search(pattern,pageSource)
 	
 	timeNow = datetime.datetime.now()
+
+	pattern = 'Bid:</th>.*?>([0-9.]+)</span><small> x <.*?>([0-9]+)</span></sma.*?Ask:</th>.*?>([0-9.]+)</span><small> x <.*?>([0-9]+)'
+	pattern = re.compile(pattern)
+	
+	
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	m = re.search(pattern,pageSource)
+
+	"""
 	if UPDATE_FLAG == False:
 		if len(HISTORY_LIST) == REMEMBER_COUNT:
 			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
@@ -288,12 +285,12 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 		else:
 			HISTORY_LIST = [finObj] + HISTORY_LIST
 	UPDATE_FLAG = False	
+	"""
 	return finObj
 
 def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
-	
-	
+	"""
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
@@ -301,10 +298,11 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 		if finObj != None:
 			finObj.getCurrentValue()
 			return finObj
+	"""
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
 	
-	url = "http://stooq.pl/q/g/?s="+abbreviation.lower()
+	url = "http://stooq.pl/q/?s="+abbreviation.lower()
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
@@ -316,6 +314,11 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	m = re.search(pattern,pageSource)
 	timeNow = datetime.datetime.now()
 	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
+	pattern = '>Bid<.*?>([0-9.]*)</span></font>.*?>x([0-9.mgk]*)</span></font>.*?>Ask<.*?>([0-9.mgk]*)</span>.*?>x([0-9.mgk]*)</span>.*?Wolumen<br>.*?>([0-9.mgk]*)</span>.*?>Obrót<br>.*?>([0-9.mgk]*)</.*?>Transakcje<br><.*?>([0-9.mgk]*)<'
+	pattern = re.compile(pattern)
+	m = re.search(pattern,pageSource)
+
+	"""
 	if UPDATE_FLAG == False:
 		if len(HISTORY_LIST) == REMEMBER_COUNT:
 			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
@@ -323,6 +326,7 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 		else:
 			HISTORY_LIST = [finObj] + HISTORY_LIST
 	UPDATE_FLAG = False	
+	"""
 	return finObj
 
 def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
@@ -808,20 +812,6 @@ def getMostPopularCommodities():
 	
 	return mostPopular
 
-<<<<<<< HEAD
-=======
-def loadStats():
-	"""Funkcja zwracajaca pobierajaca do globalnych tabel statystyki (5 najwiekszych spadkow/wzrostow/wolumenow)"""
-	top5Losers()
-	top5Volume()
-	top5Gainers()
-
-<<<<<<< HEAD
-print datetime.date.today()
-=======
->>>>>>> techAnalysis
-
->>>>>>> GUI
 
 ########################################################################################################
 

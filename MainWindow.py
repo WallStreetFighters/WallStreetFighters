@@ -11,6 +11,7 @@ class MainWindow(QtGui.QMainWindow):
         # obiekt Gui
         self.gui = GuiMainWindow()
         self.gui.setupGui(self)
+        
     def closeEvent(self, event):
 
         FILE = open('data.wsf','w')
@@ -21,10 +22,22 @@ class MainWindow(QtGui.QMainWindow):
         ran = range(self.gui.tabs.count())
         tabHistoryList = []
         for i in ran:
-            if i >1:
+            if i >2:
                 t=  self.gui.tabs.widget(i).getSettings()
                 tabHistoryList.append(t)
         cPickle.dump(tabHistoryList, open('tabHistory.wsf','w'))
+        settingsList = []
+        settingsList = self.gui.tabs.widget(2).getVal()
+        cPickle.dump(settingsList, open('settingsList.wsf','w'))
+    def keyPressEvent (self, QKeyEvent):
+        if QKeyEvent.key() == 16777274:
+            if self.isFullScreen():
+                self.showNormal()
+            else:
+                self.showFullScreen()
+        if QKeyEvent.key() == 16777216:
+            if self.isFullScreen():
+                self.showNormal()
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
