@@ -6,6 +6,8 @@ from ChartData import ChartData
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
+from matplotlib.collections import LineCollection
+from matplotlib.collections import PatchCollection
 from matplotlib.ticker import *
 from matplotlib.textpath import TextPath
 from matplotlib.text import Text
@@ -141,6 +143,8 @@ class Chart(FigureCanvas):
         if(self.grid):
             for tick in ax.xaxis.get_major_ticks():                
                 tick.gridOn=True
+        print "MainPlot:"
+        print ax.get_children()
     
     def addVolumeBars(self):
         """Dodaje do wykresu wyświetlanie wolumenu."""        
@@ -182,7 +186,7 @@ class Chart(FigureCanvas):
         for label in self.volumeBars.get_yticklabels():
             label.set_visible(False)                                
         for o in ax.findobj(Text):
-            o.set_visible(False)
+            o.set_visible(False)        
         self.formatDateAxis(ax)
         self.fixTimeLabels()
         
@@ -194,31 +198,43 @@ class Chart(FigureCanvas):
         Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
         odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
         if self.data==None or self.data.corrupted:
-            return                        
-        lines, patches = candlestick(self.mainPlot,self.data.quotes,
-                                    width=0.7,colorup='w',colordown='k')                
-        #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.name)         
-        """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
-        stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
-        Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
-        Poniższy kod to naprawia"""
-        for line in lines:                        
-            line.set_zorder(line.get_zorder()-2)
-        for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})     
-    
+            return                  
+        ax=self.mainPlot                        
+        rectsList=[]                
+        open=self.data.open
+        close=self.data.close
+        xvals=range(len(close))
+        lines=ax.vlines(xvals,self.data.low,self.data.high,label=self.data.name)       
+        lines.set_zorder(lines.get_zorder()-1)
+        for i in xvals:
+            height=max(abs(close[i]-open[i]),0.001)
+            width=0.7
+            x=i-width/2
+            y=min(open[i],close[i])
+            print x,y,width,height
+            if open[i]<=close[i]:
+                rectsList.append(Rectangle((x,y),width,height,facecolor='w',edgecolor='k'))
+            else:
+                rectsList.append(Rectangle((x,y),width,height,facecolor='k',edgecolor='k'))
+        ax.add_collection(PatchCollection(rectsList,match_original=True))
+                
     def drawBarPlot(self):
         if self.data==None or self.data.corrupted:
             return                        
         ax=self.mainPlot
         x=range(len(self.data.close))
-        lines=ax.vlines(x,self.data.low,self.data.high,label=self.data.name)
+        lines1=ax.vlines(x,self.data.low,self.data.high,label=self.data.name)
+        lines2list=[]
         for i in x:
-            newLine=Line2D([i-0.3,i],[self.data.open[i],self.data.open[i]],color='k')                
-            ax.add_line(newLine)
-            newLine=Line2D([i,i+0.3],[self.data.close[i],self.data.close[i]],color='k')                
-            ax.add_line(newLine)
+            lines2list.append(((i-0.3,self.data.open[i]),(i,self.data.open[i])))
+            lines2list.append(((i,self.data.close[i]),(i+0.3,self.data.close[i])))
+            #newLine=Line2D([i-0.3,i],[self.data.open[i],self.data.open[i]],color='k')                
+            #ax.add_line(newLine)
+            #newLine=Line2D([i,i+0.3],[self.data.close[i],self.data.close[i]],color='k')                
+            #ax.add_line(newLine)
+        lines2=LineCollection(lines2list)
+        lines2.color('k')
+        ax.add_collection(lines2)
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
