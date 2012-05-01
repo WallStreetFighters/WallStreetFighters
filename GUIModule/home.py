@@ -196,7 +196,6 @@ class Home (QtGui.QWidget):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setHighlightSections(True)
-
         self.tableWidget.itemClicked.connect(self.tableClicked)
         self.leftLayout.addWidget(self.tableWidget)
      
@@ -238,18 +237,17 @@ class Home (QtGui.QWidget):
 
     def startUpdating(self): 
 	self.updateThread.start()
-	
+
     def tableClicked(self,a):
         if a.column() ==0:
             self.emit(QtCore.SIGNAL("tabFromHome"),(a.text()))
-	
+            
 class MyFrame(QtGui.QFrame):
     def __init__(self,parent):
         self.parent = parent
         QtGui.QWidget.__init__(self)
     def mouseDoubleClickEvent (self,event):
         if self.nameLabel.text() == "Dow":
-            self.parent.topLayout.itemAtPosition(0,1).widget().close()
             self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^DJI'))
         if self.nameLabel.text() == "Nasdaq":
             self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^IXIC'))

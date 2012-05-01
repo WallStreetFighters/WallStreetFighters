@@ -40,6 +40,9 @@ hornVul = 0.1
 hornDiv = 0.1
 """ile razy wzrost procentowy na formacji przekracza sredni wzrost """
 hornDiff = 5
+"""ile jednostek czasu trwa formowanie się podstawy flagi/chorągiewki"""
+flagBaseTime = 3
+
 
 def trend(a, trendVuln=trendVul):
     """Na podstawie wskaznika kierunkowego prostej wyznaczamy trend"""
@@ -1098,6 +1101,88 @@ def rateLines(array, scaler1, scaler2):
         returnTable = zeros((3, 4))
         return returnTable
     return 0
+
+# FLAGI I CHORAGIEWKI
+
+def findFlagsAndPennants(values,volume):
+	proposals = checkValuesForFlagsAndPennants(3,values)
+	return checkVolumeForFlagsAndPennants(proposals,volume,values)
+
+def checkValuesForFlagsAndPennants(period, values):
+	i = 0
+	maxs = max(values)
+	mins = min(values)
+	diff = maxs - mins
+	raiseproposals = []
+	fallproposals = []
+	while i < len(values) - period:
+		if values[i] + 0.25*diff < values[i+period]:
+			if raiseproposals == []:
+				raiseproposals.append(i)
+			elif raiseproposals[-1] == i-1:
+				raiseproposals[-1] = i
+			else:
+				raiseproposals.append(i)
+		elif values[i] - 0.25*diff > values[i+period]:
+			if fallproposals == []:
+				fallproposals.append(i)
+			elif fallproposals[-1] == i-1:
+				fallproposals[-1] = i
+			else:
+				fallproposals.append(i)
+		i += 1
+	raiseproposals = list(map((lambda x: x+period), raiseproposals))
+	fallproposals = list(map((lambda x: x+period), fallproposals))
+	return [raiseproposals,fallproposals]
+
+def checkVolumeForFlagsAndPennants(proposals,volume,values):
+	ups = []
+	downs = []
+	for x in proposals[0]:
+		i = x
+		while (i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
+			i = i+1
+		diff = i - x
+		if diff > 2 and diff < 28 and values[i+1] > values[i]:
+			temp = volume[x:i:1]
+			average = float(sum(temp)) / len(temp)
+			if average < volume[x]:
+				ups.append([x,i])
+
+	for x in proposals[1]:
+		i = x
+		while ( i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
+			i = i+1
+		diff = i - x
+		if  values[i+1] < values[i] and diff > 2 and diff < 28:
+			temp = volume[x:i:1]
+			average = float(sum(temp)) / len(temp)
+			if average < volume[x]:
+				downs.append([x,i])
+	maxR = 0
+	maxL = 0	
+	try:
+		tmp = reduce(lambda x,y: x+y,ups)
+		maxR = max(tmp)
+		tmp = reduce(lambda x,y: x+y,downs)
+		maxL = max(tmp)
+	except TypeError: 
+		pass
+	if maxR > maxL:
+		scale = maxR/len(volume)
+		return ['risingTrendFlagOrPennant', scale]
+	elif maxR < maxL:
+		scale = -1*(maxL/len(volume))
+		return ['fallingTrendFlagOrPennant', scale]
+	else:
+		return None
+
+
+
+"""
+def checkChannelForFlagsAndPennants(proposals,values):		
+"""
+
         
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]

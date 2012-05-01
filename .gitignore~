@@ -7,6 +7,12 @@
 *.o
 *.so
 *.pyc
+<<<<<<< HEAD
+data.wsf
+data.wsf~
+save.wsf
+=======
+>>>>>>> test-merge
 
 # Packages #
 ############
@@ -20,7 +26,9 @@
 *.rar
 *.tar
 *.zip
-
+data.wsf
+data.wsf~
+save.wsf
 # Logs and databases #
 ######################
 *.log

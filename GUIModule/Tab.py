@@ -43,7 +43,7 @@ def tabUi(self,showLists=True):
                 self.indexListView.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
                 tableStyle(self,self.indexListView) #ustawiamy styl tabeli
                 self.indexPageLayout.addWidget(self.indexListView)
-                
+
                 #Stock
                 self.stockPage = QtGui.QWidget(self.listsFrame)
                 self.stockPageLayout = QtGui.QGridLayout(self.stockPage)
@@ -236,6 +236,7 @@ def addChartButton(self):
         self.chartTypeComboBox.addItem('line')
         self.chartTypeComboBox.addItem('point')
         self.chartTypeComboBox.addItem('candlestick')
+        self.chartTypeComboBox.addItem('bar')
         self.gridLayout.addWidget(self.chartTypeComboBox,1,1,1,1)
         # Scale Type
         self.scaleTypeLabel = QtGui.QLabel('Scale',self.optionsFrame)

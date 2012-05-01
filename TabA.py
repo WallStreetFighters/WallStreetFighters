@@ -8,6 +8,8 @@ import os
 from ChartsModule.Chart import Chart
 from ChartsModule.CompareChart import CompareChart
 import DataParserModule.dataParser as dataParser
+from TechAnalysisModule.strategy import Strategy
+from GUIModule.analyze import Analyze
 
 class TabA(QtGui.QWidget):
     def __init__(self,finObjType = None, indexModel=None,stockModel=None,forexModel=None,bondModel= None,
@@ -160,9 +162,11 @@ class TabA(QtGui.QWidget):
                 self.wmaCheckBox.stateChanged.connect(self.wmaChanged)
                 self.drawTrendCheckBox.stateChanged.connect(self.updateDrawTrend)
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
+                self.analyzeButton.pressed.connect(self.newAnalyzeTab)
             self.startDateEdit.dateChanged.connect(self.checkDate)
             self.endDateEdit.dateChanged.connect(self.checkDate)
         else:
+            self.analyzeButton.setCheckable(False)
             self.compareCheckBox.stateChanged.connect(self.compareChanged)
             self.indexListView.clicked.connect(self.addSymbolToCompareLine)
             self.stockListView.clicked.connect(self.addSymbolToCompareLine)
@@ -172,7 +176,14 @@ class TabA(QtGui.QWidget):
             self.futuresListView.clicked.connect(self.addSymbolToCompareLine)
             
 
-
+    def newAnalyzeTab(self):
+        strategy = Strategy(self.chart.data.open, self.chart.data.close, self.chart.data.low, self.chart.data.high, self.chart.data.volume)
+        text = strategy.analyze()
+        self.analyzeTab = Analyze()
+        nameTab = str(self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+        nameTab = "Analyze " + nameTab
+        self.parent().parent().parent().parent().gui.tabs.setCurrentIndex(self.parent().parent().parent().parent().gui.tabs.addTab(self.analyzeTab,nameTab))
+        self.analyzeTab.textBrowser.setText(text)
     def updateScale(self):
         if self.logRadioButton.isChecked():
             self.settings["scale"] = 'log'
@@ -228,7 +239,7 @@ class TabA(QtGui.QWidget):
                     fin.updateArchive(self.settings['step'])
             else:
                 self.finObj.updateArchive(self.settings["step"])
-            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])            
+            self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -334,6 +345,7 @@ class TabA(QtGui.QWidget):
         if self.settings['indicator']:
             name = self.settings['indicator'][-1].lower()
             eval ('self.'+name+'CheckBox.setFont(font)')
+            
     def updateDrawTrend(self):
         drawTrend =self.drawTrendCheckBox.isChecked()
         if self.chart !=None and drawTrend:
@@ -355,7 +367,7 @@ class TabA(QtGui.QWidget):
         if self.chart !=None and drawTrend:
             self.chart.drawTrend()
 
-            
+
     def checkDate(self):
         if self.startDateEdit.date() >= self.endDateEdit.date():
             self.endDateEdit.setDate(self.startDateEdit.date())
@@ -405,7 +417,6 @@ class TabA(QtGui.QWidget):
             self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
 
         self.chart = Chart(self, self.finObj)        
-        
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
         self.chartsLayout.addWidget(self.chart)
         self.hasChart = True
@@ -414,8 +425,8 @@ class TabA(QtGui.QWidget):
         self.chart.setDrawingMode(self.settings["painting"])
         if self.settings["indicator"]:
             self.chart.setMainIndicator(self.settings["indicator"][-1])
-        
         self.chart.setData(self.finObj,self.settings["start"],self.settings["end"],self.settings["step"])                
+
         self.chart.setScaleType(self.settings["scale"])
         self.chart.setMainType(self.settings["chartType"])
         

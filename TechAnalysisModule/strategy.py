@@ -38,10 +38,11 @@ class Strategy:
     #Kontynuacja trendu
     symetricTriangleVal = 50
     rectangleVal = 30
+
+    defFlagPennantVal = 20
     
     defSymetricTriangleVal = 50
     defRectangleVal = 30
-
     """Wskazniki i oscylatory"""
     oscilatorsVal = 50
     newHighNewLowVal = 50
@@ -151,37 +152,48 @@ class Strategy:
         darkCloudVal = defDarkCloudVal
             
     def analyze(self):
+          resultText = ''
           overallScore = 0
           print "Program will now analyze trend, selected chart patterns, candle patterns, indicators, oscilators and gaps\n"
+          resultText = resultText + "Program will now analyze trend, selected chart patterns, candle patterns, indicators, oscilators and gaps\n"
           print "(+) -> positive\n (0) -> neutral\n (-) -> negative signal\n"
+          resultText = resultText + "(+) -> positive\n (0) -> neutral\n (-) -> negative signal\n"
           overallScore += self.trendVal * trend.optimizedTrend(self.close)
           if overallScore > 0:
               print " (+) long-term trend is rising\n"
+              resultText = resultText + " (+) long-term trend is rising\n"
           elif overallScore < 0:
               print " (-) long-term trend is falling\n"
+              resultText = resultText + " (-) long-term trend is falling\n"
           else:
               print " (0) long-term trend is neutral\n"
+              resultText = resultText + " (0) long-term trend is neutral\n"
 
           print "Program has identified following chart patterns:\n"
+          resultText = resultText + "Program has identified following chart patterns:\n"
           form = trend.lookForHeadAndShoulders(self.close, self.volume, 1)
           overallScore += form * self.headAndShouldersVal
           if form * self.headAndShouldersVal != 0:
               print " (-) head and shoulders\n"
+              resultText = resultText + " (-) head and shoulders\n"
 
           form = trend.lookForReversedHeadAndShoulders(self.close, self.volume, 1)
           overallScore += form * self.reversedHeadAndShouldersVal
           if form * self.reversedHeadAndShouldersVal != 0:
               print " (+) reversed head and shoulders\n"
+              resultText = resultText + " (+) reversed head and shoulders\n"
 
           form = trend.lookForTripleTop(self.close, self.volume, 1)
           overallScore += form * self.tripleTopVal
           if form * self.tripleTopVal != 0:
               print " (-) triple top\n"
+              resultText = resultText + " (-) triple top\n"
 
           form = trend.lookForTripleBottom(self.close, self.volume, 1)
           overallScore += form * self.tripleBottomVal
           if form * self.tripleBottomVal != 0:
               print " (+) triple bottom\n"
+              resultText = resultText + " (+) triple bottom\n"
 
           geometricFormations = trend.findGeometricFormations(self.close)
           for formation in geometricFormations:
@@ -190,30 +202,48 @@ class Strategy:
                       overallScore += self.rectangleVal * formation[3]
                       if self.rectangleVal * formation[3] > 0:
                           print " (+)  rising rectangle\n"
+                          resultText = resultText + " (+)  rising rectangle\n"
                       elif self.rectangleVal * formation[3] < 0:
                           print " (-) falling rectangle\n"
+                          resultText = resultText + " (-) falling rectangle\n"
                   elif formation[0] == 'symmetric_triangle':
                       overallScore += self.symetricTriangleVal * formation[3]
                       if self.symetricTriangleVal * formation[3] > 0:
                           print " (+) symmetric triangle - continuation of rising trend\n"
+                          resultText = resultText + " (+) symmetric triangle - continuation of rising trend\n"
                       elif self.symetricTriangleVal * formation[3] < 0:
                           print " (-) symmetric triangle - continuation of falling trend\n"
+                          resultText = resultText + " (-) symmetric triangle - continuation of falling trend\n"
                   elif formation[0] == 'falling_triangle':
                       overallScore += self.fallingTriangleVal * formation[3]
                       if self.fallingTriangleVal * formation[3] != 0:
                           print " (-) falling triangle\n"
+                          resultText = resultText + " (-) falling triangle\n"
                   elif formation[0] == 'rising_triangle':
                       overallScore += self.risingTriangleVal * formation[3]
                       if self.risingTriangleVal * formation[3] != 0:
                           print " (+) rising triangle\n"
+                          resultText = resultText + " (+) rising triangle\n"
                   elif formation[0] == 'rising_wedge':
                       overallScore += self.risingWedgeVal * formation[3]
                       if self.risingWedgeVal * formation[3] != 0:
                           print " (-) rising wedge\n"
+                          resultText = resultText + " (-) rising wedge\n"
                   elif formation[0] == 'falling_wedge':
                       overallScore += self.fallingWedgeVal * formation[3]
                       if self.fallingWedgeVal * formation[3] != 0:
                           print " (+) falling wedge\n"
+                          resultText = resultText + " (+) falling wedge\n"
+     
+	  flags = trend.findFlagsAndPennants(self.close,self.volume)
+	  if flags != None:
+		overallScore += defFlagPennantVal * flags[1]
+		if flags[1] < 0:
+			print "(-) falling-trend flag/pennant"
+			resultText = resultText + "(-) falling-trend flag/pennant"
+		else:
+			print "(+) rising-trend flag/pennant"
+			resultText = resultText + "(+) rising-trend flag/pennant"
 
           # gaps = candles.findGaps(self.high,self.low,self.close) 
           # for formation in gaps:
@@ -254,26 +284,32 @@ class Strategy:
                       overallScore +=  bull3Val * formation[3]
                       if bull3Val * formation[3] != 0:
                           print " (+) triple bull candle pattern\n"
+                          resultText = resultText + " (+) triple bull candle pattern\n"
                   elif formation[0][0] == 'morning_star':
                       overallScore += self.morningStarVal * formation[3]
                       if self.morningStarVal * formation[3] != 0:
                           print " (+) morning star candle pattern\n"
+                          resultText = resultText + " (+) morning star candle pattern\n"
                   elif formation[0][0] == 'piercing':
                       overallScore += self.piercingVal * formation[3]
                       if self.piercingVal * formation[3] != 0:
                           print " (+) piercing candle pattern\n"
+                          resultText = resultText + " (+) piercing candle pattern\n"
                   elif formation[0][0] == 'bear3':
                       overallScore += self.bear3Val * formation[3]
                       if bear3Val * formation[3] != 0:
                           print " (-) triple bear candle pattern\n"
+                          resultText = resultText + " (-) triple bear candle pattern\n"
                   elif formation[0][0] == 'evening_star':
                       overallScore += self.eveningStarVal * formation[3]
                       if self.eveningStarVal * formation[3] != 0:
                           print " (-) evening star candle pattern\n"
+                          resultText = resultText + " (-) evening star candle pattern\n"
                   elif formation[0][0] == 'dark_cloud':
                       overallScore += self.darkCloudVal * formation[3]
                       if self.darkCloudVal * formation[3] != 0:
                           print " (-) dark cloud candle pattern\n"
+                          resultText = resultText + " (-) dark cloud candle pattern\n"
 
                           
           # score, oscilatorsAndIndicators = oscilators.oscillatorStrategy(array(self.close), array(self.high), array(self.low), min(10, len(self.close)))
@@ -319,14 +355,16 @@ class Strategy:
           #           elif self.williamsVal * oscilatorsAndIndicators[6] < 0:
           #               print " (-) williams oscilator\n"
           print "\n Overall score: ",overallScore, "\n"
+          resultText = resultText + "\n Overall score: "+str(overallScore)+ "\n"
           if  overallScore > self.positiveSignal:
               print " technical analysis generated positive signal, however fundamental analysis should be also considered\n"
+              resultText = resultText + " technical analysis generated positive signal, however fundamental analysis should be also considered\n"
           elif overallScore < self.negativeSignal:
               print " technical analysis generated negative signal, if you own actives it is recommended to sell, however fundamental analysis should be also considered\n"
+              resultText = resultText + " technical analysis generated negative signal, if you own actives it is recommended to sell, however fundamental analysis should be also considered\n"
           else:
               print " technical analysis generated neutral signal\n"
+              resultText = resultText + " technical analysis generated neutral signal\n"
           print "\n Remember that authors of this software DO NOT TAKE ANY RESPONSIBILITY for possible financial loss\n"
-
-
-
-    
+          resultText = resultText + "\n Remember that authors of this software DO NOT TAKE ANY RESPONSIBILITY for possible financial loss\n"
+          return resultText
