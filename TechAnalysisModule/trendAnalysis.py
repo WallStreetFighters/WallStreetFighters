@@ -904,7 +904,7 @@ def findGeometricFormationOnFragment(values, a, b):
     factorX=1.0 / len(values)
     factorY=1.0 / (max(values) - minY)    
     supx0, supy0, supx1, supy1 = sup[0][1], sup[0][0], sup[len(sup)- 1][1], sup[len(sup)- 1][0]     
-    resx0, resy0, resx1, resy1 = res[0][1], res[0][0], res[len(res)- 1][1], res[len(res)- 1][0]
+    resx0, resy0, resx1, resy1 = res[0][1], res[0][0], res[len(res)- 1][1], res[len(res)- 1][0]    
     if(supy0>=resy0 or supy1>resy1):
         return None        
     scaledSupLine=lineFrom2Points(factorX * supx0, factorY * (supy0 - minY),factorX * supx1, factorY * (supy1 - minY))
@@ -914,13 +914,13 @@ def findGeometricFormationOnFragment(values, a, b):
     #print "supAngle: ", supAngle, "resAngle: ", resAngle
     #prostokąt
     if resAngle < formVul and resAngle > - formVul and supAngle < formVul and supAngle > - formVul:        
-        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1] 
-#        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:int(min(supx0, resx0))]) ] 
+        #return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1] 
+        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:int(min(supx0, resx0))]) ] 
     #trójkąt symetryczny
     elif resAngle < - formVul and supAngle > formVul:        
-        return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1]
-#         return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
-#        1 * optimizedTrend(values[0:min(supx0, resx0)])] 
+        #return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1]
+         return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
+        1 * optimizedTrend(values[0:int(min(supx0, resx0))])] 
     #trójkąt zniżkujący
     elif resAngle < - formVul and abs(supAngle) < formVul and supAngle - resAngle > convergenceVul:        
         return ['falling_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1] 

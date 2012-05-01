@@ -96,7 +96,7 @@ class Chart(FigureCanvas):
         self.drawGeometricFormation()
         #self.drawRateLines()
         #self.drawTrend()
-        self.drawCandleFormations()
+        #self.drawCandleFormations()
         #self.drawGaps()
 		
     
@@ -495,21 +495,21 @@ class Chart(FigureCanvas):
         H=self.data.high
         L=self.data.low
         C=self.data.close        
-        gaps=findGaps(H,L,C)       
-        print gaps
-        if(gaps!=[]):
-            for gap in gaps[0]:            
-                print gap
-                x=gap[1]
-                width=1
-                if("rising" in gap[0]):
-                    y=H[gap[1]]            
-                    height=L[gap[1]+1]-H[gap[1]]
-                else:
-                    y=H[gap[1]+1]            
-                    height=L[gap[1]]-H[gap[1]+1]
-                self.drawRectangle(x,y,width,height)        
-        self.drawTrend()
+        gapsList=findGaps(H,L,C)       
+        print gapsList
+        if(gapsList!=[]):
+            for gaps in gapsList:
+                for gap in gaps[0]:            
+                    print gap
+                    x=gap[1]
+                    width=1
+                    if("rising" in gap[0]):
+                        y=H[gap[1]]            
+                        height=L[gap[1]+1]-H[gap[1]]
+                    else:
+                        y=H[gap[1]+1]            
+                        height=L[gap[1]]-H[gap[1]+1]
+                    self.drawRectangle(x,y,width,height)                
         
     def drawTrend(self):
         self.clearLines()
