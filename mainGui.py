@@ -35,9 +35,12 @@ class GuiMainWindow(object):
 
         #załadowanie List
         os.chdir("../WallStreetFighters/DataParserModule")
-        dataParser.loadData()
-	FILE = open("../GUIModule/data.wsf", 'r')
-	dataParser.loadHistory(FILE).start()
+	try:
+        	dataParser.loadData()
+		FILE = open("../GUIModule/data.wsf", 'r')
+		dataParser.loadHistory(FILE).start()
+	except: 
+		pass
 
         # inicjujemy model danych dla Index
         self._indexModel = self.ListModel(list=dataParser.INDEX_LIST)
@@ -78,11 +81,12 @@ class GuiMainWindow(object):
         self.futuresModel.setDynamicSortFilter(True)
         
         """home """
-
-	File = open("../GUIModule/save.wsf",'r')
-	valueList = cPickle.load(File)
-	self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2])       
-        
+	try:
+		File = open("../GUIModule/save.wsf",'r')
+		valueList = cPickle.load(File)
+		self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2],valueList[4])       
+        except:
+		self.home = Home()
 	self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         #os.chdir("../../WallStreetFighters/GUIModule")

@@ -17,7 +17,7 @@ class MainWindow(QtGui.QMainWindow):
         FILE = open('data.wsf','w')
         dataParser.saveHistory(FILE)
         FILE.close()
-        valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList]
+        valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList, self.gui.home.finObjList]
         cPickle.dump(valueList, open('save.wsf','w'))
         ran = range(self.gui.tabs.count())
         tabHistoryList = []

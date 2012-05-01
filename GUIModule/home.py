@@ -4,11 +4,12 @@ import DataParserModule.dataParser as dataParser
 import time
 
 class Home (QtGui.QWidget):
-    def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None):
+    def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None, finObjList = None):
         self.topList = topList
         self.mostList = mostList
         self.loserList = loserList
         self.gainerList = gainerList
+	self.finObjList = finObjList
 	self.updateThread = UpdateThread()
 	self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
         QtGui.QWidget.__init__(self)
@@ -217,6 +218,7 @@ class Home (QtGui.QWidget):
 	self.mostList = self.updateThread.mostList
 	self.loserList = self.updateThread.loserList
 	self.gainerList = self.updateThread.gainerList
+	self.finObjList = self.updateThread.finObjList
 
         ran = range(self.leftLayout.count())
         for i in ran:
@@ -283,6 +285,7 @@ class UpdateThread(QtCore.QThread):
 	self.topList = []
 	self.loserList = []
 	self.gainerList = []
+	self.finObjList = []
 
     def __del__(self):
         self.wait()
@@ -295,11 +298,22 @@ class UpdateThread(QtCore.QThread):
 			self.loserList = dataParser.top5Losers()
 			self.gainerList = dataParser.top5Gainers()
 			self.topList = dataParser.getMostPopular()
-			self.emit(QtCore.SIGNAL("Update"))
+			self.emit(QtCore.SIGNAL("Update"))	
 			
+			self.finObjList = []
+			self.finObjList.append(dataParser.getDataToLightWeightChart("^DJI","index","Yahoo"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("^IXIC","index","Yahoo"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("^GSPC","index","Yahoo"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("EURUSD","forex","Stooq"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("10USY.B","bond","Stooq"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("XAUUSD","resource","Stooq"))
+			self.finObjList.append(dataParser.getDataToLightWeightChart("CL.F","resource","Stooq"))
+
+			array  = self.finObjList[1].getArray('daily')
+			print array["date"]
+		 			
 		except dataParser.DataAPIException:
 			pass
-
         
         
         
