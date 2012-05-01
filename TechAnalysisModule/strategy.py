@@ -137,12 +137,9 @@ class Strategy:
         risingBreakawayGapVal = defRisingBreakawayGapVal
         risingContinuationGapVal = defRisingContinuationGapVal
         fallingExhaustionGapVal = defFallingExhaustionGapVal 
-        fallingBreakawayGapVal = -50
-        risingExhaustionGapVal = -50
-        fallingContinuationGapVal = -30
-        defFallingBreakawayGapVal = -50
-        defRisingExhaustionGapVal = -50
-        defFallingContinuationGapVal = -30
+        fallingBreakawayGapVal = defFallingBreakawayGapVal
+        risingExhaustionGapVal = defRisingExhaustionGapVal
+        fallingContinuationGapVal = defFallingContinuationGapVal
         bull3Val = defBull3Val
         mornigStarVal = defMornigStarVal
         piercingVal = defPiercingVal
@@ -152,17 +149,17 @@ class Strategy:
             
     def analyze(self):
           overallScore = 0
-          print "Program will now analyze trend, selected chart patterns, candle patterns, indicators, oscilators and gaps\n"
+          print "The program will now analyse trends, selected chart patterns, candle patterns, indicators, oscillators and gaps\n"
           print "(+) -> positive\n (0) -> neutral\n (-) -> negative signal\n"
           overallScore += self.trendVal * trend.optimizedTrend(self.close)
           if overallScore > 0:
-              print " (+) long-term trend is rising\n"
+              print " (+) the long term trend is rising\n"
           elif overallScore < 0:
-              print " (-) long-term trend is falling\n"
+              print " (-) the long term trend is falling\n"
           else:
-              print " (0) long-term trend is neutral\n"
+              print " (0) the long term trend is neutral\n"
 
-          print "Program has identified following chart patterns:\n"
+          print "The program has identified the following chart patterns:\n"
           form = trend.lookForHeadAndShoulders(self.close, self.volume, 1)
           overallScore += form * self.headAndShouldersVal
           if form * self.headAndShouldersVal != 0:
@@ -233,7 +230,7 @@ class Strategy:
           #         elif formation[0][0] == 'rising_exhaustion_gap':
           #             overallScore += self.risingExhaustionGapVal * formation[1]
           #             if self.risingExhaustionGapVal * formation[1] != 0:
-          #                 print " (-) rising exhaoustion gap\n"
+          #                 print " (-) rising exhaustion gap\n"
           #         elif formation[0][0] == 'falling_breakaway_gap':
           #             overallScore += self.fallingBreakawayGapVal * formation[1]
           #             if self.fallingBreakawayGapVal * formation[1] != 0:
@@ -241,7 +238,7 @@ class Strategy:
           #         elif formation[0][0] == 'falling_continuation_gap':
           #             overallScore += self.fallingContinuationGapVal * formation[1]
           #             if self.fallingContinuationGapVal * formation[1] != 0:
-          #                 print " (-) falling contination gap\n"
+          #                 print " (-) falling continuation gap\n"
           #         elif formation[0][0] == 'falling_exhaustion_gap':
           #             overallScore += self.fallingExhaustionGapVal * formation[1]
           #             if self.fallingExhaustionGapVal * formation[1] != 0:
@@ -291,41 +288,41 @@ class Strategy:
           # 
           #           overallScore += self.momentumVal * oscilatorsAndIndicators[2]
           #           if self.momentumVal * oscilatorsAndIndicators > 0:
-          #               print " (+) momentum oscilator\n"
+          #               print " (+) momentum oscillator\n"
           #           elif self.momentumVal * oscilatorsAndIndicators < 0:
-          #               print " (-) momentum oscilator\n"
+          #               print " (-) momentum oscillator\n"
           # 
           #           overallScore += self.rocVal * oscilatorsAndIndicators[3]
           #           if self.rocVal * oscilatorsAndIndicators[3] > 0:
-          #               print " (+) roc oscilator\n"
+          #               print " (+) roc oscillator\n"
           #           elif self.rocVal * oscilatorsAndIndicators[3] < 0:
-          #               print " (-) roc oscilator\n"
+          #               print " (-) roc oscillator\n"
           # 
           #           overallScore += self.cciVal * oscilatorsAndIndicators[4]
           #           if self.cciVal * oscilatorsAndIndicators[4] > 0:
-          #               print " (+) cci oscilator\n"
+          #               print " (+) cci oscillator\n"
           #           elif self.cciVal * oscilatorsAndIndicators[4] < 0:
-          #               print " (-) cci oscilator\n"
+          #               print " (-) cci oscillator\n"
           # 
           #           overallScore += self.rsiVal * oscilatorsAndIndicators[5]
           #           if self.rsiVal * oscilatorsAndIndicators[5] > 0:
-          #               print " (+) rsi oscilator\n"
+          #               print " (+) rsi oscillator\n"
           #           elif self.rsiVal * oscilatorsAndIndicators[5] < 0:
-          #               print " (-) rsi oscilator\n"
+          #               print " (-) rsi oscillator\n"
           # 
           #           overallScore += self.williamsVal * oscilatorsAndIndicators[6]
           #           if self.williamsVal * oscilatorsAndIndicators[6] > 0:
-          #               print " (+) williams oscilator\n"
+          #               print " (+) williams oscillator\n"
           #           elif self.williamsVal * oscilatorsAndIndicators[6] < 0:
-          #               print " (-) williams oscilator\n"
+          #               print " (-) williams oscillator\n"
           print "\n Overall score: ",overallScore, "\n"
           if  overallScore > self.positiveSignal:
-              print " technical analysis generated positive signal, however fundamental analysis should be also considered\n"
+              print " the technical analysis has generated a positive signal, however a fundamental analysis should also be considered\n"
           elif overallScore < self.negativeSignal:
-              print " technical analysis generated negative signal, if you own actives it is recommended to sell, however fundamental analysis should be also considered\n"
+              print " the technical analysis has generated a negative signal. If you own actives, you should consider selling them. However, a fundamental analysis should also be taken into account\n"
           else:
-              print " technical analysis generated neutral signal\n"
-          print "\n Remember that authors of this software DO NOT TAKE ANY RESPONSIBILITY for possible financial loss\n"
+              print " the technical analysis has generated a neutral signal\n"
+          print "\nNO RESPONSIBILITY is taken by the authors of this software, for the accuracy of any predictions or the loss of any finance by anyone using this program. You may use this software at your own risk.\n"
 
 
 
