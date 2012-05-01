@@ -68,7 +68,10 @@ def optimizedTrend(values):
     index = []
     val = []
     for i in range(size):
-        val = val + [(values[i] - minV) * 1.0 / (maxV - minV)]
+        if maxV != minV:
+            val = val + [(values[i] - minV) * 1.0 / (maxV - minV)]
+        else:
+            val = val + [(values[i] - minV) * 1.0]
         index = index + [i * 1.0 / size]
     index = asarray(index)
     A = vstack([index, ones(len(val))]).T
