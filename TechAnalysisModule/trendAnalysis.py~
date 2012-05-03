@@ -1104,9 +1104,9 @@ def rateLines(array, scaler1, scaler2):
 
 # FLAGI I CHORAGIEWKI
 
-def findFlagsAndPennants(values, volume, maxval, minval):
+def findFlagsAndPennants(values,volume, maxval, minval):
 	proposals = checkValuesForFlagsAndPennants(3,values)
-	proposals = checkVolumeForFlagsAndPennants(proposals,volume,values)
+	proposals = checkVolumeForFlagsAndPennants(proposals,volume,close)
 	raising,falling = checkRegressionForFlagsAndPennants(proposals,maxval,minval)
 	print scoreFlags(raising,falling,volume)
 
