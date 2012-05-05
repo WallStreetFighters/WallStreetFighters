@@ -556,48 +556,48 @@ class Strategy:
                           resultText = resultText + "   (-) dark cloud candle pattern\n"
 
                           
-          # score, oscilatorsAndIndicators = oscilators.oscillatorStrategy(array(self.data.close), array(self.data.high), array(self.data.low), min(10, len(self.data.close)))
-          #           overallScore += self.newHighNewLowVal * oscilatorsAndIndicators[0]
-          #           if self.newHighNewLowVal * oscilatorsAndIndicators[0] > 0:
-          #               print "   (+) new high - new low index\n"
-          #           elif self.newHighNewLowVal * oscilatorsAndIndicators[0] < 0:
-          #               print "   (-) new high - new low index\n"
-          # 
-          #           overallScore += self.bollignerVal * oscilatorsAndIndicators[1]
-          #           if self.bollignerVal * oscilatorsAndIndicators > 0:
-          #               print "   (+) bolligner bounds\n"
-          #           elif self.bollignerVal * oscilatorsAndIndicators < 0:
-          #               print "   (-) bolligner bounds\n"
-          # 
-          #           overallScore += self.momentumVal * oscilatorsAndIndicators[2]
-          #           if self.momentumVal * oscilatorsAndIndicators > 0:
-          #               print "   (+) momentum oscillator\n"
-          #           elif self.momentumVal * oscilatorsAndIndicators < 0:
-          #               print "   (-) momentum oscillator\n"
-          # 
-          #           overallScore += self.rocVal * oscilatorsAndIndicators[3]
-          #           if self.rocVal * oscilatorsAndIndicators[3] > 0:
-          #               print "   (+) roc oscillator\n"
-          #           elif self.rocVal * oscilatorsAndIndicators[3] < 0:
-          #               print "   (-) roc oscillator\n"
-          # 
-          #           overallScore += self.cciVal * oscilatorsAndIndicators[4]
-          #           if self.cciVal * oscilatorsAndIndicators[4] > 0:
-          #               print "   (+) cci oscillator\n"
-          #           elif self.cciVal * oscilatorsAndIndicators[4] < 0:
-          #               print "   (-) cci oscillator\n"
-          # 
-          #           overallScore += self.rsiVal * oscilatorsAndIndicators[5]
-          #           if self.rsiVal * oscilatorsAndIndicators[5] > 0:
-          #               print "   (+) rsi oscillator\n"
-          #           elif self.rsiVal * oscilatorsAndIndicators[5] < 0:
-          #               print "   (-) rsi oscillator\n"
-          # 
-          #           overallScore += self.williamsVal * oscilatorsAndIndicators[6]
-          #           if self.williamsVal * oscilatorsAndIndicators[6] > 0:
-          #               print "   (+) williams oscillator\n"
-          #           elif self.williamsVal * oscilatorsAndIndicators[6] < 0:
-          #               print "   (-) williams oscillator\n"
+          score, oscilatorsAndIndicators = oscilators.oscillatorStrategy(array(self.data.close), array(self.data.high), array(self.data.low), min(10, len(self.data.close)))
+          overallScore += self.newHighNewLowVal * oscilatorsAndIndicators[0]
+          if self.newHighNewLowVal * oscilatorsAndIndicators[0] > 0:
+              print "   (+) new high - new low index\n"
+          elif self.newHighNewLowVal * oscilatorsAndIndicators[0] < 0:
+              print "   (-) new high - new low index\n"
+
+          overallScore += self.bollignerVal * oscilatorsAndIndicators[1]
+          if self.bollignerVal * oscilatorsAndIndicators > 0:
+              print "   (+) bolligner bounds\n"
+          elif self.bollignerVal * oscilatorsAndIndicators < 0:
+                print "   (-) bolligner bounds\n"
+
+          overallScore += self.momentumVal * oscilatorsAndIndicators[2]
+          if self.momentumVal * oscilatorsAndIndicators > 0:
+                print "   (+) momentum oscillator\n"
+          elif self.momentumVal * oscilatorsAndIndicators < 0:
+                print "   (-) momentum oscillator\n"
+
+          overallScore += self.rocVal * oscilatorsAndIndicators[3]
+          if self.rocVal * oscilatorsAndIndicators[3] > 0:
+                print "   (+) roc oscillator\n"
+          elif self.rocVal * oscilatorsAndIndicators[3] < 0:
+                print "   (-) roc oscillator\n"
+
+          overallScore += self.cciVal * oscilatorsAndIndicators[4]
+          if self.cciVal * oscilatorsAndIndicators[4] > 0:
+                print "   (+) cci oscillator\n"
+          elif self.cciVal * oscilatorsAndIndicators[4] < 0:
+                print "   (-) cci oscillator\n"
+
+          overallScore += self.rsiVal * oscilatorsAndIndicators[5]
+          if self.rsiVal * oscilatorsAndIndicators[5] > 0:
+                print "   (+) rsi oscillator\n"
+          elif self.rsiVal * oscilatorsAndIndicators[5] < 0:
+                print "   (-) rsi oscillator\n"
+
+          overallScore += self.williamsVal * oscilatorsAndIndicators[6]
+          if self.williamsVal * oscilatorsAndIndicators[6] > 0:
+                print "   (+) williams oscillator\n"
+          elif self.williamsVal * oscilatorsAndIndicators[6] < 0:
+                print "   (-) williams oscillator\n"
           
           print "\n Overall score: ",overallScore, "\n"
           resultText = resultText + "\n Overall score: "+str(overallScore)+ "\n\n"
