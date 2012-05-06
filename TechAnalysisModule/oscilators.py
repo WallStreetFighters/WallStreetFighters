@@ -79,6 +79,21 @@ def bollingerBands(array,duration,mode,D):
                 j += 1
         return values
 
+def bollingerBandsForStrategy(array,duration,mode,D):
+        if(duration>array.size/2):
+                return None
+        values = zeros(array.size/2+1)
+        size = array.size
+        j = 0
+        for i in range(size/2,size):
+                tempTable = array[i-duration+1:i+1]
+                if mode == 1:
+                        values[j] = simpleArthmeticAverage(tempTable)+(D*standardDeviation(tempTable))
+                if mode == 2:
+                        values[j] = simpleArthmeticAverage(tempTable)-(D*standardDeviation(tempTable))
+                j += 1
+        return values
+
 # array - tablica z wartosciami cen zamkniec itp, duration - czas trwania liczonej sredniej krokowej
 # Zwraca tablice jednowymiarowa z wartosciami sredniej krokowej dla przedzialu [size/2,size-1], aby obliczyc wartosci tablica wejsciowa musi byc 2x wieksza od zakresu(duration)
 # modes : 1-SMA(simple moving average), 2-WMA(weighted moving average), 3-EMA(expotential moving average) 
@@ -290,13 +305,15 @@ def HPI(volume, high, low, openInterest, smoothFactor=10, centValue=250):
 # 6 - Williams Oscillator
 #### WHAT THE FUCK IS DURATION? WHY THERE IS NO CHECK FOR DURATION? FUCK FUCK FUCK
 def oscillatorStrategy(array,high,low,duration):
+        if duration > array.size:
+                result = zeros(7)
+                return 0, result
         size = array.size-1
         result = zeros(7)
         score = 0
         highLowInd = highLowIndex(array)
-        higherBand = bollingerBands(array,duration,1,2)
-        lowerBand = bollingerBands(array,duration,2,2)
-        SMALine = (higherBand[higherBand.size-1] - lowerBand[lowerBand.size-1])/2.0
+        higherBand = bollingerBandsForStrategy(array,duration,1,2)
+        lowerBand = bollingerBandsForStrategy(array,duration,2,2)
         average = simpleArthmeticAverage(array)
         momentumIndex = momentum(array,duration)
         rocIndex = ROC(array,duration)
@@ -315,18 +332,23 @@ def oscillatorStrategy(array,high,low,duration):
         if highLowInd >= 75:
                 score = score + 1
                 result[0] = 1
-        if array[size] > (SMALine+higherBand[higherBand.size-1])/2:
-                score = score - 1
-                result[1] = -1
-        if array[size] > SMALine and array[size] < (SMALine+higherBand[higherBand.size-1])/2:
-                score = score - 0.4
-                result[1] = -0.4
-        if array[size] < SMALine and array[size] > (SMALine+lowerBand[lowerBand.size-1])/2:
-                score = score + 0.4
-                result[1] = 0.4
-        if array[size] < (SMALine+lowerBand[lowerBand.size-1])/2:
-                score = score + 1
-                result[1] = 1
+        if higherBand == None or lowerBand == None:
+                score += 0
+                result[1] = 0
+        else:
+                SMALine = (higherBand[higherBand.size-1] - lowerBand[lowerBand.size-1])/2.0
+                if array[size] > (SMALine+higherBand[higherBand.size-1])/2:
+                        score = score - 1
+                        result[1] = -1
+                if array[size] > SMALine and array[size] < (SMALine+higherBand[higherBand.size-1])/2:
+                        score = score - 0.4
+                        result[1] = -0.4
+                if array[size] < SMALine and array[size] > (SMALine+lowerBand[lowerBand.size-1])/2:
+                        score = score + 0.4
+                        result[1] = 0.4
+                if array[size] < (SMALine+lowerBand[lowerBand.size-1])/2:
+                        score = score + 1
+                        result[1] = 1
         if momentumIndex[momentumIndex.size-1] > (5/100)*average:
                 score = score +1
                 result[2] = 1
