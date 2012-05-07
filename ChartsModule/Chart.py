@@ -391,13 +391,13 @@ class Chart(FigureCanvas):
         self.drawingMode=mode            
         x0, y0 = None,None
     
-    def drawLine(self, x0,y0,x1,y1):
-        """Dodaje linię (trend) do wykresu."""
-        newLine=Line2D([x0,x1],[y0,y1],color='k')                
-        self.mainPlot.add_line(newLine)
-        self.additionalLines.append(newLine)
-        newLine.figure.draw_artist(newLine)                                        
-        self.blit(self.mainPlot.bbox)    #blit to taki redraw
+    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 3.0, lstyle = '-'):
+          """Rysuje linie (trend) na wykresie """
+          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=color)                
+          self.mainPlot.add_line(newLine)
+          self.additionalLines.append(newLine)
+          newLine.figure.draw_artist(newLine)                                        
+          self.blit(self.mainPlot.bbox)    #blit to taki redraw  
     
     def clearLines(self):
         """Usuwa wszystkie linie narysowane dodatkowo na wykresie (tzn. nie kurs i nie wskaźniki)"""
@@ -438,78 +438,21 @@ class Chart(FigureCanvas):
             else:
                 x1, y1 = event.xdata, event.ydata        
                 self.drawLine(self.x0,self.y0,x1,y1)                
-                self.x0, self.y0 = None,None
-                
-    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0, lstyle = '--'):
-          """Rysuje linie trendu opcja wyboru koloru i grubosci linii """
-          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=colour)                
-          self.mainPlot.add_line(newLine)
-          self.additionalLines.append(newLine)
-          newLine.figure.draw_artist(newLine)                                        
-          self.blit(self.mainPlot.bbox)    #blit to taki redraw       
+                self.x0, self.y0 = None,None                         
    
     def drawGeometricFormation(self):
-        self.clearLines()
-        formations=trend.findGeometricFormations(self.data.close)
-        print formations
-        for form in formations:
-            if form!=None:
-                self.drawTrendLine(form[1][0], form[1][1], form[1][2], form[1][3], 'r')
-                self.drawTrendLine(form[2][0], form[2][1], form[2][2], form[2][3], 'r') 
-
+        pass
+    
     def drawRateLines(self):
 		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
         a,b = osc.oscillatorStrategy(array(self.data.close),array(self.data.high),array(self.data.low),10)
-        print a,b
-        self.clearLines()
-        print "Rysuje wachlarze."
-        values = trend.rateLines(array(self.data.close),0.38,0.62)
-        print values
-        self.drawTrendLine(values[0][0],values[0][1],values[0][2],values[0][3],'y')
-        self.drawTrendLine(values[1][0],values[1][1],values[1][2],values[1][3],'y')
-        self.drawTrendLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
+        print a,b        
           
     def drawCandleFormations(self):
-        """Test formacji świecowych."""
-        print "szukam formacji świecowych"
-        self.clearRectangles()
-        O=self.data.open
-        H=self.data.high
-        L=self.data.low
-        C=self.data.close        
-        formations=findCandleFormations(O,H,L,C)                
-        for formation in formations:
-            print formation                    
-            x=formation[1]-0.5
-            y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
-            width=formation[2]-formation[1]+1
-            height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
-                        -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
-            self.drawRectangle(x,y,width,height)     
-        self.drawTrend()   
+        pass   
             
     def drawGaps(self):
-        """Test luk."""
-        print "szukam luk"
-        self.clearRectangles()
-        H=self.data.high
-        L=self.data.low
-        C=self.data.close        
-        gapsList=findGaps(H,L,C)       
-        print gapsList
-        if(gapsList!=[]):
-            for gaps in gapsList:
-                for gap in gaps[0]:            
-                    print gap
-                    x=gap[1]
-                    width=1
-                    if("rising" in gap[0]):
-                        y=H[gap[1]]            
-                        height=L[gap[1]+1]-H[gap[1]]
-                    else:
-                        y=H[gap[1]+1]            
-                        height=L[gap[1]]-H[gap[1]+1]
-                    self.drawRectangle(x,y,width,height)                
+        pass                
         
     def drawTrend(self):
         self.clearLines()

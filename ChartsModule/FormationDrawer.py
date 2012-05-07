@@ -13,7 +13,7 @@ class FormationDrawer:
     
     def setConfiguration(config):
         """Ustawiamy listę formacji, które będziemy rysować. config jest tablicą krotek postaci
-        (nazwa,kolor,linewidth) Rozpoznawane nazwy są takie jak te w wartościach
+        (nazwa,kolor,linestyle,linewidth) Rozpoznawane nazwy są takie jak te w wartościach
         zwracanych przez funkcje znajdujące formacje, oraz 'trend' """
         self.configuration=config
 
@@ -30,6 +30,8 @@ class FormationDrawer:
         computedGaps=False
         computedFandp=False
         data=self.chart.getData()
+        self.chart.clearLines()
+        self.chart.clearRectangles()
         for entry in self.configuration:
             name=entry[0]
             if name in geoForm:
@@ -69,15 +71,52 @@ class FormationDrawer:
                 self.drawHeadAndShoulders()
     
     def drawGeometricFormation(self,formation):
-        pass
+        for entry in settings:
+            if entry[0]==formation[0]:
+                color=entry[1]
+                lstyle=entry[2]
+                lwidth=entry[2]
+                break
+        self.chart.drawLine(form[1][0], form[1][1], form[1][2], form[1][3], 
+                            color, lwidth, lstyle)
+        self.chart.drawLine(form[2][0], form[2][1], form[2][2], form[2][3], 
+                            color, lwidth, lstyle)
 
-    def drawCandleFormation(self,formation):
-        pass
+    def drawCandleFormation(self,formation):                        
+        for entry in settings:
+            if entry[0]==formation[0]:
+                color=entry[1]
+                lstyle=entry[2]
+                lwidth=entry[2]
+                break
+        x=formation[1]-0.5
+        y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
+        width=formation[2]-formation[1]+1
+        height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
+                    -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
+        self.chart.drawRectangle(x,y,width,height,color,lwidth,lstyle)     
+        
     
     def drawGap(self,gap):
-        pass
+        for entry in settings:
+            if entry[0]==gap[0]:
+                color=entry[1]
+                lstyle=entry[2]
+                lwidth=entry[2]
+                break
+        x=gap[1]
+        width=1
+        data=self.chart.getData()
+        if("rising" in gap[0]):
+            y=data.high[gap[1]]            
+            height=data.low[gap[1]+1]-data.high[gap[1]]
+        else:
+            y=data.high[gap[1]+1]            
+            height=data.low[gap[1]]-data.high[gap[1]+1]
+        self.chart.drawRectangle(x,y,width,height)
     
     def drawHeadAndShoulders(self,formation):
+        #uzupełnić
         pass
     
     def drawFlagAndPennant(self,formation):
@@ -85,4 +124,12 @@ class FormationDrawer:
         pass
 
     def drawTrend(self):
+        #uzupełnić
         pass
+    
+    def drawRateLines(self):        
+        values = trend.rateLines(array(self.chart.getData().close),0.38,0.62)
+        print values
+        self.drawLine(values[0][0],values[0][1],values[0][2],values[0][3],'y')
+        self.drawLine(values[1][0],values[1][1],values[1][2],values[1][3],'y')
+        self.drawLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
