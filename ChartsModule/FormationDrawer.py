@@ -9,7 +9,7 @@ class FormationDrawer:
     def __init__(self, chart, strategy=None):
         """chart = obiekt klasy Chart. Domyślnie ustawiamy pustą listę formacji."""
         self.chart=chart
-        setFormations(strategy)
+        self.setFormations(strategy)
     
     def setFormations(self, s):
         """Ustawiamy listę formacji, które będziemy rysować, poprzez przekazanie
@@ -61,7 +61,7 @@ class FormationDrawer:
             self.configuration['dark_cloud']=(self.darkCloudColor,self.darkCloudLwidth,self.darkCloudLstyle)                                                                                          
         if abs(s.piercingVal)>0:
             self.configuration['piercing']=(self.piercingColor,self.piercingLwidth,self.piercingLstyle) 
-        #flag & penant nie mają w strategy wartości!
+        #flag & penant nie mają w strategy zmiennej z ich wartością!
                 
 
     def drawFormations(self):
@@ -82,14 +82,14 @@ class FormationDrawer:
                 if not computedGeo:
                     foundGeo=trend.findGeometricFormations(data.close)
                     computedGeo=True
-                for formation in computedGeo:
+                for formation in foundGeo:
                     if name==formation[0]:
                         self.drawGeometricFormation(formation,values[0],values[1],values[2])
             elif name in candleForm:
                 if not computedCandle:
                     foundCandle=candles.findCandleFormations(data.open, data.high, data.low, data.close)
                     computedCandle=True
-                for formation in computedCandle:
+                for formation in foundCandle:
                     if name==formation[0]:
                         self.drawCandleFormation(formation,values[0],values[1],values[2])
             elif name in gaps:
@@ -113,8 +113,9 @@ class FormationDrawer:
                 self.drawRateLines(values[0],values[1],values[2])        
             elif name=='head_shoulders':
                 self.drawHeadAndShoulders(values[0],values[1],values[2])
+            # ...
     
-    def drawGeometricFormation(self,form,color,lstyle,lwidth):        
+    def drawGeometricFormation(self,form,color='r',lstyle='--',lwidth=1.0):        
         self.chart.drawLine(form[1][0], form[1][1], form[1][2], form[1][3], 
                             color, lwidth, lstyle)
         self.chart.drawLine(form[2][0], form[2][1], form[2][2], form[2][3], 
@@ -156,6 +157,6 @@ class FormationDrawer:
     def drawRateLines(self,color,lstyle,lwidth):        
         values = trend.rateLines(array(self.chart.getData().close),0.38,0.62)
         print values
-        self.drawLine(values[0][0],values[0][1],values[0][2],values[0][3],'y')
-        self.drawLine(values[1][0],values[1][1],values[1][2],values[1][3],'y')
-        self.drawLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
+        self.drawLine(values[0][0],values[0][1],values[0][2],values[0][3],color,lwidth,lstyle)
+        self.drawLine(values[1][0],values[1][1],values[1][2],values[1][3],color,lwidth,lstyle)
+        self.drawLine(values[2][0],values[2][1],values[2][2],values[2][3],color,lwidth,lstyle)           
