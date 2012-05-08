@@ -76,7 +76,7 @@ class FormationDrawer:
         fandp=['risingTrendFlagOrPennant','fallingTrendFlagOrPennant']                                
         self.chart.clearLines()
         self.chart.clearRectangles()
-        for name, values in self.configuration.iteritems:            
+        for name, values in self.configuration.iteritems():            
             if name in geoForm:
                 if not computedGeo:
                     foundGeo=trend.findGeometricFormations(data.close)
