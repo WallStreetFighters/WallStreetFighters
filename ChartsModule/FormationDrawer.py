@@ -70,8 +70,7 @@ class FormationDrawer:
             return
         data=self.chart.getData()        
         geoForm=['rect', 'symmetric_triangle', 'rising_triangle', 'falling_triangle',
-                'rising_wedge', 'falling_wedge'] 
-        foundGeo=trend.findGeometricFormations(data.close)
+                'rising_wedge', 'falling_wedge']         
         candleForm=['bull3','bear3','morning_star','evening_star','piercing','dark_cloud']        
         gaps=['rising_breakaway_gap','rising_continuation_gap','rising_exhaustion_gap',
               'falling_breakaway_gap','falling_continuation_gap','falling_exhaustion_gap']        
