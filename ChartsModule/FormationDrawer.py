@@ -9,12 +9,14 @@ class FormationDrawer:
     def __init__(self, chart, strategy=None):
         """chart = obiekt klasy Chart. Domyślnie ustawiamy pustą listę formacji."""
         self.chart=chart
-        self.strategy=strategy
+        setFormations(strategy)
     
     def setFormations(self, s):
         """Ustawiamy listę formacji, które będziemy rysować, poprzez przekazanie
-        obiektu klasy Strategy. Narysowane zostaną formacje o niezerowej wartości"""        
+        obiektu klasy Strategy. Narysowane zostaną formacje o niezerowej wartości"""                
         self.configuration={}
+        if s==None:
+            return
         if abs(s.trendVal)>0:
             self.configuration['trend']=(self.trendColor,self.trendLwidth,self.trendLstyle)
         if abs(s.headAndShouldersVal)>0:
