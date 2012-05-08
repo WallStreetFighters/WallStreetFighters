@@ -195,26 +195,27 @@ class Chart(FigureCanvas):
         self.fixTimeLabels()
         
     def drawCandlePlot(self):
-        """Wyświetla główny wykres w postaci świecowej"""    
-        
-        """candlestick potrzebuje danych w postaci piątek (time, open, close, high, low). 
-        time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
-        Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
-        odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
+        """Wyświetla główny wykres w postaci świecowej"""            
         if self.data==None or self.data.corrupted:
-            return                        
-        lines, patches = candlestick(self.mainPlot,self.data.quotes,
-                                    width=0.7,colorup='w',colordown='k')                
-        #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.name)         
-        """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
-        stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
-        Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
-        Poniższy kod to naprawia"""
-        for line in lines:                        
-            line.set_zorder(line.get_zorder()-2)
-        for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})     
+            return
+        ax=self.mainPlot
+        rectsList=[]
+        open=self.data.open
+        close=self.data.close
+        xvals=range(len(close))
+        lines=ax.vlines(xvals,self.data.low,self.data.high,label=self.data.name)
+        lines.set_zorder(lines.get_zorder()-1)
+        for i in xvals:
+            height=max(abs(close[i]-open[i]),0.001)
+            width=0.7
+            x=i-width/2
+            y=min(open[i],close[i])
+            print x,y,width,height
+            if open[i]<=close[i]:
+                rectsList.append(Rectangle((x,y),width,height,facecolor='w',edgecolor='k'))
+            else:
+                rectsList.append(Rectangle((x,y),width,height,facecolor='k',edgecolor='k'))
+        ax.add_collection(PatchCollection(rectsList,match_original=True))     
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
