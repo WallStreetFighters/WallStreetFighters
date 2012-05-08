@@ -14,51 +14,51 @@ class FormationDrawer:
     def setFormations(self, s):
         """Ustawiamy listę formacji, które będziemy rysować, poprzez przekazanie
         obiektu klasy Strategy. Narysowane zostaną formacje o niezerowej wartości"""        
-        self.configuration=[]
+        self.configuration={}
         if abs(s.trendVal)>0:
-            self.configuration.append(('trend',self.trendColor,self.trendLwidth,self.trendLstyle))
+            self.configuration['trend']=(self.trendColor,self.trendLwidth,self.trendLstyle)
         if abs(s.headAndShouldersVal)>0:
-            self.configuration.append(('head_shoulders',self.headShouldersColor,self.headShouldersLwidth,self.headShouldersLstyle))
+            self.configuration['head_shoulders']=(self.headShouldersColor,self.headShouldersLwidth,self.headShouldersLstyle)
         if abs(s.tripleTopVal)>0:
-            self.configuration.append(('triple_top',self.tripleTopColor,self.tripleTopLwidth,self.tripleTopLstyle))        
+            self.configuration['triple_top']=(self.tripleTopColor,self.tripleTopLwidth,self.tripleTopLstyle)        
         if abs(s.risingWedgeVal)>0:
-            self.configuration.append(('rising_wedge',self.risingWedgeColor,self.risingWedgeLwidth,self.risingWedgeLstyle))        
+            self.configuration['rising_wedge']=(self.risingWedgeColor,self.risingWedgeLwidth,self.risingWedgeLstyle)        
         if abs(s.fallingTriangleVal)>0:
-            self.configuration.append(('falling_triangle',self.fallingTriangleColor,self.fallingTriangleLwidth,self.fallingTriangleLstyle))        
+            self.configuration['falling_triangle']=(self.fallingTriangleColor,self.fallingTriangleLwidth,self.fallingTriangleLstyle)        
         if abs(s.reversedHeadAndShouldersVal)>0:
-            self.configuration.append(('reversed_head_shoulders',self.reversedHeadShouldersColor,self.reversedHeadShouldersLwidth,self.reversedHeadShouldersLstyle))        
+            self.configuration['reversed_head_shoulders']=(self.reversedHeadShouldersColor,self.reversedHeadShouldersLwidth,self.reversedHeadShouldersLstyle)        
         if abs(s.tripleBottomVal)>0:
-            self.configuration.append(('triple_bottom',self.tripleBottomColor,self.tripleBottomLwidth,self.tripleBottomLstyle))        
+            self.configuration['triple_bottom']=(self.tripleBottomColor,self.tripleBottomLwidth,self.tripleBottomLstyle)        
         if abs(s.fallingWedgeVal)>0:
-            self.configuration.append(('falling_wedge',self.fallingWedgeColor,self.fallingWedgeLwidth,self.fallingWedgeLstyle))                        
+            self.configuration['falling_wedge']=(self.fallingWedgeColor,self.fallingWedgeLwidth,self.fallingWedgeLstyle)                        
         if abs(s.risingTriangleVal)>0:
-            self.configuration.append(('rising_triangle',self.risingTriangleColor,self.risingTriangleLwidth,self.risingTriangleLstyle))                                                                                          
+            self.configuration['rising_triangle']=(self.risingTriangleColor,self.risingTriangleLwidth,self.risingTriangleLstyle)                                                                                          
         if abs(s.symetricTriangleVal)>0:
-            self.configuration.append(('symmetric_triangle',self.symetricTriangleColor,self.symetricTriangleLwidth,self.symetricTriangleLstyle))                                                                                          
+            self.configuration['symmetric_triangle']=(self.symetricTriangleColor,self.symetricTriangleLwidth,self.symetricTriangleLstyle)                                                                                          
         if abs(s.risingBreakawayGapVal)>0:
-            self.configuration.append(('rising_breakaway_gap',self.risingBreakawayGapColor,self.risingBreakawayGapLwidth,self.risingBreakawayGapLstyle))                                                                                          
+            self.configuration['rising_breakaway_gap']=(self.risingBreakawayGapColor,self.risingBreakawayGapLwidth,self.risingBreakawayGapLstyle)                                                                                          
         if abs(s.risingContinuationGapVal)>0:
-            self.configuration.append(('rising_continuation_gap',self.risingContinuationGapColor,self.risingContinuationGapLwidth,self.risingContinuationGapLstyle))                                                                                          
+            self.configuration['rising_continuation_gap']=(self.risingContinuationGapColor,self.risingContinuationGapLwidth,self.risingContinuationGapLstyle)                                                                                          
         if abs(s.risingExhaustionGapVal)>0:
-            self.configuration.append(('rising_exhaustion_gap',self.risingExhaustionGapColor,self.risingExhaustionGapLwidth,self.risingExhaustionGapLstyle))                                                                                          
+            self.configuration['rising_exhaustion_gap']=(self.risingExhaustionGapColor,self.risingExhaustionGapLwidth,self.risingExhaustionGapLstyle)                                                                                          
         if abs(s.fallingBreakawayGapVal)>0:
-            self.configuration.append(('falling_breakaway_gap',self.fallingBreakawayGapColor,self.fallingBreakawayGapLwidth,self.fallingBreakawayGapLstyle))                                                                                                  
+            self.configuration['falling_breakaway_gap']=(self.fallingBreakawayGapColor,self.fallingBreakawayGapLwidth,self.fallingBreakawayGapLstyle)                                                                                                  
         if abs(s.fallingContinuationGapVal)>0:
-            self.configuration.append(('falling_breakaway_gap',self.fallingContinuationGapColor,self.fallingContinuationGapLwidth,self.fallingContinuationGapLstyle))                                                                                          
+            self.configuration['falling_breakaway_gap']=(self.fallingContinuationGapColor,self.fallingContinuationGapLwidth,self.fallingContinuationGapLstyle)                                                                                          
         if abs(s.fallingExhaustionGapVal)>0:
-            self.configuration.append(('falling_continuation_gap',self.fallingExhaustionGapColor,self.fallingExhaustionGapLwidth,self.fallingExhaustionGapLstyle))                                                                                          
+            self.configuration['falling_continuation_gap']=(self.fallingExhaustionGapColor,self.fallingExhaustionGapLwidth,self.fallingExhaustionGapLstyle)                                                                                          
         if abs(s.bull3Val)>0:
-            self.configuration.append(('bull3',self.bull3Color,self.bull3Lwidth,self.bull3Lstyle))                                                                                                      
+            self.configuration['bull3']=(self.bull3Color,self.bull3Lwidth,self.bull3Lstyle)                                                                                                      
         if abs(s.bear3Val)>0:
-            self.configuration.append(('bear3',self.bear3Color,self.bear3Lwidth,self.bear3Lstyle))                                                                                          
+            self.configuration['bear3']=(self.bear3Color,self.bear3Lwidth,self.bear3Lstyle)                                                                                          
         if abs(s.mornigStarVal)>0:
-            self.configuration.append(('morning_star',self.mornigStarColor,self.mornigStarLwidth,self.mornigStarLstyle))                                                                                          
+            self.configuration['morning_star']=(self.mornigStarColor,self.mornigStarLwidth,self.mornigStarLstyle)                                                                                          
         if abs(s.eveningStarVal)>0:
-            self.configuration.append(('evening_star',self.eveningStarColor,self.eveningStarLwidth,self.eveningStarLstyle))                                                                                                  
+            self.configuration['evening_star']=(self.eveningStarColor,self.eveningStarLwidth,self.eveningStarLstyle)                                                                                                  
         if abs(s.darkCloudVal)>0:
-            self.configuration.append(('dark_cloud',self.darkCloudColor,self.darkCloudLwidth,self.darkCloudLstyle))                                                                                          
+            self.configuration['dark_cloud']=(self.darkCloudColor,self.darkCloudLwidth,self.darkCloudLstyle)                                                                                          
         if abs(s.piercingVal)>0:
-            self.configuration.append(('piercing',self.piercingColor,self.piercingLwidth,self.piercingLstyle)) 
+            self.configuration['piercing']=(self.piercingColor,self.piercingLwidth,self.piercingLstyle) 
         #flag & penant nie mają w strategy wartości!
                 
 
@@ -76,22 +76,21 @@ class FormationDrawer:
         fandp=['risingTrendFlagOrPennant','fallingTrendFlagOrPennant']                                
         self.chart.clearLines()
         self.chart.clearRectangles()
-        for entry in self.configuration:
-            name=entry[0]
+        for name, values in self.configuration.iteritems:            
             if name in geoForm:
                 if not computedGeo:
                     foundGeo=trend.findGeometricFormations(data.close)
                     computedGeo=True
                 for formation in computedGeo:
                     if name==formation[0]:
-                        self.drawGeometricFormation(formation,entry[1],entry[2],entry[3])
+                        self.drawGeometricFormation(formation,values[0],values[1],values[2])
             elif name in candleForm:
                 if not computedCandle:
                     foundCandle=candles.findCandleFormations(data.open, data.high, data.low, data.close)
                     computedCandle=True
                 for formation in computedCandle:
                     if name==formation[0]:
-                        self.drawCandleFormation(formation,entry[1],entry[2],entry[3])
+                        self.drawCandleFormation(formation,values[0],values[1],values[2])
             elif name in gaps:
                 if not computedGaps:
                     foundGaps=candles.findGaps(data.high, data.low, data.close)
@@ -99,20 +98,20 @@ class FormationDrawer:
                 for gapsList in foundGaps:
                     for gap in gapsList:
                         if name==gap[0]:
-                            self.drawGap(gap,entry[1],entry[2],entry[3])
+                            self.drawGap(gap,values[0],values[1],values[2])
             elif name in fandp:
                 if not computedFandp:
                     #foundFandp=trend.findFlagsAndPennants(data.close, data.volume)
                     #tak to się wywołuje?
                     computedFandp=True
                 if name == foundFandp[0]:
-                    self.drawFlagAndPennant(foundFanp,entry[1],entry[2],entry[3])                
+                    self.drawFlagAndPennant(foundFanp,values[0],values[1],values[2])                
             elif name=='trend':
-                self.drawTrend(entry[1],entry[2],entry[3])
+                self.drawTrend(values[0],values[1],values[2])
             elif name=='rate_lines':
-                self.drawRateLines(entry[1],entry[2],entry[3])        
+                self.drawRateLines(values[0],values[1],values[2])        
             elif name=='head_shoulders':
-                self.drawHeadAndShoulders(entry[1],entry[2],entry[3])
+                self.drawHeadAndShoulders(values[0],values[1],values[2])
     
     def drawGeometricFormation(self,form,color,lstyle,lwidth):        
         self.chart.drawLine(form[1][0], form[1][1], form[1][2], form[1][3], 
