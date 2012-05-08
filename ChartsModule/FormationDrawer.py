@@ -114,7 +114,7 @@ class FormationDrawer:
             elif name=='head_shoulders':
                 self.drawHeadAndShoulders(entry[1],entry[2],entry[3])
     
-    def drawGeometricFormation(self,formation,color,lstyle,lwidth):        
+    def drawGeometricFormation(self,form,color,lstyle,lwidth):        
         self.chart.drawLine(form[1][0], form[1][1], form[1][2], form[1][3], 
                             color, lwidth, lstyle)
         self.chart.drawLine(form[2][0], form[2][1], form[2][2], form[2][3], 
