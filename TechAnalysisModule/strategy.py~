@@ -235,7 +235,7 @@ class Strategy:
                           print " (+) falling wedge\n"
                           resultText = resultText + " (+) falling wedge\n"
      
-	  flags = trend.findFlagsAndPennants(self.close,self.volume, self.high, self.low)
+	  flags = trend.findFlagsAndPennants(self.close,self.volume)
 	  if flags != None:
 		overallScore += defFlagPennantVal * flags[1]
 		if flags[1] < 0:

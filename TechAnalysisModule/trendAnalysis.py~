@@ -1147,24 +1147,22 @@ def checkVolumeForFlagsAndPennants(proposals,volume,values):
 		while (i+2 < len(volume) and volume[i+1] < 1.6*volume[i]):
 			i = i+1
 		diff = i - x
-		if (i+1 < len(volume)):
-			if diff > 2 and diff < 28 and values[i+1] > values[i]:
-				temp = volume[x:i:1]
-				average = float(sum(temp)) / len(temp)
-				if average < volume[x]:
-					ups.append([x,i])
+		if diff > 2 and diff < 28 and values[i+1] > values[i]:
+			temp = volume[x:i:1]
+			average = float(sum(temp)) / len(temp)
+			if average < volume[x]:
+				ups.append([x,i])
 
 	for x in proposals[1]:
 		i = x
 		while ( i+2 < len(volume) and volume[i+1] < 1.6*volume[i]):
 			i = i+1
 		diff = i - x
-		if (i+1 < len(volume)):
-			if  values[i+1] < values[i] and diff > 2 and diff < 28:
-				temp = volume[x:i:1]
-				average = float(sum(temp)) / len(temp)
-				if average < volume[x]:
-					downs.append([x,i])
+		if  values[i+1] < values[i] and diff > 2 and diff < 28:
+			temp = volume[x:i:1]
+			average = float(sum(temp)) / len(temp)
+			if average < volume[x]:
+				downs.append([x,i])
 	return [ups,downs]
 
 def checkRegressionForFlagsAndPennants(proposals,maxval,minval):
