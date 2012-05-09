@@ -509,4 +509,5 @@ class Chart(FigureCanvas):
             sup, res = trend.getChannelLines(self.data.close, 1, 2)
             self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
             self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
+
         
