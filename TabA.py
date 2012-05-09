@@ -115,7 +115,7 @@ class TabA(QtGui.QWidget):
 
 
             #check box dla drawTrend
-            self.drawTrendCheckBox = QtGui.QCheckBox("drawTrend",self.optionsFrame)
+            self.drawTrendCheckBox = QtGui.QCheckBox("show Trend",self.optionsFrame)
             self.buttonsLayout.addWidget(self.drawTrendCheckBox,5,2,1,1)
             #label dla grubosci lini
             self.lineWidthLabel = QtGui.QLabel("line Width",self)
@@ -163,6 +163,7 @@ class TabA(QtGui.QWidget):
                 self.drawTrendCheckBox.stateChanged.connect(self.updateDrawTrend)
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
                 self.analyzeButton.pressed.connect(self.newAnalyzeTab)
+                self.showChartPatternsButton.pressed.connect(self.showChartPatterns)
             self.startDateEdit.dateChanged.connect(self.checkDate)
             self.endDateEdit.dateChanged.connect(self.checkDate)
         else:
@@ -184,6 +185,9 @@ class TabA(QtGui.QWidget):
         nameTab = "Analyze " + nameTab
         self.parent().parent().parent().parent().gui.tabs.setCurrentIndex(self.parent().parent().parent().parent().gui.tabs.addTab(self.analyzeTab,nameTab))
         self.analyzeTab.textBrowser.setText(text)
+    def showChartPatterns(self):
+        pass
+    
     def updateScale(self):
         if self.logRadioButton.isChecked():
             self.settings["scale"] = 'log'

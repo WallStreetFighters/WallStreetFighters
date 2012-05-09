@@ -94,7 +94,7 @@ class GuiMainWindow(object):
 	self.home.startUpdating()
 	QtCore.QObject.connect(self.home,QtCore.SIGNAL("tabFromHome"),self.tabHome)
 
-        #zajebiste Dane
+        """#zajebiste Dane
 	nowDate = datetime.datetime.now()
 	nowDate = datetime.date(nowDate.year,nowDate.month,nowDate.day)
 	d = datetime.timedelta(-367)
@@ -128,7 +128,7 @@ class GuiMainWindow(object):
         zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')
         
         self.home.topLayout.addWidget(zajebistyWykres,0,5)#zajebiste Dane1
-        zajebistyWykres.close()
+        zajebistyWykres.close()"""
         """Search"""
 	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
         self.tabs.addTab(self.tabA,"Search")

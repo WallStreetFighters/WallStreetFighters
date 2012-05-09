@@ -229,6 +229,9 @@ def addChartButton(self):
         self.stepComboBox.addItem('weekly')
         self.stepComboBox.addItem('monthly')
         self.gridLayout.addWidget(self.stepComboBox,1,0,1,1)
+        # show chart Patterns
+        self.showChartPatternsButton = QtGui.QPushButton('Show chart patterns',self.optionsFrame)
+        self.gridLayout.addWidget(self.showChartPatternsButton,2,0,1,2)
         # chartType comboBox
         self.chartTypeLabel = QtGui.QLabel('Chart Type',self.optionsFrame)#label Chart Type
         self.gridLayout.addWidget(self.chartTypeLabel,0,1,1,1)
