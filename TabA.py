@@ -177,7 +177,7 @@ class TabA(QtGui.QWidget):
             
 
     def newAnalyzeTab(self):
-        strategy = Strategy(self.chart.data.open, self.chart.data.close, self.chart.data.low, self.chart.data.high, self.chart.data.volume)
+        strategy = Strategy(self.chart.data)
         text = strategy.analyze()
         self.analyzeTab = Analyze()
         nameTab = str(self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
