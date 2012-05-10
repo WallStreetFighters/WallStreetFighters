@@ -12,6 +12,11 @@ data.wsf~
 save.wsf
 
 
+data.wsf
+data.wsf~
+save.wsf
+
+
 # Packages #
 ############
 # it's better to unpack these files and commit the raw source
