@@ -5,11 +5,548 @@ import TechAnalysisModule.trendAnalysis as trend
 class FormationDrawer:
     """Klasa odpowiedzialna za rysowanie wybranych przez użytkownika formacji
     (przekazywanych w tablicy configuration) na wykresie."""
+    defHeadAndShouldersColor = 'm'
+    defHeadAndShouldersLwidth = 2.0
+    defHeadAndShouldersLstyle = '-'
+    
+    defReversedHeadAndShouldersColor = 'c'
+    defReversedHeadAndShouldersLwidth = 2.0
+    defReversedHeadAndShouldersLstyle = '-'
+    
+    defTripleTopColor = 'y'
+    defTripleTopLwidth = 2.0
+    defTripleTopLstyle = '-'
+    
+    defTripleBottomColor = 'b'
+    defTripleBottomLwidth = 2.0
+    defTripleBottomLstyle = '-'
+    
+    
+    defRisingWedgeColor = 'g'
+    defRisingWedgeLwidth = 2.0
+    defRisingWedgeLstyle = '-'
+
+    defFallingTriangleColor = 'r'
+    defFallingTriangleLwidth = 2.0
+    defFallingTriangleLstyle = '-'
+
+    defReversedHeadShouldersColor = 'm'
+    defReversedHeadShouldersLwidth = 2.0
+    defReversedHeadShouldersLstyle = '-'
+
+    defTripleBottomColor = 'm'
+    defTripleBottomLwidth = 2.0
+    defTripleBottomLstyle = '-'
+
+    defFallingWedgeColor = 'r'
+    defFallingWedgeLwidth = 2.0
+    defFallingWedgeLstyle = '-'
+
+    defRisingTriangleColor = 'g'
+    defRisingTriangleLwidth = 2.0
+    defRisingTriangleLstyle = '-'
+
+    defSymetricTriangleColor = 'm'
+    defSymetricTriangleLwidth = 2.0
+    defSymetricTriangleLstyle = '-'
+
+    defRisingBreakawayGapColor = 'g'
+    defRisingBreakawayGapLwidth = 2.0
+    defRisingBreakawayGapLstyle = '-'
+
+    defRisingContinuationGapColor = 'g'
+    defRisingContinuationGapLwidth = 2.0
+    defRisingContinuationGapLstyle = '-'
+
+    defRisingExhaustionGapColor = 'g'
+    defRisingExhaustionGapLwidth = 2.0
+    defRisingExhaustionGapLstyle = '-'
+
+    defFallingBreakawayGapColor = 'r'
+    defFallingBreakawayGapLwidth = 2.0
+    defFallingBreakawayGapLstyle = '-'
+
+    defFallingContinuationGapColor = 'r'
+    defFallingContinuationGapLwidth = 2.0
+    defFallingContinuationGapLstyle = '-'
+
+    defFallingExhaustionGapColor = 'r'
+    defFallingExhaustionGapLwidth = 2.0
+    defFallingExhaustionGapLstyle = '-'
+
+    defBear3Color = 'm'
+    defBear3Lwidth = 2.0
+    defBear3Lstyle = '-'
+
+
+    defBull3Color = 'm'
+    defBull3Lwidth = 2.0
+    defBull3Lstyle = '-'
+
+    defMornigStarColor = 'm'
+    defMornigStarLwidth = 2.0
+    defMornigStarLstyle = '-'
+
+    defEveningStarColor = 'm'
+    defEveningStarLwidth = 2.0
+    defEveningStarLstyle = '-'
+
+    defDarkCloudColor = 'm'
+    defDarkCloudLwidth = 2.0
+    defDarkCloudLstyle = '-'
+
+    defPiercingColor = 'm'
+    defPiercingLwidth = 2.0
+    defPiercingLstyle = '-'
+    defFlagPennantColor = 'm'
+    defFlagPennantLwidth = 2.0
+    defFlagPennantLStyle
+    
     
     def __init__(self, chart, strategy=None):
         """chart = obiekt klasy Chart. Domyślnie ustawiamy pustą listę formacji."""
         self.chart=chart
         self.setFormations(strategy)
+    
+    
+    def setTrendColor(self, trendColor):
+        self.trendColor = trendColor
+
+    def resetTrendColor:(self)
+        self.trendColor = self.defTrendColor
+
+    def setTrendLwidth(self, trendLwidth):
+        self.trendLwidth = trendLwidth
+
+    def resetTrendLwidth:(self)
+        self.trendLwidth = self.defTrendLwidth
+
+    def setTrendLstyle(self, trendLstyle):
+        self.trendLstyle = trendLstyle
+
+    def resetTrendLstyle:(self)
+        self.trendLstyle = self.defTrendLstyle
+
+
+    def setHeadShouldersColor(self, headShouldersColor):
+        self.headShouldersColor = headShouldersColor
+
+    def resetHeadShouldersColor:(self)
+        self.headShouldersColor = self.defHeadShouldersColor
+
+    def setHeadShouldersLwidth(self, headShouldersLwidth):
+        self.headShouldersLwidth = headShouldersLwidth
+
+    def resetHeadShouldersLwidth:(self)
+        self.headShouldersLwidth = self.defHeadShouldersLwidth
+
+    def setHeadShouldersLstyle(self, headShouldersLstyle):
+        self.headShouldersLstyle = headShouldersLstyle
+
+    def resetHeadShouldersLstyle:(self)
+        self.headShouldersLstyle = self.defHeadShouldersLstyle
+
+
+    def setTripleTopColor(self, tripleTopColor):
+        self.tripleTopColor = tripleTopColor
+
+    def resetTripleTopColor:(self)
+        self.tripleTopColor = self.defTripleTopColor
+
+    def setTripleTopLwidth(self, tripleTopLwidth):
+        self.tripleTopLwidth = tripleTopLwidth
+
+    def resetTripleTopLwidth:(self)
+        self.tripleTopLwidth = self.defTripleTopLwidth
+
+    def setTripleTopLstyle(self, tripleTopLstyle):
+        self.tripleTopLstyle = tripleTopLstyle
+
+    def resetTripleTopLstyle:(self)
+        self.tripleTopLstyle = self.defTripleTopLstyle
+
+
+    def setRisingWedgeColor(self, risingWedgeColor):
+        self.risingWedgeColor = risingWedgeColor
+
+    def resetRisingWedgeColor:(self)
+        self.risingWedgeColor = self.defRisingWedgeColor
+
+    def setRisingWedgeLwidth(self, risingWedgeLwidth):
+        self.risingWedgeLwidth = risingWedgeLwidth
+
+    def resetRisingWedgeLwidth:(self)
+        self.risingWedgeLwidth = self.defRisingWedgeLwidth
+
+    def setRisingWedgeLstyle(self, risingWedgeLstyle):
+        self.risingWedgeLstyle = risingWedgeLstyle
+
+    def resetRisingWedgeLstyle:(self)
+        self.risingWedgeLstyle = self.defRisingWedgeLstyle
+
+
+    def setFallingTriangleColor(self, fallingTriangleColor):
+        self.fallingTriangleColor = fallingTriangleColor
+
+    def resetFallingTriangleColor:(self)
+        self.fallingTriangleColor = self.defFallingTriangleColor
+
+    def setFallingTriangleLwidth(self, fallingTriangleLwidth):
+        self.fallingTriangleLwidth = fallingTriangleLwidth
+
+    def resetFallingTriangleLwidth:(self)
+        self.fallingTriangleLwidth = self.defFallingTriangleLwidth
+
+    def setFallingTriangleLstyle(self, fallingTriangleLstyle):
+        self.fallingTriangleLstyle = fallingTriangleLstyle
+
+    def resetFallingTriangleLstyle:(self)
+        self.fallingTriangleLstyle = self.defFallingTriangleLstyle
+
+
+    def setReversedHeadShouldersColor(self, reversedHeadShouldersColor):
+        self.reversedHeadShouldersColor = reversedHeadShouldersColor
+
+    def resetReversedHeadShouldersColor:(self)
+        self.reversedHeadShouldersColor = self.defReversedHeadShouldersColor
+
+    def setReversedHeadShouldersLwidth(self, reversedHeadShouldersLwidth):
+        self.reversedHeadShouldersLwidth = reversedHeadShouldersLwidth
+
+    def resetReversedHeadShouldersLwidth:(self)
+        self.reversedHeadShouldersLwidth = self.defReversedHeadShouldersLwidth
+
+    def setReversedHeadShouldersLstyle(self, reversedHeadShouldersLstyle):
+        self.reversedHeadShouldersLstyle = reversedHeadShouldersLstyle
+
+    def resetReversedHeadShouldersLstyle:(self)
+        self.reversedHeadShouldersLstyle = self.defReversedHeadShouldersLstyle
+
+
+    def setTripleBottomColor(self, tripleBottomColor):
+        self.tripleBottomColor = tripleBottomColor
+
+    def resetTripleBottomColor:(self)
+        self.tripleBottomColor = self.defTripleBottomColor
+
+    def setTripleBottomLwidth(self, tripleBottomLwidth):
+        self.tripleBottomLwidth = tripleBottomLwidth
+
+    def resetTripleBottomLwidth:(self)
+        self.tripleBottomLwidth = self.defTripleBottomLwidth
+
+    def setTripleBottomLstyle(self, tripleBottomLstyle):
+        self.tripleBottomLstyle = tripleBottomLstyle
+
+    def resetTripleBottomLstyle:(self)
+        self.tripleBottomLstyle = self.defTripleBottomLstyle
+
+
+    def setFallingWedgeColor(self, fallingWedgeColor):
+        self.fallingWedgeColor = fallingWedgeColor
+
+    def resetFallingWedgeColor:(self)
+        self.fallingWedgeColor = self.defFallingWedgeColor
+
+    def setFallingWedgeLwidth(self, fallingWedgeLwidth):
+        self.fallingWedgeLwidth = fallingWedgeLwidth
+
+    def resetFallingWedgeLwidth:(self)
+        self.fallingWedgeLwidth = self.defFallingWedgeLwidth
+
+    def setFallingWedgeLstyle(self, fallingWedgeLstyle):
+        self.fallingWedgeLstyle = fallingWedgeLstyle
+
+    def resetFallingWedgeLstyle:(self)
+        self.fallingWedgeLstyle = self.defFallingWedgeLstyle
+
+
+    def setRisingTriangleColor(self, risingTriangleColor):
+        self.risingTriangleColor = risingTriangleColor
+
+    def resetRisingTriangleColor:(self)
+        self.risingTriangleColor = self.defRisingTriangleColor
+
+    def setRisingTriangleLwidth(self, risingTriangleLwidth):
+        self.risingTriangleLwidth = risingTriangleLwidth
+
+    def resetRisingTriangleLwidth:(self)
+        self.risingTriangleLwidth = self.defRisingTriangleLwidth
+
+    def setRisingTriangleLstyle(self, risingTriangleLstyle):
+        self.risingTriangleLstyle = risingTriangleLstyle
+
+    def resetRisingTriangleLstyle:(self)
+        self.risingTriangleLstyle = self.defRisingTriangleLstyle
+
+
+    def setSymetricTriangleColor(self, symetricTriangleColor):
+        self.symetricTriangleColor = symetricTriangleColor
+
+    def resetSymetricTriangleColor:(self)
+        self.symetricTriangleColor = self.defSymetricTriangleColor
+
+    def setSymetricTriangleLwidth(self, symetricTriangleLwidth):
+        self.symetricTriangleLwidth = symetricTriangleLwidth
+
+    def resetSymetricTriangleLwidth:(self)
+        self.symetricTriangleLwidth = self.defSymetricTriangleLwidth
+
+    def setSymetricTriangleLstyle(self, symetricTriangleLstyle):
+        self.symetricTriangleLstyle = symetricTriangleLstyle
+
+    def resetSymetricTriangleLstyle:(self)
+        self.symetricTriangleLstyle = self.defSymetricTriangleLstyle
+
+
+    def setRisingBreakawayGapColor(self, risingBreakawayGapColor):
+        self.risingBreakawayGapColor = risingBreakawayGapColor
+
+    def resetRisingBreakawayGapColor:(self)
+        self.risingBreakawayGapColor = self.defRisingBreakawayGapColor
+
+    def setRisingBreakawayGapLwidth(self, risingBreakawayGapLwidth):
+        self.risingBreakawayGapLwidth = risingBreakawayGapLwidth
+
+    def resetRisingBreakawayGapLwidth:(self)
+        self.risingBreakawayGapLwidth = self.defRisingBreakawayGapLwidth
+
+    def setRisingBreakawayGapLstyle(self, risingBreakawayGapLstyle):
+        self.risingBreakawayGapLstyle = risingBreakawayGapLstyle
+
+    def resetRisingBreakawayGapLstyle:(self)
+        self.risingBreakawayGapLstyle = self.defRisingBreakawayGapLstyle
+
+
+    def setRisingContinuationGapColor(self, risingContinuationGapColor):
+        self.risingContinuationGapColor = risingContinuationGapColor
+
+    def resetRisingContinuationGapColor:(self)
+        self.risingContinuationGapColor = self.defRisingContinuationGapColor
+
+    def setRisingContinuationGapLwidth(self, risingContinuationGapLwidth):
+        self.risingContinuationGapLwidth = risingContinuationGapLwidth
+
+    def resetRisingContinuationGapLwidth:(self)
+        self.risingContinuationGapLwidth = self.defRisingContinuationGapLwidth
+
+    def setRisingContinuationGapLstyle(self, risingContinuationGapLstyle):
+        self.risingContinuationGapLstyle = risingContinuationGapLstyle
+
+    def resetRisingContinuationGapLstyle:(self)
+        self.risingContinuationGapLstyle = self.defRisingContinuationGapLstyle
+
+
+    def setRisingExhaustionGapColor(self, risingExhaustionGapColor):
+        self.risingExhaustionGapColor = risingExhaustionGapColor
+
+    def resetRisingExhaustionGapColor:(self)
+        self.risingExhaustionGapColor = self.defRisingExhaustionGapColor
+
+    def setRisingExhaustionGapLwidth(self, risingExhaustionGapLwidth):
+        self.risingExhaustionGapLwidth = risingExhaustionGapLwidth
+
+    def resetRisingExhaustionGapLwidth:(self)
+        self.risingExhaustionGapLwidth = self.defRisingExhaustionGapLwidth
+
+    def setRisingExhaustionGapLstyle(self, risingExhaustionGapLstyle):
+        self.risingExhaustionGapLstyle = risingExhaustionGapLstyle
+
+    def resetRisingExhaustionGapLstyle:(self)
+        self.risingExhaustionGapLstyle = self.defRisingExhaustionGapLstyle
+
+
+    def setFallingBreakawayGapColor(self, fallingBreakawayGapColor):
+        self.fallingBreakawayGapColor = fallingBreakawayGapColor
+
+    def resetFallingBreakawayGapColor:(self)
+        self.fallingBreakawayGapColor = self.defFallingBreakawayGapColor
+
+    def setFallingBreakawayGapLwidth(self, fallingBreakawayGapLwidth):
+        self.fallingBreakawayGapLwidth = fallingBreakawayGapLwidth
+
+    def resetFallingBreakawayGapLwidth:(self)
+        self.fallingBreakawayGapLwidth = self.defFallingBreakawayGapLwidth
+
+    def setFallingBreakawayGapLstyle(self, fallingBreakawayGapLstyle):
+        self.fallingBreakawayGapLstyle = fallingBreakawayGapLstyle
+
+    def resetFallingBreakawayGapLstyle:(self)
+        self.fallingBreakawayGapLstyle = self.defFallingBreakawayGapLstyle
+
+
+    def setFallingContinuationGapColor(self, fallingContinuationGapColor):
+        self.fallingContinuationGapColor = fallingContinuationGapColor
+
+    def resetFallingContinuationGapColor:(self)
+        self.fallingContinuationGapColor = self.defFallingContinuationGapColor
+
+    def setFallingContinuationGapLwidth(self, fallingContinuationGapLwidth):
+        self.fallingContinuationGapLwidth = fallingContinuationGapLwidth
+
+    def resetFallingContinuationGapLwidth:(self)
+        self.fallingContinuationGapLwidth = self.defFallingContinuationGapLwidth
+
+    def setFallingContinuationGapLstyle(self, fallingContinuationGapLstyle):
+        self.fallingContinuationGapLstyle = fallingContinuationGapLstyle
+
+    def resetFallingContinuationGapLstyle:(self)
+        self.fallingContinuationGapLstyle = self.defFallingContinuationGapLstyle
+
+
+    def setFallingExhaustionGapColor(self, fallingExhaustionGapColor):
+        self.fallingExhaustionGapColor = fallingExhaustionGapColor
+
+    def resetFallingExhaustionGapColor:(self)
+        self.fallingExhaustionGapColor = self.defFallingExhaustionGapColor
+
+    def setFallingExhaustionGapLwidth(self, fallingExhaustionGapLwidth):
+        self.fallingExhaustionGapLwidth = fallingExhaustionGapLwidth
+
+    def resetFallingExhaustionGapLwidth:(self)
+        self.fallingExhaustionGapLwidth = self.defFallingExhaustionGapLwidth
+
+    def setFallingExhaustionGapLstyle(self, fallingExhaustionGapLstyle):
+        self.fallingExhaustionGapLstyle = fallingExhaustionGapLstyle
+
+    def resetFallingExhaustionGapLstyle:(self)
+        self.fallingExhaustionGapLstyle = self.defFallingExhaustionGapLstyle
+
+
+    def setBear3Color(self, bear3Color):
+        self.bear3Color = bear3Color
+
+    def resetBear3Color:(self)
+        self.bear3Color = self.defBear3Color
+
+    def setBear3Lwidth(self, bear3Lwidth):
+        self.bear3Lwidth = bear3Lwidth
+
+    def resetBear3Lwidth:(self)
+        self.bear3Lwidth = self.defBear3Lwidth
+
+    def setBear3Lstyle(self, bear3Lstyle):
+        self.bear3Lstyle = bear3Lstyle
+
+    def resetBear3Lstyle:(self)
+        self.bear3Lstyle = self.defBear3Lstyle
+
+
+
+
+    def setBull3Color(self, bull3Color):
+        self.bull3Color = bull3Color
+
+    def resetBull3Color:(self)
+        self.bull3Color = self.defBull3Color
+
+    def setBull3Lwidth(self, bull3Lwidth):
+        self.bull3Lwidth = bull3Lwidth
+
+    def resetBull3Lwidth:(self)
+        self.bull3Lwidth = self.defBull3Lwidth
+
+    def setBull3Lstyle(self, bull3Lstyle):
+        self.bull3Lstyle = bull3Lstyle
+
+    def resetBull3Lstyle:(self)
+        self.bull3Lstyle = self.defBull3Lstyle
+
+
+
+    def setMornigStarColor(self, mornigStarColor):
+        self.mornigStarColor = mornigStarColor
+
+    def resetMornigStarColor:(self)
+        self.mornigStarColor = self.defMornigStarColor
+
+    def setMornigStarLwidth(self, mornigStarLwidth):
+        self.mornigStarLwidth = mornigStarLwidth
+
+    def resetMornigStarLwidth:(self)
+        self.mornigStarLwidth = self.defMornigStarLwidth
+
+    def setMornigStarLstyle(self, mornigStarLstyle):
+        self.mornigStarLstyle = mornigStarLstyle
+
+    def resetMornigStarLstyle:(self)
+        self.mornigStarLstyle = self.defMornigStarLstyle
+
+
+    def setEveningStarColor(self, eveningStarColor):
+        self.eveningStarColor = eveningStarColor
+
+    def resetEveningStarColor:(self)
+        self.eveningStarColor = self.defEveningStarColor
+
+    def setEveningStarLwidth(self, eveningStarLwidth):
+        self.eveningStarLwidth = eveningStarLwidth
+
+    def resetEveningStarLwidth:(self)
+        self.eveningStarLwidth = self.defEveningStarLwidth
+
+    def setEveningStarLstyle(self, eveningStarLstyle):
+        self.eveningStarLstyle = eveningStarLstyle
+
+    def resetEveningStarLstyle:(self)
+        self.eveningStarLstyle = self.defEveningStarLstyle
+
+
+    def setDarkCloudColor(self, darkCloudColor):
+        self.darkCloudColor = darkCloudColor
+
+    def resetDarkCloudColor:(self)
+        self.darkCloudColor = self.defDarkCloudColor
+
+    def setDarkCloudLwidth(self, darkCloudLwidth):
+        self.darkCloudLwidth = darkCloudLwidth
+
+    def resetDarkCloudLwidth:(self)
+        self.darkCloudLwidth = self.defDarkCloudLwidth
+
+    def setDarkCloudLstyle(self, darkCloudLstyle):
+        self.darkCloudLstyle = darkCloudLstyle
+
+    def resetDarkCloudLstyle:(self)
+        self.darkCloudLstyle = self.defDarkCloudLstyle
+
+
+    def setPiercingColor(self, piercingColor):
+        self.piercingColor = piercingColor
+
+    def resetPiercingColor:(self)
+        self.piercingColor = self.defPiercingColor
+
+    def setPiercingLwidth(self, piercingLwidth):
+        self.piercingLwidth = piercingLwidth
+
+    def resetPiercingLwidth:(self)
+        self.piercingLwidth = self.defPiercingLwidth
+
+    def setPiercingLstyle(self, piercingLstyle):
+        self.piercingLstyle = piercingLstyle
+
+    def resetPiercingLstyle:(self)
+        self.piercingLstyle = self.defPiercingLstyle
+
+    def setFlagPennantColor(self, flagPennantColor):
+        self.flagPennantColor = flagPennantColor
+
+    def resetFlagPennantColor:(self)
+        self.flagPennantColor = self.defFlagPennantColor
+
+    def setFlagPennantLwidth(self, flagPennantLwidth):
+        self.flagPennantLwidth = flagPennantLwidth
+
+    def resetFlagPennantLwidth:(self)
+        self.flagPennantLwidth = self.defFlagPennantLwidth
+
+    def setFlagPennantLStyle(self, flagPennantLStyle):
+        self.flagPennantLStyle = flagPennantLStyle
+
+    def resetFlagPennantLStyle:(self)
+        self.flagPennantLStyle = self.defFlagPennantLStyle
+
     
     def setFormations(self, s):
         """Ustawiamy listę formacji, które będziemy rysować, poprzez przekazanie
@@ -61,7 +598,8 @@ class FormationDrawer:
             self.configuration['dark_cloud']=(self.darkCloudColor,self.darkCloudLwidth,self.darkCloudLstyle)                                                                                          
         if abs(s.piercingVal)>0:
             self.configuration['piercing']=(self.piercingColor,self.piercingLwidth,self.piercingLstyle) 
-        #flag & penant nie mają w strategy zmiennej z ich wartością!
+        if abs(s.flagPennantVal)>0:
+            self.configutation['risingTrendFlagOrPennant']=(self.flagPennantColor, self.flagPennantLwidth, self.flagPennantLStyle)
                 
 
     def drawFormations(self):
@@ -74,7 +612,7 @@ class FormationDrawer:
         candleForm=['bull3','bear3','morning_star','evening_star','piercing','dark_cloud']        
         gaps=['rising_breakaway_gap','rising_continuation_gap','rising_exhaustion_gap',
               'falling_breakaway_gap','falling_continuation_gap','falling_exhaustion_gap']        
-        fandp=['risingTrendFlagOrPennant','fallingTrendFlagOrPennant']                                
+        fandp=['risingTrendFlagOrPennant','fallingTrendFlagOrPennant']
         self.chart.clearLines()
         self.chart.clearRectangles()
         for name, values in self.configuration.iteritems():            
@@ -112,7 +650,17 @@ class FormationDrawer:
             elif name=='rate_lines':
                 self.drawRateLines(values[0],values[1],values[2])        
             elif name=='head_shoulders':
-                self.drawHeadAndShoulders(values[0],values[1],values[2])
+                neckline = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
+                self.drawHST(neckline, values[0],values[1],values[2])
+            elif name=='reversed_head_shoulders'    
+                neckline = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
+                self.drawHST(neckline, values[0],values[1],values[2])
+            elif name=='triple_top'
+                neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
+                self.drawHST(neckline, values[0],values[1],values[2])
+            elif name=='triple_bottom'
+                neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
+                self.drawHST(neckline, values[0],values[1],values[2])
             # ...
     
     def drawGeometricFormation(self,form,color='r',lstyle='--',lwidth=1.0):        
@@ -142,17 +690,24 @@ class FormationDrawer:
             height=data.low[gap[1]]-data.high[gap[1]+1]
         self.chart.drawRectangle(x,y,width,height,color,lwidth,lstyle)
     
-    def drawHeadAndShoulders(self,formation,color,lstyle,lwidth):
-        #uzupełnić
-        pass
+    #head and shoulders /reversed hs, triple top/botom
+    def drawHST(self,neckline,color,lstyle,lwidth): 
+        if (neckLine[0] != neckLine[2]):
+            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], color, lwidth, lstyle)
     
     def drawFlagAndPennant(self,formation,color,lstyle,lwidth):
         #uzupełnić
         pass
 
     def drawTrend(self,color,lstyle,lwidth):
-        #uzupełnić
-        pass
+        sup, res = trend.getChannelLines(self.data.close)
+        self.chart.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', lwidth, lstyle)
+        self.chart.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', lwidth, lstyle)
+        if len(self.data.close) > 30:
+            sup, res = trend.getChannelLines(self.data.close, 1, 2)
+            self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2*lwidth, lstyle)
+            self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2*lwidth, lstyle)
+        
     
     def drawRateLines(self,color,lstyle,lwidth):        
         values = trend.rateLines(array(self.chart.getData().close),0.38,0.62)

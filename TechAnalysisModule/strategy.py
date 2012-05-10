@@ -38,9 +38,10 @@ class Strategy:
     #Kontynuacja trendu
     symetricTriangleVal = 50
     rectangleVal = 30
+    
+    flagPennantVal = 20
 
     defFlagPennantVal = 20
-    
     defSymetricTriangleVal = 50
     defRectangleVal = 30
     """Wskazniki i oscylatory"""
@@ -208,6 +209,12 @@ class Strategy:
     def enableRectangleVal(self):
         self.rectangleVal = self.defRectangleVal
 
+    def setFlagPennantVal(self, flagPennantVal):
+        self.flagPennantVal = flagPennantVal
+    def disableFlagPennantVal(self):
+        self.flagPennantVal = 0
+    def enableFlagPennantVal(self):
+        self.flagPennantVal = self.defFlagPennantVal    
     """Wskazniki i oscylatory"""
 
     def setOscilatorsVal(self, oscilatorsVal):
@@ -396,6 +403,7 @@ class Strategy:
         self.bear3Val = self.defBear3Val
         self.eveningStarVal = self.defEveningStarVal
         self.darkCloudVal = self.defDarkCloudVal
+        self.flagPennantVal = self.defFlagPennantVal
             
     def analyze(self):
           resultText = ''
