@@ -1,1 +1,3 @@
 http://feeds.reuters.com/reuters/bondsNews
+http://www.federalreserve.gov/feeds/press_all.xml
+http://www.smartmoney.com/rss/tickernews.cfm?ticker=AAPL
