@@ -112,323 +112,323 @@ class FormationDrawer:
     def setTrendColor(self, trendColor):
         self.trendColor = trendColor
 
-    def resetTrendColor:(self)
+    def resetTrendColor(self):
         self.trendColor = self.defTrendColor
 
     def setTrendLwidth(self, trendLwidth):
         self.trendLwidth = trendLwidth
 
-    def resetTrendLwidth:(self)
+    def resetTrendLwidth(self):
         self.trendLwidth = self.defTrendLwidth
 
     def setTrendLstyle(self, trendLstyle):
         self.trendLstyle = trendLstyle
 
-    def resetTrendLstyle:(self)
+    def resetTrendLstyle(self):
         self.trendLstyle = self.defTrendLstyle
 
 
     def setHeadShouldersColor(self, headShouldersColor):
         self.headShouldersColor = headShouldersColor
 
-    def resetHeadShouldersColor:(self)
+    def resetHeadShouldersColor(self):
         self.headShouldersColor = self.defHeadShouldersColor
 
     def setHeadShouldersLwidth(self, headShouldersLwidth):
         self.headShouldersLwidth = headShouldersLwidth
 
-    def resetHeadShouldersLwidth:(self)
+    def resetHeadShouldersLwidth(self):
         self.headShouldersLwidth = self.defHeadShouldersLwidth
 
     def setHeadShouldersLstyle(self, headShouldersLstyle):
         self.headShouldersLstyle = headShouldersLstyle
 
-    def resetHeadShouldersLstyle:(self)
+    def resetHeadShouldersLstyle(self):
         self.headShouldersLstyle = self.defHeadShouldersLstyle
 
 
     def setTripleTopColor(self, tripleTopColor):
         self.tripleTopColor = tripleTopColor
 
-    def resetTripleTopColor:(self)
+    def resetTripleTopColor(self):
         self.tripleTopColor = self.defTripleTopColor
 
     def setTripleTopLwidth(self, tripleTopLwidth):
         self.tripleTopLwidth = tripleTopLwidth
 
-    def resetTripleTopLwidth:(self)
+    def resetTripleTopLwidth(self):
         self.tripleTopLwidth = self.defTripleTopLwidth
 
     def setTripleTopLstyle(self, tripleTopLstyle):
         self.tripleTopLstyle = tripleTopLstyle
 
-    def resetTripleTopLstyle:(self)
+    def resetTripleTopLstyle(self):
         self.tripleTopLstyle = self.defTripleTopLstyle
 
 
     def setRisingWedgeColor(self, risingWedgeColor):
         self.risingWedgeColor = risingWedgeColor
 
-    def resetRisingWedgeColor:(self)
+    def resetRisingWedgeColor(self):
         self.risingWedgeColor = self.defRisingWedgeColor
 
     def setRisingWedgeLwidth(self, risingWedgeLwidth):
         self.risingWedgeLwidth = risingWedgeLwidth
 
-    def resetRisingWedgeLwidth:(self)
+    def resetRisingWedgeLwidth(self):
         self.risingWedgeLwidth = self.defRisingWedgeLwidth
 
     def setRisingWedgeLstyle(self, risingWedgeLstyle):
         self.risingWedgeLstyle = risingWedgeLstyle
 
-    def resetRisingWedgeLstyle:(self)
+    def resetRisingWedgeLstyle(self):
         self.risingWedgeLstyle = self.defRisingWedgeLstyle
 
 
     def setFallingTriangleColor(self, fallingTriangleColor):
         self.fallingTriangleColor = fallingTriangleColor
 
-    def resetFallingTriangleColor:(self)
+    def resetFallingTriangleColor(self):
         self.fallingTriangleColor = self.defFallingTriangleColor
 
     def setFallingTriangleLwidth(self, fallingTriangleLwidth):
         self.fallingTriangleLwidth = fallingTriangleLwidth
 
-    def resetFallingTriangleLwidth:(self)
+    def resetFallingTriangleLwidth(self):
         self.fallingTriangleLwidth = self.defFallingTriangleLwidth
 
     def setFallingTriangleLstyle(self, fallingTriangleLstyle):
         self.fallingTriangleLstyle = fallingTriangleLstyle
 
-    def resetFallingTriangleLstyle:(self)
+    def resetFallingTriangleLstyle(self):
         self.fallingTriangleLstyle = self.defFallingTriangleLstyle
 
 
     def setReversedHeadShouldersColor(self, reversedHeadShouldersColor):
         self.reversedHeadShouldersColor = reversedHeadShouldersColor
 
-    def resetReversedHeadShouldersColor:(self)
+    def resetReversedHeadShouldersColor(self):
         self.reversedHeadShouldersColor = self.defReversedHeadShouldersColor
 
     def setReversedHeadShouldersLwidth(self, reversedHeadShouldersLwidth):
         self.reversedHeadShouldersLwidth = reversedHeadShouldersLwidth
 
-    def resetReversedHeadShouldersLwidth:(self)
+    def resetReversedHeadShouldersLwidth(self):
         self.reversedHeadShouldersLwidth = self.defReversedHeadShouldersLwidth
 
     def setReversedHeadShouldersLstyle(self, reversedHeadShouldersLstyle):
         self.reversedHeadShouldersLstyle = reversedHeadShouldersLstyle
 
-    def resetReversedHeadShouldersLstyle:(self)
+    def resetReversedHeadShouldersLstyle(self):
         self.reversedHeadShouldersLstyle = self.defReversedHeadShouldersLstyle
 
 
     def setTripleBottomColor(self, tripleBottomColor):
         self.tripleBottomColor = tripleBottomColor
 
-    def resetTripleBottomColor:(self)
+    def resetTripleBottomColor(self):
         self.tripleBottomColor = self.defTripleBottomColor
 
     def setTripleBottomLwidth(self, tripleBottomLwidth):
         self.tripleBottomLwidth = tripleBottomLwidth
 
-    def resetTripleBottomLwidth:(self)
+    def resetTripleBottomLwidth(self):
         self.tripleBottomLwidth = self.defTripleBottomLwidth
 
     def setTripleBottomLstyle(self, tripleBottomLstyle):
         self.tripleBottomLstyle = tripleBottomLstyle
 
-    def resetTripleBottomLstyle:(self)
+    def resetTripleBottomLstyle(self):
         self.tripleBottomLstyle = self.defTripleBottomLstyle
 
 
     def setFallingWedgeColor(self, fallingWedgeColor):
         self.fallingWedgeColor = fallingWedgeColor
 
-    def resetFallingWedgeColor:(self)
+    def resetFallingWedgeColor(self):
         self.fallingWedgeColor = self.defFallingWedgeColor
 
     def setFallingWedgeLwidth(self, fallingWedgeLwidth):
         self.fallingWedgeLwidth = fallingWedgeLwidth
 
-    def resetFallingWedgeLwidth:(self)
+    def resetFallingWedgeLwidth(self):
         self.fallingWedgeLwidth = self.defFallingWedgeLwidth
 
     def setFallingWedgeLstyle(self, fallingWedgeLstyle):
         self.fallingWedgeLstyle = fallingWedgeLstyle
 
-    def resetFallingWedgeLstyle:(self)
+    def resetFallingWedgeLstyle(self):
         self.fallingWedgeLstyle = self.defFallingWedgeLstyle
 
 
     def setRisingTriangleColor(self, risingTriangleColor):
         self.risingTriangleColor = risingTriangleColor
 
-    def resetRisingTriangleColor:(self)
+    def resetRisingTriangleColor(self):
         self.risingTriangleColor = self.defRisingTriangleColor
 
     def setRisingTriangleLwidth(self, risingTriangleLwidth):
         self.risingTriangleLwidth = risingTriangleLwidth
 
-    def resetRisingTriangleLwidth:(self)
+    def resetRisingTriangleLwidth(self):
         self.risingTriangleLwidth = self.defRisingTriangleLwidth
 
     def setRisingTriangleLstyle(self, risingTriangleLstyle):
         self.risingTriangleLstyle = risingTriangleLstyle
 
-    def resetRisingTriangleLstyle:(self)
+    def resetRisingTriangleLstyle(self):
         self.risingTriangleLstyle = self.defRisingTriangleLstyle
 
 
     def setSymetricTriangleColor(self, symetricTriangleColor):
         self.symetricTriangleColor = symetricTriangleColor
 
-    def resetSymetricTriangleColor:(self)
+    def resetSymetricTriangleColor(self):
         self.symetricTriangleColor = self.defSymetricTriangleColor
 
     def setSymetricTriangleLwidth(self, symetricTriangleLwidth):
         self.symetricTriangleLwidth = symetricTriangleLwidth
 
-    def resetSymetricTriangleLwidth:(self)
+    def resetSymetricTriangleLwidth(self):
         self.symetricTriangleLwidth = self.defSymetricTriangleLwidth
 
     def setSymetricTriangleLstyle(self, symetricTriangleLstyle):
         self.symetricTriangleLstyle = symetricTriangleLstyle
 
-    def resetSymetricTriangleLstyle:(self)
+    def resetSymetricTriangleLstyle(self):
         self.symetricTriangleLstyle = self.defSymetricTriangleLstyle
 
 
     def setRisingBreakawayGapColor(self, risingBreakawayGapColor):
         self.risingBreakawayGapColor = risingBreakawayGapColor
 
-    def resetRisingBreakawayGapColor:(self)
+    def resetRisingBreakawayGapColor(self):
         self.risingBreakawayGapColor = self.defRisingBreakawayGapColor
 
     def setRisingBreakawayGapLwidth(self, risingBreakawayGapLwidth):
         self.risingBreakawayGapLwidth = risingBreakawayGapLwidth
 
-    def resetRisingBreakawayGapLwidth:(self)
+    def resetRisingBreakawayGapLwidth(self):
         self.risingBreakawayGapLwidth = self.defRisingBreakawayGapLwidth
 
     def setRisingBreakawayGapLstyle(self, risingBreakawayGapLstyle):
         self.risingBreakawayGapLstyle = risingBreakawayGapLstyle
 
-    def resetRisingBreakawayGapLstyle:(self)
+    def resetRisingBreakawayGapLstyle(self):
         self.risingBreakawayGapLstyle = self.defRisingBreakawayGapLstyle
 
 
     def setRisingContinuationGapColor(self, risingContinuationGapColor):
         self.risingContinuationGapColor = risingContinuationGapColor
 
-    def resetRisingContinuationGapColor:(self)
+    def resetRisingContinuationGapColor(self):
         self.risingContinuationGapColor = self.defRisingContinuationGapColor
 
     def setRisingContinuationGapLwidth(self, risingContinuationGapLwidth):
         self.risingContinuationGapLwidth = risingContinuationGapLwidth
 
-    def resetRisingContinuationGapLwidth:(self)
+    def resetRisingContinuationGapLwidth(self):
         self.risingContinuationGapLwidth = self.defRisingContinuationGapLwidth
 
     def setRisingContinuationGapLstyle(self, risingContinuationGapLstyle):
         self.risingContinuationGapLstyle = risingContinuationGapLstyle
 
-    def resetRisingContinuationGapLstyle:(self)
+    def resetRisingContinuationGapLstyle(self):
         self.risingContinuationGapLstyle = self.defRisingContinuationGapLstyle
 
 
     def setRisingExhaustionGapColor(self, risingExhaustionGapColor):
         self.risingExhaustionGapColor = risingExhaustionGapColor
 
-    def resetRisingExhaustionGapColor:(self)
+    def resetRisingExhaustionGapColor(self):
         self.risingExhaustionGapColor = self.defRisingExhaustionGapColor
 
     def setRisingExhaustionGapLwidth(self, risingExhaustionGapLwidth):
         self.risingExhaustionGapLwidth = risingExhaustionGapLwidth
 
-    def resetRisingExhaustionGapLwidth:(self)
+    def resetRisingExhaustionGapLwidth(self):
         self.risingExhaustionGapLwidth = self.defRisingExhaustionGapLwidth
 
     def setRisingExhaustionGapLstyle(self, risingExhaustionGapLstyle):
         self.risingExhaustionGapLstyle = risingExhaustionGapLstyle
 
-    def resetRisingExhaustionGapLstyle:(self)
+    def resetRisingExhaustionGapLstyle(self):
         self.risingExhaustionGapLstyle = self.defRisingExhaustionGapLstyle
 
 
     def setFallingBreakawayGapColor(self, fallingBreakawayGapColor):
         self.fallingBreakawayGapColor = fallingBreakawayGapColor
 
-    def resetFallingBreakawayGapColor:(self)
+    def resetFallingBreakawayGapColor(self):
         self.fallingBreakawayGapColor = self.defFallingBreakawayGapColor
 
     def setFallingBreakawayGapLwidth(self, fallingBreakawayGapLwidth):
         self.fallingBreakawayGapLwidth = fallingBreakawayGapLwidth
 
-    def resetFallingBreakawayGapLwidth:(self)
+    def resetFallingBreakawayGapLwidth(self):
         self.fallingBreakawayGapLwidth = self.defFallingBreakawayGapLwidth
 
     def setFallingBreakawayGapLstyle(self, fallingBreakawayGapLstyle):
         self.fallingBreakawayGapLstyle = fallingBreakawayGapLstyle
 
-    def resetFallingBreakawayGapLstyle:(self)
+    def resetFallingBreakawayGapLstyle(self):
         self.fallingBreakawayGapLstyle = self.defFallingBreakawayGapLstyle
 
 
     def setFallingContinuationGapColor(self, fallingContinuationGapColor):
         self.fallingContinuationGapColor = fallingContinuationGapColor
 
-    def resetFallingContinuationGapColor:(self)
+    def resetFallingContinuationGapColor(self):
         self.fallingContinuationGapColor = self.defFallingContinuationGapColor
 
     def setFallingContinuationGapLwidth(self, fallingContinuationGapLwidth):
         self.fallingContinuationGapLwidth = fallingContinuationGapLwidth
 
-    def resetFallingContinuationGapLwidth:(self)
+    def resetFallingContinuationGapLwidth(self):
         self.fallingContinuationGapLwidth = self.defFallingContinuationGapLwidth
 
     def setFallingContinuationGapLstyle(self, fallingContinuationGapLstyle):
         self.fallingContinuationGapLstyle = fallingContinuationGapLstyle
 
-    def resetFallingContinuationGapLstyle:(self)
+    def resetFallingContinuationGapLstyle(self):
         self.fallingContinuationGapLstyle = self.defFallingContinuationGapLstyle
 
 
     def setFallingExhaustionGapColor(self, fallingExhaustionGapColor):
         self.fallingExhaustionGapColor = fallingExhaustionGapColor
 
-    def resetFallingExhaustionGapColor:(self)
+    def resetFallingExhaustionGapColor(self):
         self.fallingExhaustionGapColor = self.defFallingExhaustionGapColor
 
     def setFallingExhaustionGapLwidth(self, fallingExhaustionGapLwidth):
         self.fallingExhaustionGapLwidth = fallingExhaustionGapLwidth
 
-    def resetFallingExhaustionGapLwidth:(self)
+    def resetFallingExhaustionGapLwidth(self):
         self.fallingExhaustionGapLwidth = self.defFallingExhaustionGapLwidth
 
     def setFallingExhaustionGapLstyle(self, fallingExhaustionGapLstyle):
         self.fallingExhaustionGapLstyle = fallingExhaustionGapLstyle
 
-    def resetFallingExhaustionGapLstyle:(self)
+    def resetFallingExhaustionGapLstyle(self):
         self.fallingExhaustionGapLstyle = self.defFallingExhaustionGapLstyle
 
 
     def setBear3Color(self, bear3Color):
         self.bear3Color = bear3Color
 
-    def resetBear3Color:(self)
+    def resetBear3Color(self):
         self.bear3Color = self.defBear3Color
 
     def setBear3Lwidth(self, bear3Lwidth):
         self.bear3Lwidth = bear3Lwidth
 
-    def resetBear3Lwidth:(self)
+    def resetBear3Lwidth(self):
         self.bear3Lwidth = self.defBear3Lwidth
 
     def setBear3Lstyle(self, bear3Lstyle):
         self.bear3Lstyle = bear3Lstyle
 
-    def resetBear3Lstyle:(self)
+    def resetBear3Lstyle(self):
         self.bear3Lstyle = self.defBear3Lstyle
 
 
@@ -437,19 +437,19 @@ class FormationDrawer:
     def setBull3Color(self, bull3Color):
         self.bull3Color = bull3Color
 
-    def resetBull3Color:(self)
+    def resetBull3Color(self):
         self.bull3Color = self.defBull3Color
 
     def setBull3Lwidth(self, bull3Lwidth):
         self.bull3Lwidth = bull3Lwidth
 
-    def resetBull3Lwidth:(self)
+    def resetBull3Lwidth(self):
         self.bull3Lwidth = self.defBull3Lwidth
 
     def setBull3Lstyle(self, bull3Lstyle):
         self.bull3Lstyle = bull3Lstyle
 
-    def resetBull3Lstyle:(self)
+    def resetBull3Lstyle(self):
         self.bull3Lstyle = self.defBull3Lstyle
 
 
@@ -457,94 +457,94 @@ class FormationDrawer:
     def setMornigStarColor(self, mornigStarColor):
         self.mornigStarColor = mornigStarColor
 
-    def resetMornigStarColor:(self)
+    def resetMornigStarColor(self):
         self.mornigStarColor = self.defMornigStarColor
 
     def setMornigStarLwidth(self, mornigStarLwidth):
         self.mornigStarLwidth = mornigStarLwidth
 
-    def resetMornigStarLwidth:(self)
+    def resetMornigStarLwidth(self):
         self.mornigStarLwidth = self.defMornigStarLwidth
 
     def setMornigStarLstyle(self, mornigStarLstyle):
         self.mornigStarLstyle = mornigStarLstyle
 
-    def resetMornigStarLstyle:(self)
+    def resetMornigStarLstyle(self):
         self.mornigStarLstyle = self.defMornigStarLstyle
 
 
     def setEveningStarColor(self, eveningStarColor):
         self.eveningStarColor = eveningStarColor
 
-    def resetEveningStarColor:(self)
+    def resetEveningStarColor(self):
         self.eveningStarColor = self.defEveningStarColor
 
     def setEveningStarLwidth(self, eveningStarLwidth):
         self.eveningStarLwidth = eveningStarLwidth
 
-    def resetEveningStarLwidth:(self)
+    def resetEveningStarLwidth(self):
         self.eveningStarLwidth = self.defEveningStarLwidth
 
     def setEveningStarLstyle(self, eveningStarLstyle):
         self.eveningStarLstyle = eveningStarLstyle
 
-    def resetEveningStarLstyle:(self)
+    def resetEveningStarLstyle(self):
         self.eveningStarLstyle = self.defEveningStarLstyle
 
 
     def setDarkCloudColor(self, darkCloudColor):
         self.darkCloudColor = darkCloudColor
 
-    def resetDarkCloudColor:(self)
+    def resetDarkCloudColor(self):
         self.darkCloudColor = self.defDarkCloudColor
 
     def setDarkCloudLwidth(self, darkCloudLwidth):
         self.darkCloudLwidth = darkCloudLwidth
 
-    def resetDarkCloudLwidth:(self)
+    def resetDarkCloudLwidth(self):
         self.darkCloudLwidth = self.defDarkCloudLwidth
 
     def setDarkCloudLstyle(self, darkCloudLstyle):
         self.darkCloudLstyle = darkCloudLstyle
 
-    def resetDarkCloudLstyle:(self)
+    def resetDarkCloudLstyle(self):
         self.darkCloudLstyle = self.defDarkCloudLstyle
 
 
     def setPiercingColor(self, piercingColor):
         self.piercingColor = piercingColor
 
-    def resetPiercingColor:(self)
+    def resetPiercingColor(self):
         self.piercingColor = self.defPiercingColor
 
     def setPiercingLwidth(self, piercingLwidth):
         self.piercingLwidth = piercingLwidth
 
-    def resetPiercingLwidth:(self)
+    def resetPiercingLwidth(self):
         self.piercingLwidth = self.defPiercingLwidth
 
     def setPiercingLstyle(self, piercingLstyle):
         self.piercingLstyle = piercingLstyle
 
-    def resetPiercingLstyle:(self)
+    def resetPiercingLstyle(self):
         self.piercingLstyle = self.defPiercingLstyle
 
     def setFlagPennantColor(self, flagPennantColor):
         self.flagPennantColor = flagPennantColor
 
-    def resetFlagPennantColor:(self)
+    def resetFlagPennantColor(self):
         self.flagPennantColor = self.defFlagPennantColor
 
     def setFlagPennantLwidth(self, flagPennantLwidth):
         self.flagPennantLwidth = flagPennantLwidth
 
-    def resetFlagPennantLwidth:(self)
+    def resetFlagPennantLwidth(self):
         self.flagPennantLwidth = self.defFlagPennantLwidth
 
     def setFlagPennantLStyle(self, flagPennantLStyle):
         self.flagPennantLStyle = flagPennantLStyle
 
-    def resetFlagPennantLStyle:(self)
+    def resetFlagPennantLStyle(self):
         self.flagPennantLStyle = self.defFlagPennantLStyle
 
     
