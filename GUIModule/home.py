@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
 import DataParserModule.dataParser as dataParser
+from ChartsModule.LightweightChart import *
+import datetime
+import TechAnalysisModule.oscilators as indicators
 import time
 
 class Home (QtGui.QWidget):
@@ -10,7 +13,7 @@ class Home (QtGui.QWidget):
         self.loserList = loserList
         self.gainerList = gainerList
 	self.finObjList = finObjList
-	self.updateThread = UpdateThread()
+	self.updateThread = UpdateThread(self.finObjList)
 	self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
         QtGui.QWidget.__init__(self)
         self.initUi()
@@ -18,17 +21,18 @@ class Home (QtGui.QWidget):
         self.gridLayout = QtGui.QGridLayout(self)
         #ramka zawierajaca obiekty z góry yahoo 
         self.topFrame = QtGui.QFrame(self)
-        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 160))
-        self.topFrame.setMinimumSize(QtCore.QSize(0, 160))
+        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 320))
+        self.topFrame.setMinimumSize(QtCore.QSize(0, 320))
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.topLayout = QtGui.QGridLayout(self.topFrame)
         #spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         #self.topLayout.addItem(spacerItem)
         k = 0
-        for objList in self.topList:
-            self.addTopObject(objList,k)
-            k=k+2
+        if self.topList:
+            for objList in self.topList:
+                self.addTopObject(objList,k)
+                k=k+1
 
 
         
@@ -87,6 +91,7 @@ class Home (QtGui.QWidget):
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
     def addTopObject(self,objList,k):
+        #print "jestem w addTopObject"
         self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
@@ -114,7 +119,25 @@ class Home (QtGui.QWidget):
             precentLabel.setStyleSheet('QLabel {color: green}')
         precentLabel.setText(objList[3])
         verticalLayout.addWidget(precentLabel)
-        self.topLayout.addWidget(self.frame,0,k)
+        self.topLayout.addWidget(self.frame,k/4,(2*k)%8)
+        # tworzymy LightWeightChart
+        #print """ fgfg """ + self.finObjList
+        print " fin OBj List:"
+        print self.finObjList
+        if  self.finObjList:
+            finObj = self.finObjList[k]
+            d = finObj.getArray('daily')
+            dates=d['date']
+            values=d['close']
+            print "cos tam ok ok "
+            #values=indicators.adLine(d['adv'], d['dec'])
+            #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
+            #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
+            zajebistyWykres = LightweightChart(self,dates,values,'A/D line')                        
+            self.topLayout.addWidget(zajebistyWykres,k/4,(2*k+1)%8)#zajebiste Dane1
+
+            
+        
         
                                   
     def addTable(self,objList2):
@@ -153,42 +176,43 @@ class Home (QtGui.QWidget):
         item = QtGui.QTableWidgetItem('%Chg')
         self.tableWidget.setHorizontalHeaderItem(2, item)
         k = 0
-        for objList in objList2:
-            item = QtGui.QTableWidgetItem(objList[0])
-            brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
-            brush.setStyle(QtCore.Qt.NoBrush)
-            item.setBackground(brush)
-            brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
-            brush.setStyle(QtCore.Qt.BDiagPattern)
-            item.setForeground(brush)
-            self.tableWidget.setItem(k, 0, item)
-            #Prize
-            item = QtGui.QTableWidgetItem(objList[1])
-            item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            self.tableWidget.setItem(k, 1, item)
-            #Change
-            #item = QtGui.QTableWidgetItem(objList[2])
-            #item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            #if objList[2][0] =='-':
-                #brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
-            #else:
-                #brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
-            #brush.setStyle(QtCore.Qt.NoBrush)
-            #item.setForeground(brush)
-            #item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
-            #self.tableWidget.setItem(k, 2, item)
-            #%chg
-            item = QtGui.QTableWidgetItem(objList[2])
-            item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
-            if objList[2][0] == '-':
-                brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
-            else:
-                brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
-            brush.setStyle(QtCore.Qt.NoBrush)
-            item.setForeground(brush)
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
-            self.tableWidget.setItem(k, 2, item)
-            k+=1
+        if objList2:
+            for objList in objList2:
+                item = QtGui.QTableWidgetItem(objList[0])
+                brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
+                brush.setStyle(QtCore.Qt.NoBrush)
+                item.setBackground(brush)
+                brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
+                brush.setStyle(QtCore.Qt.BDiagPattern)
+                item.setForeground(brush)
+                self.tableWidget.setItem(k, 0, item)
+                #Prize
+                item = QtGui.QTableWidgetItem(objList[1])
+                item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
+                self.tableWidget.setItem(k, 1, item)
+                #Change
+                #item = QtGui.QTableWidgetItem(objList[2])
+                #item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
+                #if objList[2][0] =='-':
+                    #brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+                #else:
+                    #brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
+                #brush.setStyle(QtCore.Qt.NoBrush)
+                #item.setForeground(brush)
+                #item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+                #self.tableWidget.setItem(k, 2, item)
+                #%chg
+                item = QtGui.QTableWidgetItem(objList[2])
+                item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
+                if objList[2][0] == '-':
+                    brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
+                else:
+                    brush = QtGui.QBrush(QtGui.QColor(0,255, 0)) 
+                brush.setStyle(QtCore.Qt.NoBrush)
+                item.setForeground(brush)
+                item.setFlags(QtCore.Qt.ItemIsEnabled)
+                self.tableWidget.setItem(k, 2, item)
+                k+=1
         
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(74)
@@ -203,6 +227,7 @@ class Home (QtGui.QWidget):
     def updateTopList(self):
        
 	self.topList = self.updateThread.topList
+	self.finObjList = self.updateThread.finObjList
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
         for i in ran:
@@ -210,15 +235,17 @@ class Home (QtGui.QWidget):
             
 
         # tworzymy nowe ramki z nowymi wartościami
+        k = 0
         for objList in self.topList:
-            self.addTopObject(objList)
+            self.addTopObject(objList,k)
+            k = k+1
 
     def updateTable(self):
 	
 	self.mostList = self.updateThread.mostList
 	self.loserList = self.updateThread.loserList
 	self.gainerList = self.updateThread.gainerList
-	self.finObjList = self.updateThread.finObjList
+	
 
         ran = range(self.leftLayout.count())
         for i in ran:
@@ -234,7 +261,7 @@ class Home (QtGui.QWidget):
         self.addTable(self.loserList)
 	
     def updateHome(self):
-	#self.updateTopList()
+	self.updateTopList()
 	self.updateTable()
 
     def startUpdating(self): 
@@ -279,13 +306,13 @@ class MyFrame(QtGui.QFrame):
         
 class UpdateThread(QtCore.QThread):
 
-    def __init__(self):
+    def __init__(self,finObjList):
         QtCore.QThread.__init__(self)
 	self.mostList = []
 	self.topList = []
 	self.loserList = []
 	self.gainerList = []
-	self.finObjList = []
+	self.finObjList = finObjList
 
     def __del__(self):
         self.wait()
@@ -300,15 +327,15 @@ class UpdateThread(QtCore.QThread):
 			self.topList = dataParser.getMostPopular()
 			self.emit(QtCore.SIGNAL("Update"))	
 			
-			self.finObjList = []
-			self.finObjList.append(dataParser.getDataToLightWeightChart("^DJI","index","Yahoo"))
-			self.finObjList.append(dataParser.getDataToLightWeightChart("^IXIC","index","Yahoo"))
-			self.finObjList.append(dataParser.getDataToLightWeightChart("^GSPC","index","Yahoo"))
-			self.finObjList.append(dataParser.getDataToLightWeightChart("EURUSD","forex","Stooq"))
-			self.finObjList.append(dataParser.getDataToLightWeightChart("10USY.B","bond","Stooq"))
-			self.finObjList.append(dataParser.getDataToLightWeightChart("XAUUSD","resource","Stooq"))
-			self.finObjList.append(dataParser.getDataToLightWeightChart("CL.F","resource","Stooq"))
-
+			self.finObjListTemp = []
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("^DJI","index","Yahoo"))
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("^IXIC","index","Yahoo"))
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("^GSPC","index","Yahoo"))
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("EURUSD","forex","Stooq"))
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("10USY.B","bond","Stooq"))
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("XAUUSD","resource","Stooq"))
+			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("CL.F","resource","Stooq"))
+                        self.finObjList = self.finObjListTemp
 			array  = self.finObjList[1].getArray('daily')
 			print array["date"]
 		 			
