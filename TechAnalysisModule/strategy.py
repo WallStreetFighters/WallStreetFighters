@@ -516,10 +516,10 @@ class Strategy:
               overallScore += defFlagPennantVal * flags[1]
               if flags[1] < 0:
                   print "(-) falling-trend flag/pennant"
-                  resultText = resultText + "(-) falling-trend flag/pennant"
+                  resultText = resultText + "(-) falling-trend flag/pennant\n"
               else:
                   print "(+) rising-trend flag/pennant"
-                  resultText = resultText + "(+) rising-trend flag/pennant"
+                  resultText = resultText + "(+) rising-trend flag/pennant\n"
 
           gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)
           for formation in gaps:

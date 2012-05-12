@@ -1111,7 +1111,7 @@ def findFlagsAndPennants(values, volume, maxval, minval):
 	proposals = checkValuesForFlagsAndPennants(3,values)
 	proposals = checkVolumeForFlagsAndPennants(proposals,volume,values)
 	raising,falling = checkRegressionForFlagsAndPennants(proposals,maxval,minval)
-	print scoreFlags(raising,falling,volume)
+	return scoreFlags(raising,falling,volume)
 
 
 def checkValuesForFlagsAndPennants(period, values):
