@@ -71,7 +71,10 @@ def optimizedTrend(values):
     index = []
     val = []
     for i in range(size):
-        val = val + [(values[i] - minV) * 1.0 / (maxV - minV)]
+        if maxV != minV:
+            val = val + [(values[i] - minV) * 1.0 / (maxV - minV)]
+        else:
+            val = val + [(values[i] - minV) * 1.0]
         index = index + [i * 1.0 / size]
     index = asarray(index)
     A = vstack([index, ones(len(val))]).T
@@ -321,7 +324,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     maxVal = max(values)
@@ -369,13 +372,13 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
                 
     # print "nie znaleziono"
     if analyze == 0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
 
 
 
@@ -476,7 +479,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -527,13 +530,13 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
 
     # print "nie znaleziono", z
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
  
 
 def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastArmVol, maxFirstArmVal, maxFirstArmVol, maxMiddleVal,
@@ -610,7 +613,7 @@ def lookForTripleTop(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -661,14 +664,14 @@ def lookForTripleTop(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
                 
 
     # print "nie znaleziono", z
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
     
 
 def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastArmVol, minFirstArmVal, maxFirstArmVol, minMiddleVal,
@@ -695,7 +698,7 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
         if optimizedTrend(prev) == 1:
             return 0, [0, 0, 0, 0]
 
-		 #Wartosc szczytow lewego ramienia, glowy i prawego ramienia lezy mniej wiecej na tym samym poziomie
+         #Wartosc szczytow lewego ramienia, glowy i prawego ramienia lezy mniej wiecej na tym samym poziomie
     if (aInRect(asarray([minFirstArmVal, minMiddleVal, minLastArmVal]), tripleDiff) == 0):
         return 0, [0, 0, 0, 0]
     #na kolejnych szczytach wolumen zmniejsza sie
@@ -747,7 +750,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
         if analyze == 0:
             return [0, 0, 0, 0]
         else:
-            return 0
+            return [0]
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -798,14 +801,14 @@ def lookForTripleBottom(values, volumine, analyze=0):
                 if analyze == 0:
                     return neckLine[index]
                 else:
-                    return z[index]
+                    return [z[index], neckLine[index]]
                 
 
     # print "nie znaleziono", z
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
-        return 0
+        return [0]
 
 def averageChange(values):
     """ srednia zmiana kursu wyrazona w procentach, moze byc ujemna"""
@@ -907,7 +910,7 @@ def findGeometricFormationOnFragment(values, a, b):
     factorX=1.0 / len(values)
     factorY=1.0 / (max(values) - minY)    
     supx0, supy0, supx1, supy1 = sup[0][1], sup[0][0], sup[len(sup)- 1][1], sup[len(sup)- 1][0]     
-    resx0, resy0, resx1, resy1 = res[0][1], res[0][0], res[len(res)- 1][1], res[len(res)- 1][0]
+    resx0, resy0, resx1, resy1 = res[0][1], res[0][0], res[len(res)- 1][1], res[len(res)- 1][0]    
     if(supy0>=resy0 or supy1>resy1):
         return None        
     scaledSupLine=lineFrom2Points(factorX * supx0, factorY * (supy0 - minY),factorX * supx1, factorY * (supy1 - minY))
@@ -917,13 +920,13 @@ def findGeometricFormationOnFragment(values, a, b):
     #print "supAngle: ", supAngle, "resAngle: ", resAngle
     #prostokąt
     if resAngle < formVul and resAngle > - formVul and supAngle < formVul and supAngle > - formVul:        
-        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1] 
-#        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:int(min(supx0, resx0))]) ] 
+        #return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1] 
+        return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1 * optimizedTrend(values[0:int(min(supx0, resx0))]) ] 
     #trójkąt symetryczny
     elif resAngle < - formVul and supAngle > formVul:        
-        return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1]
-#         return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
-#        1 * optimizedTrend(values[0:min(supx0, resx0)])] 
+        #return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1]
+         return ['symmetric_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),
+        1 * optimizedTrend(values[0:int(min(supx0, resx0))])] 
     #trójkąt zniżkujący
     elif resAngle < - formVul and abs(supAngle) < formVul and supAngle - resAngle > convergenceVul:        
         return ['falling_triangle',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1] 
@@ -956,8 +959,8 @@ def findMinLine(array):
         temp = arraySorted[i]
         for j in range(0, size):
             if array[j] == temp:
-                numberOfSimilarValues +=1
-        if numberOfSimilarValues <2:
+                numberOfSimilarValues += 1
+        if numberOfSimilarValues < 2:
             numberOfSimilarValues = 0
         else:
             z = 0
@@ -984,8 +987,8 @@ def findMaxLine(array):
         temp = arraySorted[i]
         for j in range(0, size):
             if array[j] == temp:
-                numberOfSimilarValues +=1
-        if numberOfSimilarValues <2:
+                numberOfSimilarValues += 1
+        if numberOfSimilarValues < 2:
             numberOfSimilarValues = 0
         else:
             z = 0
@@ -1104,6 +1107,90 @@ def rateLines(array, scaler1, scaler2):
 
 # FLAGI I CHORAGIEWKI
 
+<<<<<<< HEAD:TechAnalysisModule/trendAnalysis.py~
+=======
+<<<<<<< HEAD
+def findFlagsAndPennants(values,volume):
+    proposals = checkValuesForFlagsAndPennants(3,values)
+    return checkVolumeForFlagsAndPennants(proposals,volume,values)
+
+def checkValuesForFlagsAndPennants(period, values):
+    i = 0
+    maxs = max(values)
+    mins = min(values)
+    diff = maxs - mins
+    raiseproposals = []
+    fallproposals = []
+    while i < len(values) - period:
+        if values[i] + 0.25*diff < values[i+period]:
+            if raiseproposals == []:
+                raiseproposals.append(i)
+            elif raiseproposals[-1] == i-1:
+                raiseproposals[-1] = i
+            else:
+                raiseproposals.append(i)
+        elif values[i] - 0.25*diff > values[i+period]:
+            if fallproposals == []:
+                fallproposals.append(i)
+            elif fallproposals[-1] == i-1:
+                fallproposals[-1] = i
+            else:
+                fallproposals.append(i)
+        i += 1
+    raiseproposals = list(map((lambda x: x+period), raiseproposals))
+    fallproposals = list(map((lambda x: x+period), fallproposals))
+    return [raiseproposals,fallproposals]
+
+def checkVolumeForFlagsAndPennants(proposals,volume,values):
+    ups = []
+    downs = []
+    for x in proposals[0]:
+        i = x
+        while (i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
+            i = i+1
+        diff = i - x
+        if diff > 2 and diff < 28 and values[i+1] > values[i]:
+            temp = volume[x:i:1]
+            average = float(sum(temp)) / len(temp)
+            if average < volume[x]:
+                ups.append([x,i])
+
+    for x in proposals[1]:
+        i = x
+        while ( i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
+            i = i+1
+        diff = i - x
+        if  values[i+1] < values[i] and diff > 2 and diff < 28:
+            temp = volume[x:i:1]
+            average = float(sum(temp)) / len(temp)
+            if average < volume[x]:
+                downs.append([x,i])
+    maxR = 0
+    maxL = 0    
+    try:
+        tmp = reduce(lambda x,y: x+y,ups)
+        maxR = max(tmp)
+        tmp = reduce(lambda x,y: x+y,downs)
+        maxL = max(tmp)
+    except TypeError: 
+        pass
+    if maxR > maxL:
+        scale = maxR/len(volume)
+        return ['risingTrendFlagOrPennant', scale]
+    elif maxR < maxL:
+        scale = -1*(maxL/len(volume))
+        return ['fallingTrendFlagOrPennant', scale]
+    else:
+        return None
+    proposals = checkValuesForFlagsAndPennants(3,values)
+    return checkVolumeForFlagsAndPennants(proposals,volume,values)
+
+"""
+def checkChannelForFlagsAndPennants(proposals,values):      
+"""
+        
+=======
+>>>>>>> chart:TechAnalysisModule/trendAnalysis.py.orig
 def findFlagsAndPennants(values, volume, maxval, minval):
 	proposals = checkValuesForFlagsAndPennants(3,values)
 	proposals = checkVolumeForFlagsAndPennants(proposals,volume,values)
@@ -1147,22 +1234,32 @@ def checkVolumeForFlagsAndPennants(proposals,volume,values):
 		while (i+2 < len(volume) and volume[i+1] < 1.6*volume[i]):
 			i = i+1
 		diff = i - x
-		if diff > 2 and diff < 28 and values[i+1] > values[i]:
-			temp = volume[x:i:1]
-			average = float(sum(temp)) / len(temp)
-			if average < volume[x]:
-				ups.append([x,i])
+		if (i+1 < len(volume)):
+			if diff > 2 and diff < 28 and values[i+1] > values[i]:
+				temp = volume[x:i:1]
+				average = float(sum(temp)) / len(temp)
+				if average < volume[x]:
+					ups.append([x,i])
 
 	for x in proposals[1]:
 		i = x
 		while ( i+2 < len(volume) and volume[i+1] < 1.6*volume[i]):
 			i = i+1
 		diff = i - x
+<<<<<<< HEAD:TechAnalysisModule/trendAnalysis.py~
 		if  values[i+1] < values[i] and diff > 2 and diff < 28:
 			temp = volume[x:i:1]
 			average = float(sum(temp)) / len(temp)
 			if average < volume[x]:
 				downs.append([x,i])
+=======
+		if (i+1 < len(volume)):
+			if  values[i+1] < values[i] and diff > 2 and diff < 28:
+				temp = volume[x:i:1]
+				average = float(sum(temp)) / len(temp)
+				if average < volume[x]:
+					downs.append([x,i])
+>>>>>>> chart:TechAnalysisModule/trendAnalysis.py.orig
 	return [ups,downs]
 
 def checkRegressionForFlagsAndPennants(proposals,maxval,minval):
@@ -1212,6 +1309,10 @@ def scoreFlags(rising,falling,volume):
 
 
 
+<<<<<<< HEAD:TechAnalysisModule/trendAnalysis.py~
+=======
+>>>>>>> GUI
+>>>>>>> chart:TechAnalysisModule/trendAnalysis.py.orig
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
 #values = asarray(values)

@@ -7,6 +7,10 @@
 *.o
 *.so
 *.pyc
+data.wsf
+data.wsf~
+save.wsf
+
 
 data.wsf
 data.wsf~
@@ -25,9 +29,11 @@ save.wsf
 *.rar
 *.tar
 *.zip
+*~
 data.wsf
 data.wsf~
 save.wsf
+save.wsf~
 # Logs and databases #
 ######################
 *.log

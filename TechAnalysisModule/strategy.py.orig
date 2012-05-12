@@ -38,10 +38,9 @@ class Strategy:
     #Kontynuacja trendu
     symetricTriangleVal = 50
     rectangleVal = 30
-    
-    flagPennantVal = 20
 
     defFlagPennantVal = 20
+    
     defSymetricTriangleVal = 50
     defRectangleVal = 30
     """Wskazniki i oscylatory"""
@@ -209,12 +208,6 @@ class Strategy:
     def enableRectangleVal(self):
         self.rectangleVal = self.defRectangleVal
 
-    def setFlagPennantVal(self, flagPennantVal):
-        self.flagPennantVal = flagPennantVal
-    def disableFlagPennantVal(self):
-        self.flagPennantVal = 0
-    def enableFlagPennantVal(self):
-        self.flagPennantVal = self.defFlagPennantVal    
     """Wskazniki i oscylatory"""
 
     def setOscilatorsVal(self, oscilatorsVal):
@@ -403,7 +396,6 @@ class Strategy:
         self.bear3Val = self.defBear3Val
         self.eveningStarVal = self.defEveningStarVal
         self.darkCloudVal = self.defDarkCloudVal
-        self.flagPennantVal = self.defFlagPennantVal
             
     def analyze(self):
           resultText = ''
@@ -498,53 +490,6 @@ class Strategy:
                       overallScore += self.fallingWedgeVal * formation[3]
                       if self.fallingWedgeVal * formation[3] != 0:
 <<<<<<< HEAD
-                          print " (+) falling wedge\n"
-                          resultText = resultText + " (+) falling wedge\n"
-     
-	  flags = trend.findFlagsAndPennants(self.close,self.volume, self.high, self.low)
-	  if flags != None:
-		overallScore += defFlagPennantVal * flags[1]
-		if flags[1] < 0:
-			print "(-) falling-trend flag/pennant"
-			resultText = resultText + "(-) falling-trend flag/pennant"
-		else:
-			print "(+) rising-trend flag/pennant"
-			resultText = resultText + "(+) rising-trend flag/pennant"
-
-          # gaps = candles.findGaps(self.high,self.low,self.close) 
-          # for formation in gaps:
-          #     if formation != None:
-          #         print "luka ", formation
-          #         print "luka2 ", formation[0]
-          #         print "luka3 ", formation[0][0]
-          #         
-          #         if formation[0][0] == 'rising_breakaway_gap':
-          #             overallScore += self.risingBreakawayGapVal * formation[1]
-          #             if self.risingBreakawayGapVal * formation[1] != 0:
-          #                 print " (+) rising breakaway gap\n"
-          #         elif formation[0][0] == 'rising_continuation_gap':
-          #             overallScore += self.risingContinuationGapVal * formation[1]
-          #             if self.risingContinuationGapVal * formation[1] != 0:
-          #                 print " (+) rising continuation gap\n"
-          #         elif formation[0][0] == 'rising_exhaustion_gap':
-          #             overallScore += self.risingExhaustionGapVal * formation[1]
-          #             if self.risingExhaustionGapVal * formation[1] != 0:
-          #                 print " (-) rising exhaoustion gap\n"
-          #         elif formation[0][0] == 'falling_breakaway_gap':
-          #             overallScore += self.fallingBreakawayGapVal * formation[1]
-          #             if self.fallingBreakawayGapVal * formation[1] != 0:
-          #                 print " (-) falling breakaway gap\n"
-          #         elif formation[0][0] == 'falling_continuation_gap':
-          #             overallScore += self.fallingContinuationGapVal * formation[1]
-          #             if self.fallingContinuationGapVal * formation[1] != 0:
-          #                 print " (-) falling contination gap\n"
-          #         elif formation[0][0] == 'falling_exhaustion_gap':
-          #             overallScore += self.fallingExhaustionGapVal * formation[1]
-          #             if self.fallingExhaustionGapVal * formation[1] != 0:
-          #                 print " (+) falling exhaustion gap\n"
-
-          candleFormations = candles.findCandleFormations(self.open, self.high, self.low, self.close)
-=======
                           print "   (+) falling wedge\n"
                           resultText = resultText + "   (+) falling wedge     "
                           hasFound = 1
@@ -591,7 +536,54 @@ class Strategy:
                           print "   (+) falling exhaustion gap\n"
 
           candleFormations = candles.findCandleFormations(self.data.open, self.data.high, self.data.low, self.data.close)
->>>>>>> chart
+=======
+                          print " (+) falling wedge\n"
+                          resultText = resultText + " (+) falling wedge\n"
+     
+	  flags = trend.findFlagsAndPennants(self.close,self.volume, self.high, self.low)
+	  if flags != None:
+		overallScore += defFlagPennantVal * flags[1]
+		if flags[1] < 0:
+			print "(-) falling-trend flag/pennant"
+			resultText = resultText + "(-) falling-trend flag/pennant"
+		else:
+			print "(+) rising-trend flag/pennant"
+			resultText = resultText + "(+) rising-trend flag/pennant"
+
+          # gaps = candles.findGaps(self.high,self.low,self.close) 
+          # for formation in gaps:
+          #     if formation != None:
+          #         print "luka ", formation
+          #         print "luka2 ", formation[0]
+          #         print "luka3 ", formation[0][0]
+          #         
+          #         if formation[0][0] == 'rising_breakaway_gap':
+          #             overallScore += self.risingBreakawayGapVal * formation[1]
+          #             if self.risingBreakawayGapVal * formation[1] != 0:
+          #                 print " (+) rising breakaway gap\n"
+          #         elif formation[0][0] == 'rising_continuation_gap':
+          #             overallScore += self.risingContinuationGapVal * formation[1]
+          #             if self.risingContinuationGapVal * formation[1] != 0:
+          #                 print " (+) rising continuation gap\n"
+          #         elif formation[0][0] == 'rising_exhaustion_gap':
+          #             overallScore += self.risingExhaustionGapVal * formation[1]
+          #             if self.risingExhaustionGapVal * formation[1] != 0:
+          #                 print " (-) rising exhaoustion gap\n"
+          #         elif formation[0][0] == 'falling_breakaway_gap':
+          #             overallScore += self.fallingBreakawayGapVal * formation[1]
+          #             if self.fallingBreakawayGapVal * formation[1] != 0:
+          #                 print " (-) falling breakaway gap\n"
+          #         elif formation[0][0] == 'falling_continuation_gap':
+          #             overallScore += self.fallingContinuationGapVal * formation[1]
+          #             if self.fallingContinuationGapVal * formation[1] != 0:
+          #                 print " (-) falling contination gap\n"
+          #         elif formation[0][0] == 'falling_exhaustion_gap':
+          #             overallScore += self.fallingExhaustionGapVal * formation[1]
+          #             if self.fallingExhaustionGapVal * formation[1] != 0:
+          #                 print " (+) falling exhaustion gap\n"
+
+          candleFormations = candles.findCandleFormations(self.open, self.high, self.low, self.close)
+>>>>>>> GUI
           for formation in candleFormations:
               if formation != None:
                   if formation[0][0] == 'bull3':

@@ -8,11 +8,17 @@
 *.so
 *.pyc
 <<<<<<< HEAD
+<<<<<<< HEAD:.gitignore~
 data.wsf
 data.wsf~
 save.wsf
 =======
 >>>>>>> test-merge
+=======
+=======
+
+>>>>>>> chart
+>>>>>>> chart:.gitignore.orig
 
 # Packages #
 ############

@@ -19,7 +19,7 @@ class LightweightChart(FigureCanvas):
     num_ticks = 4 #tyle jest etykiet pod wykresem
     
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
-    margin, maxSize = 0.1, 0.8         
+    margin, maxSize = 0.0, 1.0         
     
     def __init__(self, parent, dates=None, values=None, name=None, width=3.2, height=2.4, dpi=100):
         """Konstruktor. Tworzy wykres dla podanych danych. Domyślny rozmiar to 320x240 pixli."""                                
@@ -58,11 +58,8 @@ class LightweightChart(FigureCanvas):
         ax.set_xlim(x[0],x[-1])        
         minVal=min(self.values)
         maxVal=max(self.values)
-        ax.set_ylim(minVal-0.1*abs(minVal),maxVal+0.1*abs(maxVal))        
-        #legenda
-        leg = ax.legend(loc='best', fancybox=True)
-        leg.get_frame().set_alpha(0.5)
-        self.formatDateAxis(self.plot)   
+        ax.set_ylim(minVal-0.01*abs(minVal),maxVal+0.01*abs(maxVal))      
+        self.formatDateAxis(ax)
         self.draw()
     
     def formatDateAxis(self,ax):
