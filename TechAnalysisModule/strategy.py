@@ -62,6 +62,11 @@ class Strategy:
     defRsiVal = 50
     defWilliamsVal = 50
 
+    """Wachlarze"""
+
+    defRateLinesVal = 10
+    rateLinesVal = 10
+
     """Luki"""
     #Wzrostowe
     risingBreakawayGapVal = 50
@@ -207,6 +212,15 @@ class Strategy:
         self.rectangleVal = 0
     def enableRectangleVal(self):
         self.rectangleVal = self.defRectangleVal
+
+    """Wachlarze"""
+
+    def setRateLinesVal(self, rateLinesVal):
+        self.rateLinesVal = rateLinesVal
+    def disableRateLinesVal(self):
+        self.rateLinesVal = 0
+    def enableRateLinesVal(self):
+        self.rateLinesVal = self.defRateLinesVal
 
     """Wskazniki i oscylatory"""
 
@@ -396,6 +410,7 @@ class Strategy:
         self.bear3Val = self.defBear3Val
         self.eveningStarVal = self.defEveningStarVal
         self.darkCloudVal = self.defDarkCloudVal
+        self.rateLinesVal = self.defRateLinesVal
             
     def analyze(self):
           resultText = ''
@@ -496,15 +511,15 @@ class Strategy:
                       resultText = resultText + self.data.date[int(formation[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(formation[1][2])].strftime("%Y-%m-%d") + "\n"   
                       
            
-	  flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
-	  if flags != None:
-		overallScore += defFlagPennantVal * flags[1]
-		if flags[1] < 0:
-			print "(-) falling-trend flag/pennant"
-			resultText = resultText + "(-) falling-trend flag/pennant"
-		else:
-			print "(+) rising-trend flag/pennant"
-			resultText = resultText + "(+) rising-trend flag/pennant"
+          flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
+          if flags != None:
+              overallScore += defFlagPennantVal * flags[1]
+              if flags[1] < 0:
+                  print "(-) falling-trend flag/pennant"
+                  resultText = resultText + "(-) falling-trend flag/pennant"
+              else:
+                  print "(+) rising-trend flag/pennant"
+                  resultText = resultText + "(+) rising-trend flag/pennant"
 
           gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)
           for formation in gaps:
@@ -573,45 +588,68 @@ class Strategy:
           overallScore += self.newHighNewLowVal * oscilatorsAndIndicators[0]
           if self.newHighNewLowVal * oscilatorsAndIndicators[0] > 0:
               print "   (+) new high - new low index\n"
+              resultText = resultText + "   (+) new high - new low index\n"
           elif self.newHighNewLowVal * oscilatorsAndIndicators[0] < 0:
               print "   (-) new high - new low index\n"
+              resultText = resultText + "   (-) new high - new low index\n"
            
           overallScore += self.bollignerVal * oscilatorsAndIndicators[1]
           if self.bollignerVal * oscilatorsAndIndicators[1] > 0:
               print "   (+) bolligner bounds\n"
+              resultText = resultText + "   (+) bolligner bounds\n"
           elif self.bollignerVal * oscilatorsAndIndicators[1] < 0:
               print "   (-) bolligner bounds\n"
+              resultText = resultText + "   (-) bolligner bounds\n"
            
           overallScore += self.momentumVal * oscilatorsAndIndicators[2]
           if self.momentumVal * oscilatorsAndIndicators[2] > 0:
               print "   (+) momentum oscillator\n"
+              resultText = resultText + "   (+) momentum oscillator\n"
           elif self.momentumVal * oscilatorsAndIndicators[2] < 0:
               print "   (-) momentum oscillator\n"
+              resultText = resultText + "   (-) momentum oscillator\n"
            
           overallScore += self.rocVal * oscilatorsAndIndicators[3]
           if self.rocVal * oscilatorsAndIndicators[3] > 0:
               print "   (+) roc oscillator\n"
+              resultText = resultText + "   (+) roc oscillator\n"
           elif self.rocVal * oscilatorsAndIndicators[3] < 0:
               print "   (-) roc oscillator\n"
+              resultText = resultText + "   (-) roc oscillator\n"
            
           overallScore += self.cciVal * oscilatorsAndIndicators[4]
           if self.cciVal * oscilatorsAndIndicators[4] > 0:
               print "   (+) cci oscillator\n"
+              resultText = resultText + "   (+) cci oscillator\n"
           elif self.cciVal * oscilatorsAndIndicators[4] < 0:
               print "   (-) cci oscillator\n"
+              resultText = resultText + "   (-) cci oscillator\n"
            
           overallScore += self.rsiVal * oscilatorsAndIndicators[5]
           if self.rsiVal * oscilatorsAndIndicators[5] > 0:
               print "   (+) rsi oscillator\n"
+              resultText = resultText + "   (+) rsi oscillator\n"
           elif self.rsiVal * oscilatorsAndIndicators[5] < 0:
               print "   (-) rsi oscillator\n"
+              resultText = resultText + "   (-) rsi oscillator\n"
            
           overallScore += self.williamsVal * oscilatorsAndIndicators[6]
           if self.williamsVal * oscilatorsAndIndicators[6] > 0:
               print "   (+) williams oscillator\n"
+              resultText = resultText + "   (+) williams oscillator\n"
           elif self.williamsVal * oscilatorsAndIndicators[6] < 0:
               print "   (-) williams oscillator\n"
-          
+              resultText = resultText + "   (-) williams oscillator\n"
+
+          rateLinesTable = trend.rateLines(array(self.data.close),0.38,0.62)    
+          dataValues = array(self.data.close)
+          if dataValues[dataValues.size-1] > rateLinesTable[2][3]:
+              resultText = resultText + "   (+) Rate Lines : " + self.data.date[int(rateLinesTable[0][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(rateLinesTable[0][2])].strftime("%Y-%m-%d") + "\n"
+              overallScore = overallScore + self.rateLinesVal * 0.4
+          else:
+              resultText = resultText + "   (-) Rate Lines : " + self.data.date[int(rateLinesTable[0][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(rateLinesTable[0][2])].strftime("%Y-%m-%d") + "\n"
+              overallScore = overallScore + self.rateLinesVal * (-0.4)
+
           print "\n Overall score: ",overallScore, "\n"
           resultText = resultText + "\n Overall score: "+str(overallScore)+ "\n\n"
           if  overallScore > self.positiveSignal:
