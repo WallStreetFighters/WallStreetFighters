@@ -95,7 +95,7 @@ class Chart(FigureCanvas):
         self.draw()        
         #self.drawGeometricFormation()
         #self.drawRateLines()
-        self.drawTrend()
+        #self.drawTrend()
         #self.drawCandleFormations()
         #self.drawGaps()
 		
@@ -392,7 +392,7 @@ class Chart(FigureCanvas):
         self.drawingMode=mode            
         x0, y0 = None,None
     
-    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 3.0, lstyle = '-'):
+    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 1.0, lstyle = '-'):
           """Rysuje linie (trend) na wykresie """
           newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=color)                
           self.mainPlot.add_line(newLine)
@@ -405,6 +405,15 @@ class Chart(FigureCanvas):
         for line in self.additionalLines:            
             line.remove()
         self.additionalLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
+    
+    def clearLastLine(self):
+        """Usuwa ostatnią linię narysowaną na wykresie."""
+        if self.additionalLines==[]:
+            return
+        self.additionalLines[-1].remove()
+        self.additionalLines.remove(self.additionalLines[-1])
         self.draw()
         self.blit(self.mainPlot.bbox)
     
@@ -430,8 +439,10 @@ class Chart(FigureCanvas):
         gówno w ogóle zadziałało."""        
         if self.drawingMode==False:
             return
-        if event.button==3: #nie no kurwa, RMB to tutaj button 3 -_-
-            self.clearLines()            
+        if event.button==3: 
+            self.clearLastLine()            
+        if event.button==2: 
+            self.clearLines()
         elif event.button==1:
             if self.x0==None or self.y0==None :
                 self.x0, self.y0 = event.xdata, event.ydata
@@ -463,40 +474,31 @@ class Chart(FigureCanvas):
         trend.optimizedTrend(self.data.close)
         #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
         sup, res = trend.getChannelLines(self.data.close)
-        self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
-        self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
+        self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
+        self.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
         neckLine = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
+            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
         
         trend.hornBottoms(self.data.close, self.data.volume)
         trend.hornTops(self.data.close, self.data.volume)
         neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'y', 2.0, '-')
+            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'y', 2.0, '-')
         neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'b', 2.0, '-')
+            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'b', 2.0, '-')
         neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
+            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
        # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
         
      #   min, mindex = trend.findMinLine(asarray(self.data.close))
-     #   self.drawTrendLine(mindex[0], min[0], mindex[len(min)-1], min[len(sup)-1], 'b', 1.0)
+     #   self.drawLine(mindex[0], min[0], mindex[len(min)-1], min[len(sup)-1], 'b', 1.0)
      #   max, mindex = trend.findMaxLine(asarray(self.data.close))
-     #   self.drawTrendLine(mindex[0], max[0], mindex[len(min)-1], max[len(sup)-1], 'b', 1.0)
+     #   self.drawLine(mindex[0], max[0], mindex[len(min)-1], max[len(sup)-1], 'b', 1.0)
         if len(self.data.close) > 30:
             sup, res = trend.getChannelLines(self.data.close, 1, 2)
-            self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
-            self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
+            self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
+            self.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
             
-def getBoundsAsRect(axes):
-    """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
-        tzn. tablicy."""
-    bounds=axes.get_position().get_points()
-    left=bounds[0][0]
-    bottom=bounds[0][1]
-    width=bounds[1][0]-left
-    height=bounds[1][0]-bottom
-    return [left, bottom, width, height]

@@ -22,7 +22,7 @@ class FormationDrawer:
     defTripleBottomLstyle = '-'
     
     
-    defRisingWedgeColor = 'g'
+    defRisingWedgeColor = 'r'
     defRisingWedgeLwidth = 2.0
     defRisingWedgeLstyle = '-'
 
@@ -38,7 +38,7 @@ class FormationDrawer:
     defTripleBottomLwidth = 2.0
     defTripleBottomLstyle = '-'
 
-    defFallingWedgeColor = 'r'
+    defFallingWedgeColor = 'g'
     defFallingWedgeLwidth = 2.0
     defFallingWedgeLstyle = '-'
 
@@ -58,7 +58,7 @@ class FormationDrawer:
     defRisingContinuationGapLwidth = 2.0
     defRisingContinuationGapLstyle = '-'
 
-    defRisingExhaustionGapColor = 'g'
+    defRisingExhaustionGapColor = 'r'
     defRisingExhaustionGapLwidth = 2.0
     defRisingExhaustionGapLstyle = '-'
 
@@ -70,32 +70,32 @@ class FormationDrawer:
     defFallingContinuationGapLwidth = 2.0
     defFallingContinuationGapLstyle = '-'
 
-    defFallingExhaustionGapColor = 'r'
+    defFallingExhaustionGapColor = 'g'
     defFallingExhaustionGapLwidth = 2.0
     defFallingExhaustionGapLstyle = '-'
 
-    defBear3Color = 'm'
+    defBear3Color = 'r'
     defBear3Lwidth = 2.0
     defBear3Lstyle = '-'
 
 
-    defBull3Color = 'm'
+    defBull3Color = 'g'
     defBull3Lwidth = 2.0
     defBull3Lstyle = '-'
 
-    defMornigStarColor = 'm'
+    defMornigStarColor = 'g'
     defMornigStarLwidth = 2.0
     defMornigStarLstyle = '-'
 
-    defEveningStarColor = 'm'
+    defEveningStarColor = 'r'
     defEveningStarLwidth = 2.0
     defEveningStarLstyle = '-'
 
-    defDarkCloudColor = 'm'
+    defDarkCloudColor = 'r'
     defDarkCloudLwidth = 2.0
     defDarkCloudLstyle = '-'
 
-    defPiercingColor = 'm'
+    defPiercingColor = 'g'
     defPiercingLwidth = 2.0
     defPiercingLstyle = '-'
     defFlagPennantColor = 'm'
