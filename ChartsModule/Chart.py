@@ -392,7 +392,7 @@ class Chart(FigureCanvas):
         self.drawingMode=mode            
         x0, y0 = None,None
     
-    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 3.0, lstyle = '-'):
+    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 1.0, lstyle = '-'):
           """Rysuje linie (trend) na wykresie """
           newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=color)                
           self.mainPlot.add_line(newLine)
@@ -405,6 +405,15 @@ class Chart(FigureCanvas):
         for line in self.additionalLines:            
             line.remove()
         self.additionalLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
+    
+    def clearLastLine(self):
+        """Usuwa ostatnią linię narysowaną na wykresie."""
+        if self.additionalLines==[]:
+            return
+        self.additionalLines[-1].remove()
+        self.additionalLines.remove(self.additionalLines[-1])
         self.draw()
         self.blit(self.mainPlot.bbox)
     
@@ -430,8 +439,10 @@ class Chart(FigureCanvas):
         gówno w ogóle zadziałało."""        
         if self.drawingMode==False:
             return
-        if event.button==3: #nie no kurwa, RMB to tutaj button 3 -_-
-            self.clearLines()            
+        if event.button==3: 
+            self.clearLastLine()            
+        if event.button==2: 
+            self.clearLines()
         elif event.button==1:
             if self.x0==None or self.y0==None :
                 self.x0, self.y0 = event.xdata, event.ydata
