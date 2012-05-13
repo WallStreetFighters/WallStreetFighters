@@ -7,6 +7,7 @@ import datetime
 import os
 from ChartsModule.Chart import Chart
 from ChartsModule.CompareChart import CompareChart
+from ChartsModule.FormationDrawer import FormationDrawer
 import DataParserModule.dataParser as dataParser
 from TechAnalysisModule.strategy import Strategy
 from GUIModule.analyze import Analyze
@@ -186,7 +187,260 @@ class TabA(QtGui.QWidget):
         self.parent().parent().parent().parent().gui.tabs.setCurrentIndex(self.parent().parent().parent().parent().gui.tabs.addTab(self.analyzeTab,nameTab))
         self.analyzeTab.textBrowser.setText(text)
     def showChartPatterns(self):
-        pass
+        settings = self.parent().parent().parent().parent().gui.settingsTab.getVal()
+
+        lineStyle = []
+        for x in settings[1]:
+            if x == 0:
+                lineStyle.append('solid')
+            elif x == 1:
+                lineStyle.append('dashed')
+            elif x == 2:
+                lineStyle.append('dashdot')
+            elif x == 3:
+                lineStyle.append('dotted')
+            else:
+                lineStyle.append('-')
+            
+        color = []
+        for x in settings[2]:
+            if x == 0:
+                color.append('r')
+            elif x == 1:
+                color.append('b')
+            elif x == 2:
+                color.append('y')
+            elif x == 3:
+                color.append('b')
+            elif x == 4:
+                color.append('g')
+            elif x == 5:
+                color.append('c')
+            else:
+                color.append('r')
+        values = settings[0]
+        enables = settings[3]
+                
+        strategy = Strategy(self.chart.data)
+        strategy.setPositiveSignal(values[0])
+        strategy.setNegativeSignal(values[1])
+        #ustawiane wartości
+        if enables[2]:
+            strategy.setTrendVal(values[2])
+        else:
+            strategy.disableTrendVal()
+            
+        if enables[3]:
+            strategy.setHeadAndShouldersVal(values[3])
+        else:
+            strategy.disableHeadAndShouldersVal()
+            
+        if enables[4]:
+            strategy.setTripleTopVal(values[4])
+        else:
+            strategy.disableTripleTopVal()
+            
+        if enables[5]:
+            strategy.setRisingWedgeVal(values[5])
+        else:
+            strategy.disableRisingWedgeVal()
+            
+        if enables[6]:
+            strategy.setFallingTriangleVal(values[6])
+        else:
+            strategy.disableFallingTriangleVal()
+            
+        if enables[7]:
+            strategy.setReversedHeadAndShouldersVal(values[7])
+        else:
+            strategy.disableReversedHeadAndShouldersVal()
+            
+        if enables[8]:
+            strategy.setTripleBottomVal(values[8])
+        else:
+            strategy.disableTripleBottomVal()
+            
+        if enables[9]:
+            strategy.setFallingWedgeVal(values[9])
+        else:
+            strategy.disableFallingWedgeVal()
+            
+        if enables[10]:
+            strategy.setRisingTriangleVal(values[10])
+        else:
+            strategy.disableRisingTriangleVal()
+            
+        if enables[11]:
+            strategy.setSymetricTriangleVal(values[11])
+        else:
+            strategy.disableSymetricTriangleVal()
+            
+        if enables[12]:
+            strategy.setRectangleVal(values[12])
+        else:
+            strategy.disableRectangleVal()
+            
+        if enables[13]:
+            strategy.setFlagPennantVal(values[13])
+        else:
+            strategy.disableFlagPennantVal()
+            
+        if enables[14]:
+            strategy.setOscilatorsVal(values[14])
+        else:
+            strategy.disableOscilatorsVal()
+            
+        if enables[15]:
+            strategy.setNewHighNewLowVal(values[15])
+        else:
+            strategy.disableNewHighNewLowVal()
+            
+        if enables[16]:
+            strategy.setBollignerVal(values[16])
+        else:
+            strategy.disableBollignerVal()
+            
+        if enables[17]:
+            strategy.setMomentumVal(values[17])
+        else:
+            strategy.disableMomentumVal()
+            
+        if enables[18]:
+            strategy.setRocVal(values[18])
+        else:
+            strategy.disableRocVal()
+            
+        if enables[19]:
+            strategy.setCciVal(values[19])
+        else:
+            strategy.disableCciVal()
+            
+        if enables[20]:
+            strategy.setRsiVal(values[20])
+        else:
+            strategy.disableRsiVal()
+            
+        if enables[21]:
+            strategy.setWilliamsVal(values[21])
+        else:
+            strategy.disableWilliamsVal()
+            
+        if enables[22]:
+            strategy.setRisingBreakawayGapVal(values[22])
+        else:
+            strategy.disableRisingBreakawayGapVal()
+            
+        if enables[23]:
+            strategy.setRisingContinuationGapVal(values[23])
+        else:
+            strategy.disableRisingContinuationGapVal()
+            
+        if enables[24]:
+            strategy.setFallingExhaustionGapVal(values[24])
+        else:
+            strategy.disableFallingExhaustionGapVal()
+            
+        if enables[25]:
+            strategy.setFallingBreakawayGapVal(values[25])
+        else:
+            strategy.disableFallingBreakawayGapVal()
+            
+        if enables[26]:
+            strategy.setRisingExhaustionGapVal(values[26])
+        else:
+            strategy.disableRisingExhaustionGapVal()
+            
+        if enables[27]:
+            strategy.setFallingContinuationGapVal(values[27])
+        else:
+            strategy.disableFallingContinuationGapVal()
+
+        if enables[28]:
+            strategy.setBull3Val(values[28])
+        else:
+            strategy.disableBull3Val()
+
+        if enables[29]:
+            strategy.setMornigStarVal(values[29])
+        else:
+            strategy.disableMornigStarVal()
+
+        if enables[30]:
+            strategy.setPiercingVal(values[30])
+        else:
+            strategy.disablePiercingVal()
+
+        if enables[31]:
+            strategy.setBear3Val(values[31])
+        else:
+            strategy.disableBear3Val()
+
+        if enables[32]:
+            strategy.setEveningStarVal(values[32])
+        else:
+            strategy.disableEveningStarVal()
+
+        if enables[33]:
+            strategy.setDarkCloudVal(values[33])
+        else:
+            strategy.disableDarkCloudVal()
+
+        #ustawiamy
+               
+        self.formationDrawer = FormationDrawer(self.chart,strategy)
+        #ustawiamy formation Drawer
+        self.formationDrawer.setTrendColor(color[2])
+        self.formationDrawer.setTrendLstyle(lineStyle[2])
+        self.formationDrawer.setHeadShouldersColor(color[3])
+        self.formationDrawer.setHeadShouldersLstyle(lineStyle[3])
+        self.formationDrawer.setTripleTopColor(color[4])
+        self.formationDrawer.setTripleTopLstyle(lineStyle[4])
+        self.formationDrawer.setRisingWedgeColor(color[5])
+        self.formationDrawer.setRisingWedgeLstyle(lineStyle[5])
+        self.formationDrawer.setFallingTriangleColor(color[6])
+        self.formationDrawer.setFallingTriangleLstyle(lineStyle[6])
+        self.formationDrawer.setReversedHeadShouldersColor(color[7])
+        self.formationDrawer.setReversedHeadShouldersLstyle(lineStyle[7])
+        self.formationDrawer.setTripleBottomColor(color[8])
+        self.formationDrawer.setTripleBottomLstyle(lineStyle[8])
+        self.formationDrawer.setFallingWedgeColor(color[9])
+        self.formationDrawer.setFallingWedgeLstyle(lineStyle[9])
+        self.formationDrawer.setRisingTriangleColor(color[10])
+        self.formationDrawer.setRisingTriangleLstyle(lineStyle[10])
+        self.formationDrawer.setSymetricTriangleColor(color[11])
+        self.formationDrawer.setSymetricTriangleLstyle(lineStyle[11])
+        #przerwa
+        self.formationDrawer.setFlagPennantColor(color[13])
+        self.formationDrawer.setFlagPennantLStyle(lineStyle[13])
+        #przerwa
+        self.formationDrawer.setRisingBreakawayGapColor(color[22])
+        self.formationDrawer.setRisingBreakawayGapLstyle(lineStyle[22])
+        self.formationDrawer.setRisingContinuationGapColor(color[23])
+        self.formationDrawer.setRisingContinuationGapLstyle(lineStyle[23])
+        self.formationDrawer.setFallingExhaustionGapColor(color[24])
+        self.formationDrawer.setFallingExhaustionGapLstyle(lineStyle[24])
+        self.formationDrawer.setFallingBreakawayGapColor(color[25])
+        self.formationDrawer.setFallingBreakawayGapLstyle(lineStyle[25])
+        self.formationDrawer.setRisingExhaustionGapColor(color[26])
+        self.formationDrawer.setRisingExhaustionGapLstyle(lineStyle[26])
+        self.formationDrawer.setFallingContinuationGapColor(color[27])
+        self.formationDrawer.setFallingContinuationGapLstyle(lineStyle[27])
+        self.formationDrawer.setBull3Color(color[28])
+        self.formationDrawer.setBull3Lstyle(lineStyle[28])
+        self.formationDrawer.setMornigStarColor(color[29])
+        self.formationDrawer.setMornigStarLstyle(lineStyle[29])
+        self.formationDrawer.setPiercingColor(color[30])
+        self.formationDrawer.setPiercingLstyle(lineStyle[30])
+        self.formationDrawer.setBear3Color(color[31])
+        self.formationDrawer.setBear3Lstyle(lineStyle[31])
+        self.formationDrawer.setEveningStarColor(color[32])
+        self.formationDrawer.setEveningStarLstyle(lineStyle[32])
+        self.formationDrawer.setDarkCloudColor(color[33])
+        self.formationDrawer.setDarkCloudLstyle(lineStyle[33])
+        
+        self.formationDrawer.drawFormations()
+        
+        
     
     def updateScale(self):
         if self.logRadioButton.isChecked():

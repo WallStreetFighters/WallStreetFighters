@@ -91,7 +91,6 @@ class Home (QtGui.QWidget):
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
     def addTopObject(self,objList,k):
-        #print "jestem w addTopObject"
         self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
@@ -121,15 +120,11 @@ class Home (QtGui.QWidget):
         verticalLayout.addWidget(precentLabel)
         self.topLayout.addWidget(self.frame,k/4,(2*k)%8)
         # tworzymy LightWeightChart
-        #print """ fgfg """ + self.finObjList
-        print " fin OBj List:"
-        print self.finObjList
         if  self.finObjList:
             finObj = self.finObjList[k]
             d = finObj.getArray('daily')
             dates=d['date']
             values=d['close']
-            print "cos tam ok ok "
             #values=indicators.adLine(d['adv'], d['dec'])
             #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
             #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
@@ -337,7 +332,6 @@ class UpdateThread(QtCore.QThread):
 			self.finObjListTemp.append(dataParser.getDataToLightWeightChart("CL.F","resource","Stooq"))
                         self.finObjList = self.finObjListTemp
 			array  = self.finObjList[1].getArray('daily')
-			print array["date"]
 		 			
 		except dataParser.DataAPIException:
 			pass
