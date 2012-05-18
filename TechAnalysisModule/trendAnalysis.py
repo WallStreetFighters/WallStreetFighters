@@ -882,9 +882,10 @@ trójkąty (zwyżkujący, zniżkujący, symetryczny), prostokąt
    
 
 def findGeometricFormations(values):   
-    """Zwraca "najbardziej wartościową", tzn. największą formację geometryczną jaką uda się
-    znaleźć na danej tablicy. To tablica elementów zwracanych przez findGeometricFormationsOnArray 
-    plus czwarty element oznaczający wartość z przedziału [0, 1] """
+    """Zwraca listę formacji geometrycznych znalezionych na tablicy values (kursy zamknięć)
+    dla różnych okresów czasowych (cała tablica, 3/4, 1/2, 1/4).
+    Elementy tej listy to listy zwracane przez findGeometricFormationsOnArray z dodanym 
+    czwartym elementem oznaczającym wartość z przedziału [0, 1] """
     intervals=[(0, 1),(1, 4),(1, 2),(3, 4)]
     value=1.0
     result=[]
