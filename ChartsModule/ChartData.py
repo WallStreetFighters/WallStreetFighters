@@ -99,6 +99,9 @@ class ChartData:
                 array.insert(0,self.fullArray[type][startIdx-length+i])
         return array
     
+    #poniższe funkcje obliczają wartości wskaźników zdefiniowanych w TechAnalysisModule,
+    #z uwzględnieniem ograniczeń na długość danych
+    
     def momentum(self):
         duration=self.settings['momentumDur']
         array=self.getEarlierValues(duration)
