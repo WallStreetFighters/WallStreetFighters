@@ -3,6 +3,8 @@ __author__="Andrzej Smoliński"
 __date__ ="$2012-02-23 19:00:48$"
 
 from ChartData import ChartData
+from matplotlib.collections import LineCollection
+from matplotlib.collections import PatchCollection
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
