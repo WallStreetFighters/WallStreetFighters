@@ -231,7 +231,10 @@ def addChartButton(self):
         self.gridLayout.addWidget(self.stepComboBox,1,0,1,1)
         # show chart Patterns
         self.showChartPatternsButton = QtGui.QPushButton('Show chart patterns',self.optionsFrame)
-        self.gridLayout.addWidget(self.showChartPatternsButton,2,0,1,2)
+        self.gridLayout.addWidget(self.showChartPatternsButton,2,0,1,1)
+        #draw Trend
+        self.drawTrendCheckBox = QtGui.QPushButton('Draw Trend',self.optionsFrame)
+        self.gridLayout.addWidget(self.drawTrendCheckBox,2,1,1,1)
         # chartType comboBox
         self.chartTypeLabel = QtGui.QLabel('Chart Type',self.optionsFrame)#label Chart Type
         self.gridLayout.addWidget(self.chartTypeLabel,0,1,1,1)
@@ -250,10 +253,10 @@ def addChartButton(self):
         self.logRadioButton = QtGui.QRadioButton('log',self.optionsFrame)
         self.gridLayout.addWidget(self.logRadioButton,2,2,1,1)
         #wyłaczenie voluminu
-        self.volumenCheckBox = QtGui.QCheckBox('Hide Volumen',self.optionsFrame)
+        self.volumenCheckBox = QtGui.QCheckBox('Hide Volume',self.optionsFrame)
         self.gridLayout.addWidget(self.volumenCheckBox,0,3,1,1)
         #wlacznie możliwości rysowania na wykeresie
-        self.paintCheckBox = QtGui.QCheckBox('Enable painting',self.optionsFrame)
+        self.paintCheckBox = QtGui.QCheckBox('Enable drawing',self.optionsFrame)
         self.gridLayout.addWidget(self.paintCheckBox,1,3,1,1)
         #przycisk do analizy
         self.analyzeButton = QtGui.QPushButton('Analyze',self.optionsFrame)

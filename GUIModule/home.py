@@ -21,8 +21,8 @@ class Home (QtGui.QWidget):
         self.gridLayout = QtGui.QGridLayout(self)
         #ramka zawierajaca obiekty z góry yahoo 
         self.topFrame = QtGui.QFrame(self)
-        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 320))
-        self.topFrame.setMinimumSize(QtCore.QSize(0, 320))
+        self.topFrame.setMaximumSize(QtCore.QSize(16777215, 240))
+        self.topFrame.setMinimumSize(QtCore.QSize(0, 240))
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.topLayout = QtGui.QGridLayout(self.topFrame)
@@ -118,7 +118,7 @@ class Home (QtGui.QWidget):
             precentLabel.setStyleSheet('QLabel {color: green}')
         precentLabel.setText(objList[3])
         verticalLayout.addWidget(precentLabel)
-        self.topLayout.addWidget(self.frame,k/4,(2*k)%8)
+        self.topLayout.addWidget(self.frame,k/3,(2*k)%6)
         # tworzymy LightWeightChart
         if  self.finObjList:
             finObj = self.finObjList[k]
@@ -129,7 +129,7 @@ class Home (QtGui.QWidget):
             #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
             #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
             zajebistyWykres = LightweightChart(self,dates,values,'A/D line')                        
-            self.topLayout.addWidget(zajebistyWykres,k/4,(2*k+1)%8)#zajebiste Dane1
+            self.topLayout.addWidget(zajebistyWykres,k/3,(2*k+1)%6)#zajebiste Dane1
 
             
         
@@ -222,6 +222,7 @@ class Home (QtGui.QWidget):
     def updateTopList(self):
        
 	self.topList = self.updateThread.topList
+	self.topList.remove(self.topList[4])
 	self.finObjList = self.updateThread.finObjList
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
@@ -245,7 +246,7 @@ class Home (QtGui.QWidget):
         ran = range(self.leftLayout.count())
         for i in ran:
             self.leftLayout.itemAt(i).widget().close()
-        label1 = QtGui.QLabel("Most Activities",self.leftFrame)
+        label1 = QtGui.QLabel("Most Active",self.leftFrame)
         self.leftLayout.addWidget(label1)
         self.addTable(self.mostList)
         label2 = QtGui.QLabel("Gainers",self.leftFrame)

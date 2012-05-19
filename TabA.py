@@ -108,7 +108,7 @@ class TabA(QtGui.QWidget):
             self.buttonsLayout.addWidget(self.williamsCheckBox,2,4,1,1)
             self.oscilatorCheckBoxList.append(self.williamsCheckBox)
 
-            #horizontal line
+            """#horizontal line
             self.line = QtGui.QFrame(self.buttonsFrame)
             self.line.setFrameShape(QtGui.QFrame.HLine)
             self.line.setFrameShadow(QtGui.QFrame.Sunken)
@@ -131,7 +131,7 @@ class TabA(QtGui.QWidget):
             self.lineWidthSpinBox.setMaximum(5.0)
             self.lineWidthSpinBox.setSingleStep(0.5)
             self.lineWidthSpinBox.setProperty("value", 1.0)
-            self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)            
+            self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)"""           
 
             self.scrollArea.setWidget(self.buttonsFrame)
             if self.showLists != True:
@@ -161,7 +161,7 @@ class TabA(QtGui.QWidget):
                 self.smaCheckBox.stateChanged.connect(self.smaChanged)
                 self.emaCheckBox.stateChanged.connect(self.emaChanged)
                 self.wmaCheckBox.stateChanged.connect(self.wmaChanged)
-                self.drawTrendCheckBox.stateChanged.connect(self.updateDrawTrend)
+                self.drawTrendCheckBox.clicked.connect(self.updateDrawTrend)
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
                 self.analyzeButton.pressed.connect(self.newAnalyzeTab)
                 self.showChartPatternsButton.pressed.connect(self.showChartPatterns)
@@ -629,8 +629,9 @@ class TabA(QtGui.QWidget):
             eval ('self.'+name+'CheckBox.setFont(font)')
             
     def updateDrawTrend(self):
-        drawTrend =self.drawTrendCheckBox.isChecked()
-        if self.chart !=None and drawTrend:
+        print 'drawTrend'
+        #drawTrend =self.drawTrendCheckBox.isChecked()
+        if self.chart !=None:
             self.chart.drawTrend()
             self.chart.repaint()
             self.chart.update()
@@ -722,11 +723,8 @@ class TabA(QtGui.QWidget):
 
     def paintCompareChart(self):
         self.finObj = []
-        print self.qModelIndex
         k = 0
         for x in self.listName:
-            print self.qModelIndex[k]
-            print x 
             if x == "index":
                 index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.INDEX_LIST[index][2] == 'Yahoo':
@@ -920,7 +918,7 @@ class TabA(QtGui.QWidget):
             #draw trend
             drawTrend = self.drawTrendCheckBox.isChecked()
             #line width
-            lineWidth = self.lineWidthSpinBox.value()
+            lineWidth = 2.0
             index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
         else:
             index = []

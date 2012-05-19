@@ -507,7 +507,7 @@ class Strategy:
            
           flags = trend.findFlagsAndPennants(self.data.close, self.data.volume)
           if flags != None:
-              overallScore += defFlagPennantVal * flags[1]
+              overallScore += self.defFlagPennantVal * flags[1]
               if flags[1] < 0:
                   print "(-) falling-trend flag/pennant"
                   resultText = resultText + "(-) falling-trend flag/pennant"

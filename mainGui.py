@@ -447,7 +447,7 @@ class GuiMainWindow(object):
         #draw trend
         drawTrend = self.tabA.drawTrendCheckBox.isChecked()
         #line width
-        lineWidth = self.tabA.lineWidthSpinBox.value()
+        lineWidth = 2.0
         
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
