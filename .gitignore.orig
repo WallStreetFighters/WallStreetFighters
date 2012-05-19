@@ -7,15 +7,18 @@
 *.o
 *.so
 *.pyc
+<<<<<<< HEAD
+<<<<<<< HEAD:.gitignore~
 data.wsf
 data.wsf~
 save.wsf
+=======
+>>>>>>> test-merge
+=======
+=======
 
-
-data.wsf
-data.wsf~
-save.wsf
-
+>>>>>>> chart
+>>>>>>> chart:.gitignore.orig
 
 # Packages #
 ############
@@ -29,11 +32,9 @@ save.wsf
 *.rar
 *.tar
 *.zip
-*~
 data.wsf
 data.wsf~
 save.wsf
-save.wsf~
 # Logs and databases #
 ######################
 *.log

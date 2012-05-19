@@ -7,6 +7,10 @@ import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as parser
+<<<<<<< HEAD
+
+=======
+>>>>>>> chart
 
 class ChartData:
     """Ta klasa służy mi jako pomost pomiędzy tym, czego potrzebuje wykres, a tym
@@ -20,13 +24,17 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
-        #odwracamy tabelę, bo getArray() zwraca ją od dupy strony
+	self.fullArray=finObj.getArray(step)
         if(start==None):
-            start=datetime.datetime.strptime(finObj.getArray(step)['date'][-1],"%Y-%m-%d")
+            start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
-            end=datetime.datetime.strptime(finObj.getArray(step)['date'][0],"%Y-%m-%d")        
+            end=datetime.datetime.strptime(self.fullArray(step)['date'][-1],"%Y-%m-%d")      
         indexes=finObj.getIndex(start.date(),end.date(),step)
-        dataArray=finObj.getArray(step)[indexes[1]:indexes[0]:-1]        
+<<<<<<< HEAD
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]              
+=======
+        dataArray=self.fullArray[indexes[0]:indexes[1]:1]                              
+>>>>>>> chart
         if(len(dataArray)==0):
             self.corrupted=True
             return
@@ -36,25 +44,29 @@ class ChartData:
         for date in dataArray['date']:
             self.date.append(datetime.datetime.strptime(date,"%Y-%m-%d"))
         if(compare==False):                        
-            #potrzebujemy pełnej tabeli do obliczania wskaźników
-            self.fullArray=finObj.getArray(step)[::-1]                        
+            #potrzebujemy pełnej tabeli do obliczania wskaźników                      
             self.open=dataArray['open'].tolist()            
             self.low=dataArray['low'].tolist()
             self.high=dataArray['high'].tolist()
+<<<<<<< HEAD
             self.volume=dataArray['open'].tolist()   
+=======
+            self.volume=dataArray['volume'].tolist()   
+>>>>>>> chart
             if(not(len(self.low)==len(self.high)==len(self.open)==len(self.close)
                     ==len(self.volume)==len(self.date))):
                 self.corrupted=True
                 return
             #dane w formacie dla candlesticka
             self.quotes=[]
+	    a = datetime.datetime.now()
             for i in range(len(dataArray)):
                 time=float(i)
-                open=self.open[i]
+                open=self.open[i] 
                 close=self.close[i]
                 high=self.high[i]
                 low=self.low[i]
-                self.quotes.append((time, open, close, high, low))                    
+                self.quotes.append((time, open, close, high, low))               
         else:
             self.percentChng=[]
             firstValue=self.close[0]
@@ -185,6 +197,5 @@ class ChartData:
             return indicators.bollingerBands(np.array(array),duration,type,2)
         else:
             array=self.getEarlierValues(2*(duration+1)+length%2)
-            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                         
-    
+            return indicators.bollingerBands(np.array(array),duration,type,2)[(duration+1)-length/2:]                                 
 >>>>>>> chart
