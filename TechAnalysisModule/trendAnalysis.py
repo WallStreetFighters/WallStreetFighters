@@ -882,9 +882,10 @@ trójkąty (zwyżkujący, zniżkujący, symetryczny), prostokąt
    
 
 def findGeometricFormations(values):   
-    """Zwraca "najbardziej wartościową", tzn. największą formację geometryczną jaką uda się
-    znaleźć na danej tablicy. To tablica elementów zwracanych przez findGeometricFormationsOnArray 
-    plus czwarty element oznaczający wartość z przedziału [0, 1] """
+    """Zwraca listę formacji geometrycznych znalezionych na tablicy values (kursy zamknięć)
+    dla różnych okresów czasowych (cała tablica, 3/4, 1/2, 1/4).
+    Elementy tej listy to listy zwracane przez findGeometricFormationsOnArray z dodanym 
+    czwartym elementem oznaczającym wartość z przedziału [0, 1] """
     intervals=[(0, 1),(1, 4),(1, 2),(3, 4)]
     value=1.0
     result=[]
@@ -1179,7 +1180,7 @@ def checkRegressionForFlagsAndPennants(proposals,maxval,minval):
 		mintemp = minval[x[0]:x[1]:1]
 		a2,b2 = regression(mintemp)
 		if a1 < 0 and a2-0.05 >= a1:
-			risingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
+			risingFlags.append([x[0],x[1],a1 *x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
 		elif a1 > 0 and a2 > 0 and x[1] < (b2-b1)/(a1-a2):
 			risingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
 
@@ -1187,7 +1188,7 @@ def checkRegressionForFlagsAndPennants(proposals,maxval,minval):
 		maxtemp = maxval[x[0]:x[1]:1]
 		a1,b1 = regression(maxtemp)
 		mintemp = minval[x[0]:x[1]:1]
-		a2,b2 = reggresion(mintemp)
+		a2,b2 = regression(mintemp)
 		if a1 < 0 and a2-0.05 >= a1:
 			fallingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
 		elif a1 > 0 and a2 > 0 and x[1] < (b2-b1)/(a1-a2):
@@ -1208,21 +1209,9 @@ def scoreFlags(rising,falling,volume):
 		print len(volume)
 		scale =  ((float) (maxR))/len(volume)	
 		scale = round(scale,2)
-		return ['risingTrendFlagOrPennant', scale]
+		return ['risingTrendFlagOrPennant', scale, rising[-1]]
 	elif maxR < maxL:
 		scale = -1*(maxL/len(volume))
-		return ['fallingTrendFlagOrPennant', scale]
+		return ['fallingTrendFlagOrPennant', scale, falling [-1]]
 	else:
 		return None
-
-
-    
-#values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]
-#values = asarray(values)
-#volumin = [[1, 2, 10], [1, 1, 1], [1, 1, 1]]
-#volumin = asarray(volumin)
-# print values
-# print volumin
-# print headAndShoulders(values, volumin, 21, 10)
-#lookForHeadAndShoulders(arange(10), arange(10))
-#lookForReversedHeadAndShoulders(arange(10), arange(10))

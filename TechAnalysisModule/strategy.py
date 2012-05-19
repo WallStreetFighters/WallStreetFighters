@@ -38,9 +38,10 @@ class Strategy:
     #Kontynuacja trendu
     symetricTriangleVal = 50
     rectangleVal = 30
+    
+    flagPennantVal = 20
 
     defFlagPennantVal = 20
-    
     defSymetricTriangleVal = 50
     defRectangleVal = 30
     """Wskazniki i oscylatory"""
@@ -221,6 +222,13 @@ class Strategy:
         self.rateLinesVal = 0
     def enableRateLinesVal(self):
         self.rateLinesVal = self.defRateLinesVal
+
+    def setFlagPennantVal(self, flagPennantVal):
+        self.flagPennantVal = flagPennantVal
+    def disableFlagPennantVal(self):
+        self.flagPennantVal = 0
+    def enableFlagPennantVal(self):
+        self.flagPennantVal = self.defFlagPennantVal    
 
     """Wskazniki i oscylatory"""
 
@@ -411,6 +419,7 @@ class Strategy:
         self.eveningStarVal = self.defEveningStarVal
         self.darkCloudVal = self.defDarkCloudVal
         self.rateLinesVal = self.defRateLinesVal
+        self.flagPennantVal = self.defFlagPennantVal
             
     def analyze(self):
           resultText = ''
@@ -510,7 +519,6 @@ class Strategy:
                   if hasFound:
                       resultText = resultText + self.data.date[int(formation[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(formation[1][2])].strftime("%Y-%m-%d") + "\n"   
                       
-           
           flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
           if flags != None:
               overallScore += defFlagPennantVal * flags[1]

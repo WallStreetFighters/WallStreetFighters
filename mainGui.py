@@ -521,7 +521,7 @@ class GuiMainWindow(object):
                 return
             k= k+1
         k = 0
-        for  x in dataParser.FUTRES_LIST:
+        for  x in dataParser.FUTURES_LIST:
             if name in x:
                 qModelIndex =  self.futuresModel.index(k,0)
                 self.newFuturesTab(qModelIndex,nameTab = name,settings = None,tabType = None)

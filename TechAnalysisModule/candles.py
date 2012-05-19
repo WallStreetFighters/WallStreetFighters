@@ -23,7 +23,7 @@ HIGH_PART=0.75  #powyżej tej części wykresu szukamy luki wyczerpania
 
 def findCandleFormations(O,H,L,C):
     """Szuka na wykresie formacji świecowych, dla każdej formacji która wystąpiła
-    zwraca tablicę krotek ('nazwa',indeks rozpoczęcia, indeks zakończenia). Przy czym,
+    zwraca tablicę krotek ('nazwa',indeks rozpoczęcia, indeks zakończenia,wartość). Przy czym,
     dla każdej formacji jest co najwyżej jedna krotka z jej ostatnim wystąpieniem"""
     trend=trendA.optimizedTrend(C)
     if not (len(O)==len(H)==len(L)==len(C)):        
