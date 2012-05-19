@@ -28,7 +28,7 @@ p12
 ttRp13
 sS'index'
 p14
-I4
+I1220
 sS'indicator'
 p15
 (lp16
@@ -41,7 +41,7 @@ p19
 cdatetime
 datetime
 p20
-(S'\x07\xdc\x05\x0e\x00\x00\x00\x00\x00\x00'
+(S'\x07\xdc\x04\x1a\x00\x00\x00\x00\x00\x00'
 tRp21
 sS'hideVolumen'
 p22
@@ -52,12 +52,12 @@ S''
 sS'start'
 p24
 g20
-(S'\x07\xdb\x0b\t\x00\x00\x00\x00\x00\x00'
+(S'\x07\xdb\n\t\x00\x00\x00\x00\x00\x00'
 tRp25
 sS'lineWidth'
 p26
 F1
 sS'painting'
 p27
-I00
+I01
 sa.
