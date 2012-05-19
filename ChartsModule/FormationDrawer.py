@@ -6,102 +6,182 @@ import TechAnalysisModule.trendAnalysis as trend
 class FormationDrawer:
     """Klasa odpowiedzialna za rysowanie wybranych przez użytkownika formacji
     (przekazywanych w tablicy configuration) na wykresie."""
+   
+    defTrendColor = 'r'
+    trendColor = defTrendColor
+    defTrendLwidth = 2.0
+    trendLwidth = defTrendLwidth
+    defTrendLStyle = '-'
+    trendLStyle = defTrendLStyle
+    
     defHeadAndShouldersColor = 'm'
+    headAndShouldersColor = 'm'
     defHeadAndShouldersLwidth = 2.0
+    headAndShouldersLwidth = 2.0
     defHeadAndShouldersLstyle = '-'
+    headAndShouldersLstyle = '-'
     
     defReversedHeadAndShouldersColor = 'c'
+    reversedHeadAndShouldersColor = 'c'
     defReversedHeadAndShouldersLwidth = 2.0
+    reversedHeadAndShouldersLwidth = 2.0
     defReversedHeadAndShouldersLstyle = '-'
+    reversedHeadAndShouldersLstyle = '-'
     
     defTripleTopColor = 'y'
+    tripleTopColor = 'y'
     defTripleTopLwidth = 2.0
+    tripleTopLwidth = 2.0
     defTripleTopLstyle = '-'
+    tripleTopLstyle = '-'
     
     defTripleBottomColor = 'b'
+    tripleBottomColor = 'b'
     defTripleBottomLwidth = 2.0
+    tripleBottomLwidth = 2.0
     defTripleBottomLstyle = '-'
+    tripleBottomLstyle = '-'
     
     
     defRisingWedgeColor = 'r'
+    risingWedgeColor = 'r'
     defRisingWedgeLwidth = 2.0
+    risingWedgeLwidth = 2.0
     defRisingWedgeLstyle = '-'
+    risingWedgeLstyle = '-'
 
     defFallingTriangleColor = 'r'
+    fallingTriangleColor = 'r'
     defFallingTriangleLwidth = 2.0
+    fallingTriangleLwidth = 2.0
     defFallingTriangleLstyle = '-'
+    fallingTriangleLstyle = '-'
 
     defReversedHeadShouldersColor = 'm'
+    reversedHeadShouldersColor = 'm'
     defReversedHeadShouldersLwidth = 2.0
+    reversedHeadShouldersLwidth = 2.0
     defReversedHeadShouldersLstyle = '-'
+    reversedHeadShouldersLstyle = '-'
 
     defTripleBottomColor = 'm'
+    tripleBottomColor = 'm'
     defTripleBottomLwidth = 2.0
+    tripleBottomLwidth = 2.0
     defTripleBottomLstyle = '-'
+    tripleBottomLstyle = '-'
 
     defFallingWedgeColor = 'g'
+    fallingWedgeColor = 'g'
     defFallingWedgeLwidth = 2.0
+    fallingWedgeLwidth = 2.0
     defFallingWedgeLstyle = '-'
+    fallingWedgeLstyle = '-'
 
     defRisingTriangleColor = 'g'
+    risingTriangleColor = 'g'
     defRisingTriangleLwidth = 2.0
+    risingTriangleLwidth = 2.0
     defRisingTriangleLstyle = '-'
+    risingTriangleLstyle = '-'
 
     defSymetricTriangleColor = 'm'
+    symetricTriangleColor = 'm'
     defSymetricTriangleLwidth = 2.0
+    symetricTriangleLwidth = 2.0
     defSymetricTriangleLstyle = '-'
+    symetricTriangleLstyle = '-'
 
     defRisingBreakawayGapColor = 'g'
+    risingBreakawayGapColor = 'g'
     defRisingBreakawayGapLwidth = 2.0
+    risingBreakawayGapLwidth = 2.0
     defRisingBreakawayGapLstyle = '-'
+    risingBreakawayGapLstyle = '-'
 
     defRisingContinuationGapColor = 'g'
+    risingContinuationGapColor = 'g'
     defRisingContinuationGapLwidth = 2.0
+    risingContinuationGapLwidth = 2.0
     defRisingContinuationGapLstyle = '-'
+    risingContinuationGapLstyle = '-'
 
     defRisingExhaustionGapColor = 'r'
+    risingExhaustionGapColor = 'r'
     defRisingExhaustionGapLwidth = 2.0
+    risingExhaustionGapLwidth = 2.0
     defRisingExhaustionGapLstyle = '-'
+    risingExhaustionGapLstyle = '-'
 
     defFallingBreakawayGapColor = 'r'
+    fallingBreakawayGapColor = 'r'
     defFallingBreakawayGapLwidth = 2.0
+    fallingBreakawayGapLwidth = 2.0
     defFallingBreakawayGapLstyle = '-'
+    fallingBreakawayGapLstyle = '-'
 
     defFallingContinuationGapColor = 'r'
+    fallingContinuationGapColor = 'r'
     defFallingContinuationGapLwidth = 2.0
+    fallingContinuationGapLwidth = 2.0
     defFallingContinuationGapLstyle = '-'
+    fallingContinuationGapLstyle = '-'
 
     defFallingExhaustionGapColor = 'g'
+    fallingExhaustionGapColor = 'g'
     defFallingExhaustionGapLwidth = 2.0
+    fallingExhaustionGapLwidth = 2.0
     defFallingExhaustionGapLstyle = '-'
+    fallingExhaustionGapLstyle = '-'
 
     defBear3Color = 'r'
+    bear3Color = 'r'
     defBear3Lwidth = 2.0
+    bear3Lwidth = 2.0
     defBear3Lstyle = '-'
+    bear3Lstyle = '-'
 
 
     defBull3Color = 'g'
+    bull3Color = 'g'
     defBull3Lwidth = 2.0
+    bull3Lwidth = 2.0
     defBull3Lstyle = '-'
+    bull3Lstyle = '-'
 
     defMornigStarColor = 'g'
+    mornigStarColor = 'g'
     defMornigStarLwidth = 2.0
+    mornigStarLwidth = 2.0
     defMornigStarLstyle = '-'
+    mornigStarLstyle = '-'
 
     defEveningStarColor = 'r'
+    eveningStarColor = 'r'
     defEveningStarLwidth = 2.0
+    eveningStarLwidth = 2.0
     defEveningStarLstyle = '-'
+    eveningStarLstyle = '-'
 
     defDarkCloudColor = 'r'
+    darkCloudColor = 'r'
     defDarkCloudLwidth = 2.0
+    darkCloudLwidth = 2.0
     defDarkCloudLstyle = '-'
+    darkCloudLstyle = '-'
 
     defPiercingColor = 'g'
+    piercingColor = 'g'
     defPiercingLwidth = 2.0
+    piercingLwidth = 2.0
     defPiercingLstyle = '-'
+    piercingLstyle = '-'
     defFlagPennantColor = 'm'
+    flagPennantColor = 'm'
     defFlagPennantLwidth = 2.0
+    flagPennantLwidth = 2.0
     defFlagPennantLStyle = '-'
+    flagPennantLStyle = '-'
     
     
     def __init__(self, chart, strategy=None):
