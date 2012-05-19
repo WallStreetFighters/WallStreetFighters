@@ -417,7 +417,7 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
     
     def clearLines(self):
         """Usuwa wszystkie linie narysowane dodatkowo na wykresie w związku z formacjami"""
-        for line in self.userLines:            
+        for line in self.formationLines:            
             line.remove()
         self.formationLines = []
         self.draw()
@@ -471,7 +471,7 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         if event.button==3: 
             self.clearLastUserLine()            
         if event.button==2: 
-            self.clearUserLines()
+            self.clearUserLines()            
         elif event.button==1:
             if self.x0==None or self.y0==None :
                 self.x0, self.y0 = event.xdata, event.ydata
