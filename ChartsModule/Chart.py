@@ -3,6 +3,8 @@ __author__="Andrzej Smoliński"
 __date__ ="$2012-02-23 19:00:48$"
 
 from ChartData import ChartData
+from matplotlib.collections import LineCollection
+from matplotlib.collections import PatchCollection
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.finance import candlestick
@@ -24,49 +26,38 @@ class Chart(FigureCanvas):
     Paweł, na jednym wykresie wyświetlam jeden wskaźnik i jeden oscylator, a jak ktoś
     będzie chciał więcej, to kliknie sobie jakiś guzik, który mu pootwiera kilka wykresów
     w nowym oknie."""
-    data = None #obiekt klasy Data przechowujący dane    
-    
-    fig = None #rysowany wykres (tzn. obiekt klasy Figure)
-    mainPlot = None #główny wykres (punktowy, liniowy, świecowy)        
-    volumeBars = None #wykres wolumenu
-    oscPlot = None #wykres oscylatora    
-    additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
-    rectangles = [] #lista prostokątów (do zaznaczania świec)
-    
-    mainType = None #typ głównego wykresu
-    oscType = None #typ oscylatora (RSI, momentum, ...)
-    mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
-    
-    x0, y0 = None,None      #współrzędne początku linii        
-    drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć        
-    
-    scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')                    
-    grid = True #czy rysujemy grida
-    
-    num_ticks = 8 #tyle jest etykiet pod wykresem
-    
     #margines (pionowy i poziomy oraz maksymalna wysokość/szerokość wykresu)
-    margin, maxSize = 0.1, 0.8     
+    margin, maxSize = 0.1, 0.8
     #wysokość wolumenu i wykresu oscylatora
-    volHeight, oscHeight = 0.1, 0.15        
+    volHeight, oscHeight = 0.1, 0.15
     
     def __init__(self, parent, finObj=None, width=8, height=6, dpi=100):
         """Konstruktor. Tworzy domyślny wykres (liniowy z wolumenem, bez wskaźników)
-        dla podanych danych. Domyślny rozmiar to 800x600 pixli"""                        
-        self.additionalLines=[]
-        self.rectangles=[]
+dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
+        self.mainPlot=None
+        self.volumeBars=None
+        self.oscPlot=None
+        self.additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
+        self.rectangles = [] #lista prostokątów (do zaznaczania świec)
+        self.mainType = None #typ głównego wykresu
+        self.oscType = None #typ oscylatora (RSI, momentum, ...)
+        self.mainIndicator = None #typ wskaźnika rysowany dodatkowo na głównym wykresie (średnia krocząca, ...)
+        self.x0, self.y0 = None,None #współrzędne początku linii
+        self.drawingMode = False #zakładam, że możliwość rysowania będzie można włączyć/wyłączyć
+        self.scaleType = 'linear' #rodzaj skali na osi y ('linear' lub 'log')
+        self.grid = True #czy rysujemy grida
         self.setData(finObj)
-        self.mainType='line'                
-        self.fig = Figure(figsize=(width, height), dpi=dpi)        
+        self.mainType='line'
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
                                    QtGui.QSizePolicy.Expanding,
                                    QtGui.QSizePolicy.Expanding)
-        FigureCanvas.updateGeometry(self)        
+        FigureCanvas.updateGeometry(self)
         self.addMainPlot()
-        self.addVolumeBars()                                        
-        self.mpl_connect('button_press_event', self.onClick)        
+        self.addVolumeBars()
+        self.mpl_connect('button_press_event', self.onClick)     
            
     def setData(self, finObj, start=None, end=None, step='daily'):
         """Ustawiamy model danych, który ma reprezentować wykres. Następnie
@@ -77,6 +68,9 @@ class Chart(FigureCanvas):
         if(self.mainPlot!=None):
             self.updatePlot()
     
+    def getData(self):
+        return self.data
+        
     def setGrid(self, grid):
         """Włącza (True) lub wyłącza (False) rysowanie grida"""
         self.grid=grid
@@ -95,7 +89,7 @@ class Chart(FigureCanvas):
         self.draw()        
         #self.drawGeometricFormation()
         #self.drawRateLines()
-        self.drawTrend()
+        #self.drawTrend()
         #self.drawCandleFormations()
         #self.drawGaps()
 		
@@ -118,6 +112,8 @@ class Chart(FigureCanvas):
             ax.plot(x,self.data.close,'b.',label=self.data.name)
         elif self.mainType=='candlestick':
             self.drawCandlePlot()
+        elif self.mainType=='bar':
+            self.drawBarPlot()
         else:            
             return
         if self.mainIndicator != None:
@@ -195,26 +191,42 @@ class Chart(FigureCanvas):
         self.fixTimeLabels()
         
     def drawCandlePlot(self):
-        """Wyświetla główny wykres w postaci świecowej"""    
-        
-        """candlestick potrzebuje danych w postaci piątek (time, open, close, high, low). 
-        time musi być w postaci numerycznej (ilość dni od 0000-00-00 powiększona  o 1).         
-        Atrybut width = szerokość świecy w ułamkach dnia na osi x. Czyli jeśli jedna świeca
-        odpowiada za 1 dzień, to ustawiamy jej szerokość na ~0.7 żeby był jakiś margines między nimi"""
+        """Wyświetla główny wykres w postaci świecowej"""            
         if self.data==None or self.data.corrupted:
-            return                        
-        lines, patches = candlestick(self.mainPlot,self.data.quotes,
-                                    width=0.7,colorup='w',colordown='k')                
-        #to po to żeby się wyświetlała legenda
-        lines[0].set_label(self.data.name)         
-        """Ludzie, którzy robili tą bibliotekę byli tak genialni, że uniemożliwili
-        stworzenie świec w najbardziej klasycznej postaci, tzn. białe=wzrost, czarne=spadek.
-        Wynika to z tego, że prostokąty domyślnie nie mają obramowania i są rysowane POD liniami.
-        Poniższy kod to naprawia"""
-        for line in lines:                        
-            line.set_zorder(line.get_zorder()-2)
-        for rect in patches:                                    
-            rect.update({'edgecolor':'k','linewidth':0.5})     
+            return
+        ax=self.mainPlot
+        rectsList=[]
+        open=self.data.open
+        close=self.data.close
+        xvals=range(len(close))
+        lines=ax.vlines(xvals,self.data.low,self.data.high,label=self.data.name,linewidth=0.5)
+        lines.set_zorder(lines.get_zorder()-1)
+        for i in xvals:
+            height=max(abs(close[i]-open[i]),0.001)
+            width=0.7
+            x=i-width/2
+            y=min(open[i],close[i])
+            print x,y,width,height
+            if open[i]<=close[i]:
+                rectsList.append(Rectangle((x,y),width,height,facecolor='w',edgecolor='k',linewidth=0.5))
+            else:
+                rectsList.append(Rectangle((x,y),width,height,facecolor='k',edgecolor='k',linewidth=0.5))
+        ax.add_collection(PatchCollection(rectsList,match_original=True))     
+    
+    def drawBarPlot(self):
+        """Rysuje główny wykres w postaci barowej."""
+        if self.data==None or self.data.corrupted:
+            return
+        ax=self.mainPlot
+        x=range(len(self.data.close))
+        lines1=ax.vlines(x,self.data.low,self.data.high,label=self.data.name)
+        lines2list=[]
+        for i in x:
+            lines2list.append(((i-0.3,self.data.open[i]),(i,self.data.open[i])))
+            lines2list.append(((i,self.data.close[i]),(i+0.3,self.data.close[i])))   
+        lines2=LineCollection(lines2list)
+        lines2.color('k')
+        ax.add_collection(lines2)
     
     def setMainIndicator(self, type):
         """Ustawiamy, jaki wskaźnik chcemy wyświetlać na głównym wykresie"""
@@ -389,21 +401,30 @@ class Chart(FigureCanvas):
     def setDrawingMode(self, mode):
         """Włączamy (True) lub wyłączamy (False) tryb rysowania po wykresie"""
         self.drawingMode=mode            
-        x0, y0 = None,None
+        self.x0, self.y0 = None,None
     
-    def drawLine(self, x0,y0,x1,y1):
-        """Dodaje linię (trend) do wykresu."""
-        newLine=Line2D([x0,x1],[y0,y1],color='k')                
-        self.mainPlot.add_line(newLine)
-        self.additionalLines.append(newLine)
-        newLine.figure.draw_artist(newLine)                                        
-        self.blit(self.mainPlot.bbox)    #blit to taki redraw
+    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 1.0, lstyle = '-'):
+          """Rysuje linie (trend) na wykresie """
+          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=color)                
+          self.mainPlot.add_line(newLine)
+          self.additionalLines.append(newLine)
+          newLine.figure.draw_artist(newLine)                                        
+          self.blit(self.mainPlot.bbox)    #blit to taki redraw  
     
     def clearLines(self):
         """Usuwa wszystkie linie narysowane dodatkowo na wykresie (tzn. nie kurs i nie wskaźniki)"""
         for line in self.additionalLines:            
             line.remove()
         self.additionalLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
+    
+    def clearLastLine(self):
+        """Usuwa ostatnią linię narysowaną na wykresie."""
+        if self.additionalLines==[]:
+            return
+        self.additionalLines[-1].remove()
+        self.additionalLines.remove(self.additionalLines[-1])
         self.draw()
         self.blit(self.mainPlot.bbox)
     
@@ -424,13 +445,13 @@ class Chart(FigureCanvas):
         self.blit(self.mainPlot.bbox)
 
     def onClick(self, event):
-        """Rysujemy linię pomiędzy dwoma kolejnymi kliknięciami. Później to będzie 
-        pewnie mniej biedne (z podglądem na żywo), ale pół dnia siedziałem żeby to
-        gówno w ogóle zadziałało."""        
+        """Rysujemy linię pomiędzy dwoma kolejnymi kliknięciami."""        
         if self.drawingMode==False:
             return
-        if event.button==3: #nie no kurwa, RMB to tutaj button 3 -_-
-            self.clearLines()            
+        if event.button==3: 
+            self.clearLastLine()            
+        if event.button==2: 
+            self.clearLines()
         elif event.button==1:
             if self.x0==None or self.y0==None :
                 self.x0, self.y0 = event.xdata, event.ydata
@@ -438,121 +459,17 @@ class Chart(FigureCanvas):
             else:
                 x1, y1 = event.xdata, event.ydata        
                 self.drawLine(self.x0,self.y0,x1,y1)                
-                self.x0, self.y0 = None,None
-                
-    def drawTrendLine(self, x0, y0, x1, y1, colour, lwidth = 3.0, lstyle = '--'):
-          """Rysuje linie trendu opcja wyboru koloru i grubosci linii """
-          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=colour)                
-          self.mainPlot.add_line(newLine)
-          self.additionalLines.append(newLine)
-          newLine.figure.draw_artist(newLine)                                        
-          self.blit(self.mainPlot.bbox)    #blit to taki redraw       
-   
-    def drawGeometricFormation(self):
-        self.clearLines()
-        formations=trend.findGeometricFormations(self.data.close)
-        print formations
-        for form in formations:
-            if form!=None:
-                self.drawTrendLine(form[1][0], form[1][1], form[1][2], form[1][3], 'r')
-                self.drawTrendLine(form[2][0], form[2][1], form[2][2], form[2][3], 'r') 
-
-    def drawRateLines(self):
-		# Tutaj sobie testuje strategie bo nie wiedzialem gdzie to wrzucic :)
-        a,b = osc.oscillatorStrategy(array(self.data.close),array(self.data.high),array(self.data.low),10)
-        print a,b
-        self.clearLines()
-        print "Rysuje wachlarze."
-        values = trend.rateLines(array(self.data.close),0.38,0.62)
-        print values
-        self.drawTrendLine(values[0][0],values[0][1],values[0][2],values[0][3],'y')
-        self.drawTrendLine(values[1][0],values[1][1],values[1][2],values[1][3],'y')
-        self.drawTrendLine(values[2][0],values[2][1],values[2][2],values[2][3],'y')           
-          
-    def drawCandleFormations(self):
-        """Test formacji świecowych."""
-        print "szukam formacji świecowych"
-        self.clearRectangles()
-        O=self.data.open
-        H=self.data.high
-        L=self.data.low
-        C=self.data.close        
-        formations=findCandleFormations(O,H,L,C)                
-        for formation in formations:
-            print formation                    
-            x=formation[1]-0.5
-            y=0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
-            width=formation[2]-formation[1]+1
-            height=1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
-                        -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
-            self.drawRectangle(x,y,width,height)     
-        self.drawTrend()   
-            
-    def drawGaps(self):
-        """Test luk."""
-        print "szukam luk"
-        self.clearRectangles()
-        H=self.data.high
-        L=self.data.low
-        C=self.data.close        
-        gapsList=findGaps(H,L,C)       
-        print gapsList
-        if(gapsList!=[]):
-            for gaps in gapsList:
-                for gap in gaps[0]:            
-                    print gap
-                    x=gap[1]
-                    width=1
-                    if("rising" in gap[0]):
-                        y=H[gap[1]]            
-                        height=L[gap[1]+1]-H[gap[1]]
-                    else:
-                        y=H[gap[1]+1]            
-                        height=L[gap[1]]-H[gap[1]+1]
-                    self.drawRectangle(x,y,width,height)                
+                self.x0, self.y0 = None,None                                          
         
     def drawTrend(self):
         self.clearLines()
-        strategy = Strategy(self.data)
-        strategy.analyze()
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)
         #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
         sup, res = trend.getChannelLines(self.data.close)
-        self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
-        self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
-        neckLine = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
-        
-        trend.hornBottoms(self.data.close, self.data.volume)
-        trend.hornTops(self.data.close, self.data.volume)
-        neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'y', 2.0, '-')
-        neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'b', 2.0, '-')
-        neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
-       # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
-        
-     #   min, mindex = trend.findMinLine(asarray(self.data.close))
-     #   self.drawTrendLine(mindex[0], min[0], mindex[len(min)-1], min[len(sup)-1], 'b', 1.0)
-     #   max, mindex = trend.findMaxLine(asarray(self.data.close))
-     #   self.drawTrendLine(mindex[0], max[0], mindex[len(min)-1], max[len(sup)-1], 'b', 1.0)
+        self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
+        self.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
         if len(self.data.close) > 30:
             sup, res = trend.getChannelLines(self.data.close, 1, 2)
-            self.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
-            self.drawTrendLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)
-            
-def getBoundsAsRect(axes):
-    """Funkcja pomocnicza do pobrania wymiarów wykresu w formie prostokąta,
-        tzn. tablicy."""
-    bounds=axes.get_position().get_points()
-    left=bounds[0][0]
-    bottom=bounds[0][1]
-    width=bounds[1][0]-left
-    height=bounds[1][0]-bottom
-    return [left, bottom, width, height]
+            self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
+            self.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2.0)

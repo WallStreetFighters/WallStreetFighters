@@ -334,7 +334,6 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 	
 	global HISTORY_LIST
 	global UPDATE_FLAG
-	print 'Flaga' + str(UPDATE_FLAG)
 	if UPDATE_FLAG == False:
 		print isInHistory(abbreviation)
 		finObj = isInHistory(abbreviation)
@@ -346,10 +345,9 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail, currentDate)
 	print "Pobieram: " + abbreviation
-	url = 'http://ichart.finance.yahoo.com/table.csv?s='+abbreviation+'&a='+str(sinceDate.day)+'&b='+str(sinceDate.month-1)	 
+	url = 'http://ichart.finance.yahoo.com/table.csv?s='+abbreviation+'&a='+str(sinceDate.month-1)+'&b='+str(sinceDate.day)	 
         url = url+'&c='+str(sinceDate.year)+'&d='+str(currentDate.month-1)+'&e='
 	url = url+str(currentDate.day)+'&f='+str(currentDate.year)+'&g=d&ignore=.csv'
-
 	if timePeriod == 'weekly':
 		url = url.replace('&g=d', '&g=w')
 	elif timePeriod == 'monthly':
@@ -811,6 +809,22 @@ def getMostPopularCommodities():
 	mostPopular.append(mostPopularPatternSearch('Copper',pageSource))
 	
 	return mostPopular
+
+def getDataToLightWeightChart(abbreviation, financialType, source):
+	global UPDATE_FLAG
+	today = datetime.date.today()
+	ddays = datetime.timedelta(days=30)
+	since = today - ddays
+	UPDATE_FLAG = True
+	if source == "Stooq":
+		finObj = createWithArchivesFromStooq("", abbreviation, financialType, "", "daily", since)
+	else:
+	   	finObj = createWithArchivesFromYahoo("", abbreviation, financialType, "", "daily", since)
+	UPDATE_FLAG = False
+	return finObj
+	
+
+
 
 
 ########################################################################################################

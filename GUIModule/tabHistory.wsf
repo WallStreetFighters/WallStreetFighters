@@ -52,12 +52,12 @@ S''
 sS'start'
 p24
 g20
-(S'\x07\xdc\x04\r\x00\x00\x00\x00\x00\x00'
+(S'\x07\xdb\n\t\x00\x00\x00\x00\x00\x00'
 tRp25
 sS'lineWidth'
 p26
-F1
+F2.5
 sS'painting'
 p27
-I00
+I01
 sa.

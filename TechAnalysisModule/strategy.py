@@ -38,9 +38,10 @@ class Strategy:
     #Kontynuacja trendu
     symetricTriangleVal = 50
     rectangleVal = 30
+    
+    flagPennantVal = 20
 
     defFlagPennantVal = 20
-    
     defSymetricTriangleVal = 50
     defRectangleVal = 30
     """Wskazniki i oscylatory"""
@@ -208,6 +209,12 @@ class Strategy:
     def enableRectangleVal(self):
         self.rectangleVal = self.defRectangleVal
 
+    def setFlagPennantVal(self, flagPennantVal):
+        self.flagPennantVal = flagPennantVal
+    def disableFlagPennantVal(self):
+        self.flagPennantVal = 0
+    def enableFlagPennantVal(self):
+        self.flagPennantVal = self.defFlagPennantVal    
     """Wskazniki i oscylatory"""
 
     def setOscilatorsVal(self, oscilatorsVal):
@@ -396,6 +403,7 @@ class Strategy:
         self.bear3Val = self.defBear3Val
         self.eveningStarVal = self.defEveningStarVal
         self.darkCloudVal = self.defDarkCloudVal
+        self.flagPennantVal = self.defFlagPennantVal
             
     def analyze(self):
           resultText = ''
@@ -489,6 +497,7 @@ class Strategy:
                   elif formation[0] == 'falling_wedge':
                       overallScore += self.fallingWedgeVal * formation[3]
                       if self.fallingWedgeVal * formation[3] != 0:
+
                           print "   (+) falling wedge\n"
                           resultText = resultText + "   (+) falling wedge     "
                           hasFound = 1
@@ -496,15 +505,16 @@ class Strategy:
                       resultText = resultText + self.data.date[int(formation[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(formation[1][2])].strftime("%Y-%m-%d") + "\n"   
                       
            
-          flags = trend.findFlagsAndPennants(self.data.close, self.data.volume)
-          if flags != None:
-              overallScore += defFlagPennantVal * flags[1]
-              if flags[1] < 0:
-                  print "(-) falling-trend flag/pennant"
-                  resultText = resultText + "(-) falling-trend flag/pennant"
-              else:
-                  print "(+) rising-trend flag/pennant"
-                  resultText = resultText + "(+) rising-trend flag/pennant"
+	  flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
+	  if flags != None:
+		overallScore += defFlagPennantVal * flags[1]
+		if flags[1] < 0:
+			print "(-) falling-trend flag/pennant"
+			resultText = resultText + "(-) falling-trend flag/pennant"
+		else:
+			print "(+) rising-trend flag/pennant"
+			resultText = resultText + "(+) rising-trend flag/pennant"
+
 
           gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)
           for formation in gaps:
