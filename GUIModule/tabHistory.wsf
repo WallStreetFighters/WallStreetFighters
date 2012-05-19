@@ -28,7 +28,11 @@ p12
 ttRp13
 sS'index'
 p14
+<<<<<<< HEAD
 I1220
+=======
+I2
+>>>>>>> cc20b380f8aece298e707e9f1d31f513cbbc0e8d
 sS'indicator'
 p15
 (lp16
@@ -52,7 +56,11 @@ S''
 sS'start'
 p24
 g20
+<<<<<<< HEAD
 (S'\x07\xdb\n\t\x00\x00\x00\x00\x00\x00'
+=======
+(S'\x07\xd9\n\x06\x00\x00\x00\x00\x00\x00'
+>>>>>>> cc20b380f8aece298e707e9f1d31f513cbbc0e8d
 tRp25
 sS'lineWidth'
 p26

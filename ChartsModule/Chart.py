@@ -37,7 +37,8 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         self.mainPlot=None
         self.volumeBars=None
         self.oscPlot=None
-        self.additionalLines = [] #lista linii narysowanych na wykresie (przez usera, albo przez wykrycie trendu)
+        self.userLines = [] #lista linii narysowanych na wykresie przez użytkownika
+        self.formationLines = [] #lista linii oznaczających formacje
         self.rectangles = [] #lista prostokątów (do zaznaczania świec)
         self.mainType = None #typ głównego wykresu
         self.oscType = None #typ oscylatora (RSI, momentum, ...)
@@ -121,9 +122,12 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         ax.set_xlim(x[0],x[-1])
         ax.set_yscale(self.scaleType)
         ax.set_ylim(0.995*min(self.data.low),1.005*max(self.data.high))                 
-        for line in self.additionalLines:
+        for line in self.userLines:
             ax.add_line(line)
             line.figure.draw_artist(line)         
+        for line in self.formationLines:
+            ax.add_line(line)
+            line.figure.draw_artist(line)
         for rect in self.rectangles:
             ax.add_patch(rect)
             rect.figure.draw_artist(rect)        
@@ -403,28 +407,44 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         self.drawingMode=mode            
         self.x0, self.y0 = None,None
     
-    def drawLine(self, x0, y0, x1, y1, color='black', lwidth = 1.0, lstyle = '-'):
-          """Rysuje linie (trend) na wykresie """
+    def drawLine(self, x0, y0, x1, y1, color='red', lwidth = 1.0, lstyle = '-'):
+          """Rysuje linię na wykresie (do formacji)"""
           newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=color)                
           self.mainPlot.add_line(newLine)
-          self.additionalLines.append(newLine)
+          self.formationLines.append(newLine)
           newLine.figure.draw_artist(newLine)                                        
           self.blit(self.mainPlot.bbox)    #blit to taki redraw  
     
     def clearLines(self):
-        """Usuwa wszystkie linie narysowane dodatkowo na wykresie (tzn. nie kurs i nie wskaźniki)"""
-        for line in self.additionalLines:            
+        """Usuwa wszystkie linie narysowane dodatkowo na wykresie w związku z formacjami"""
+        for line in self.userLines:            
             line.remove()
-        self.additionalLines = []
+        self.formationLines = []
         self.draw()
         self.blit(self.mainPlot.bbox)
     
-    def clearLastLine(self):
-        """Usuwa ostatnią linię narysowaną na wykresie."""
-        if self.additionalLines==[]:
+    def drawUserLine(self, x0, y0, x1, y1, color='black', lwidth = 1.0, lstyle = '-'):
+          """Rysuje wyklikaną przez użytkownika linie na wykresie"""
+          newLine=Line2D([x0,x1],[y0,y1], linewidth = lwidth, linestyle=lstyle, color=color)                
+          self.mainPlot.add_line(newLine)
+          self.userLines.append(newLine)
+          newLine.figure.draw_artist(newLine)                                        
+          self.blit(self.mainPlot.bbox)    #blit to taki redraw  
+    
+    def clearUserLines(self):
+        """Usuwa wszystkie linie narysowane przez usera na wykresie"""
+        for line in self.userLines:            
+            line.remove()
+        self.userLines = []
+        self.draw()
+        self.blit(self.mainPlot.bbox)
+    
+    def clearLastUserLine(self):
+        """Usuwa ostatnią linię narysowaną przez usera na wykresie."""
+        if self.userLines==[]:
             return
-        self.additionalLines[-1].remove()
-        self.additionalLines.remove(self.additionalLines[-1])
+        self.userLines[-1].remove()
+        self.userLines.remove(self.userLines[-1])
         self.draw()
         self.blit(self.mainPlot.bbox)
     
@@ -449,16 +469,16 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         if self.drawingMode==False:
             return
         if event.button==3: 
-            self.clearLastLine()            
+            self.clearLastUserLine()            
         if event.button==2: 
-            self.clearLines()
+            self.clearUserLines()
         elif event.button==1:
             if self.x0==None or self.y0==None :
                 self.x0, self.y0 = event.xdata, event.ydata
                 self.firstPoint=True
             else:
                 x1, y1 = event.xdata, event.ydata        
-                self.drawLine(self.x0,self.y0,x1,y1)                
+                self.drawUserLine(self.x0,self.y0,x1,y1)                
                 self.x0, self.y0 = None,None                                          
         
     def drawTrend(self):
