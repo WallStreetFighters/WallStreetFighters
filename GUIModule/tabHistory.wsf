@@ -28,7 +28,7 @@ p12
 ttRp13
 sS'index'
 p14
-I1916
+I2
 sS'indicator'
 p15
 (lp16
@@ -52,7 +52,7 @@ S''
 sS'start'
 p24
 g20
-(S'\x07\xdc\x05\x01\x00\x00\x00\x00\x00\x00'
+(S'\x07\xd9\n\x06\x00\x00\x00\x00\x00\x00'
 tRp25
 sS'lineWidth'
 p26
