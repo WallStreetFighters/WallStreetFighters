@@ -600,7 +600,7 @@ class FormationDrawer:
         if abs(s.piercingVal)>0:
             self.configuration['piercing']=(self.piercingColor,self.piercingLwidth,self.piercingLstyle) 
         if abs(s.flagPennantVal)>0:
-            self.configutation['risingTrendFlagOrPennant']=(self.flagPennantColor, self.flagPennantLwidth, self.flagPennantLStyle)
+            self.configutation['FlagOrPennant']=(self.flagPennantColor, self.flagPennantLwidth, self.flagPennantLStyle)
                 
 
     def drawFormations(self):
@@ -613,7 +613,7 @@ class FormationDrawer:
         candleForm=['bull3','bear3','morning_star','evening_star','piercing','dark_cloud']        
         gaps=['rising_breakaway_gap','rising_continuation_gap','rising_exhaustion_gap',
               'falling_breakaway_gap','falling_continuation_gap','falling_exhaustion_gap']        
-        fandp=['risingTrendFlagOrPennant','fallingTrendFlagOrPennant']
+        fandp=['risingTrendFlagOrPennant','fallingTrendFlagOrPennant', 'FlagOrPennant']
         self.chart.clearLines()
         self.chart.clearRectangles()
         for name, values in self.configuration.iteritems():            
@@ -641,11 +641,10 @@ class FormationDrawer:
                             self.drawGap(gap,values[0],values[1],values[2])
             elif name in fandp:
                 if not computedFandp:
-                    #foundFandp=trend.findFlagsAndPennants(data.close, data.volume)
-                    #tak to się wywołuje?
+                    foundFandp=flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
                     computedFandp=True
-                if name == foundFandp[0]:
-                    self.drawFlagAndPennant(foundFanp,values[0],values[1],values[2])                
+                if name == 'FlagOrPennant':
+                    self.drawFlagAndPennant(foundFanp,values[0],values[1],values[2])                 
             elif name=='trend':
                 self.drawTrend(values[0],values[1],values[2])
             elif name=='rate_lines':
@@ -697,9 +696,10 @@ class FormationDrawer:
             self.drawTrendLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], color, lwidth, lstyle)
     
     def drawFlagAndPennant(self,formation,color,lstyle,lwidth):
-        #uzupełnić
-        pass
-
+        if formation != None:
+		self.drawTrendLine(formation[2][0], formation[2][1], formation[2][2], formation[2][3], color, lwidth, lstyle)
+		self.drawTrendLine(formation[2][0], formation[2][1], formation[2][3], formation[2][4], color, lwidth, lstyle)
+ 
     def drawTrend(self,color,lstyle,lwidth):
         sup, res = trend.getChannelLines(self.data.close)
         self.chart.drawTrendLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', lwidth, lstyle)
