@@ -1187,7 +1187,7 @@ def checkRegressionForFlagsAndPennants(proposals,maxval,minval):
 		maxtemp = maxval[x[0]:x[1]:1]
 		a1,b1 = regression(maxtemp)
 		mintemp = minval[x[0]:x[1]:1]
-		a2,b2 = reggresion(mintemp)
+		a2,b2 = regression(mintemp)
 		if a1 < 0 and a2-0.05 >= a1:
 			fallingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
 		elif a1 > 0 and a2 > 0 and x[1] < (b2-b1)/(a1-a2):
