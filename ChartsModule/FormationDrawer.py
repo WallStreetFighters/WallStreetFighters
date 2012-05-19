@@ -652,13 +652,13 @@ class FormationDrawer:
             elif name=='head_shoulders':
                 neckline = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
-            elif name=='reversed_head_shoulders'    
+            elif name=='reversed_head_shoulders':    
                 neckline = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
-            elif name=='triple_top'
+            elif name=='triple_top':
                 neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
-            elif name=='triple_bottom'
+            elif name=='triple_bottom':
                 neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
             # ...
