@@ -11,8 +11,8 @@ class FormationDrawer:
     trendColor = defTrendColor
     defTrendLwidth = 2.0
     trendLwidth = defTrendLwidth
-    defTrendLStyle = '-'
-    trendLStyle = defTrendLStyle
+    defTrendLstyle = '-'
+    trendLstyle = defTrendLstyle
     
     defHeadAndShouldersColor = 'm'
     headAndShouldersColor = 'm'
@@ -57,12 +57,12 @@ class FormationDrawer:
     defFallingTriangleLstyle = '-'
     fallingTriangleLstyle = '-'
 
-    defReversedHeadShouldersColor = 'm'
-    reversedHeadShouldersColor = 'm'
-    defReversedHeadShouldersLwidth = 2.0
-    reversedHeadShouldersLwidth = 2.0
-    defReversedHeadShouldersLstyle = '-'
-    reversedHeadShouldersLstyle = '-'
+    defReversedHeadAndShouldersColor = 'm'
+    reversedHeadAndShouldersColor = 'm'
+    defReversedHeadAndShouldersLwidth = 2.0
+    reversedHeadAndShouldersLwidth = 2.0
+    defReversedHeadAndShouldersLstyle = '-'
+    reversedHeadAndShouldersLstyle = '-'
 
     defTripleBottomColor = 'm'
     tripleBottomColor = 'm'
@@ -180,8 +180,8 @@ class FormationDrawer:
     flagPennantColor = 'm'
     defFlagPennantLwidth = 2.0
     flagPennantLwidth = 2.0
-    defFlagPennantLStyle = '-'
-    flagPennantLStyle = '-'
+    defFlagPennantLstyle = '-'
+    flagPennantLstyle = '-'
     
     
     def __init__(self, chart, strategy=None):
@@ -209,23 +209,23 @@ class FormationDrawer:
         self.trendLstyle = self.defTrendLstyle
 
 
-    def setHeadShouldersColor(self, headShouldersColor):
-        self.headShouldersColor = headShouldersColor
+    def setHeadAndShouldersColor(self, headAndShouldersColor):
+        self.headAndShouldersColor = headAndShouldersColor
 
-    def resetHeadShouldersColor(self):
-        self.headShouldersColor = self.defHeadShouldersColor
+    def resetHeadAndShouldersColor(self):
+        self.headAndShouldersColor = self.defHeadAndShouldersColor
 
-    def setHeadShouldersLwidth(self, headShouldersLwidth):
-        self.headShouldersLwidth = headShouldersLwidth
+    def setHeadAndShouldersLwidth(self, headAndShouldersLwidth):
+        self.headAndShouldersLwidth = headAndShouldersLwidth
 
-    def resetHeadShouldersLwidth(self):
-        self.headShouldersLwidth = self.defHeadShouldersLwidth
+    def resetHeadAndShouldersLwidth(self):
+        self.headAndShouldersLwidth = self.defHeadAndShouldersLwidth
 
-    def setHeadShouldersLstyle(self, headShouldersLstyle):
-        self.headShouldersLstyle = headShouldersLstyle
+    def setHeadAndShouldersLstyle(self, headAndShouldersLstyle):
+        self.headAndShouldersLstyle = headAndShouldersLstyle
 
-    def resetHeadShouldersLstyle(self):
-        self.headShouldersLstyle = self.defHeadShouldersLstyle
+    def resetHeadAndShouldersLstyle(self):
+        self.headAndShouldersLstyle = self.defHeadAndShouldersLstyle
 
 
     def setTripleTopColor(self, tripleTopColor):
@@ -285,23 +285,23 @@ class FormationDrawer:
         self.fallingTriangleLstyle = self.defFallingTriangleLstyle
 
 
-    def setReversedHeadShouldersColor(self, reversedHeadShouldersColor):
-        self.reversedHeadShouldersColor = reversedHeadShouldersColor
+    def setReversedHeadAndShouldersColor(self, reversedHeadAndShouldersColor):
+        self.reversedHeadAndShouldersColor = reversedHeadAndShouldersColor
 
-    def resetReversedHeadShouldersColor(self):
-        self.reversedHeadShouldersColor = self.defReversedHeadShouldersColor
+    def resetReversedHeadAndShouldersColor(self):
+        self.reversedHeadAndShouldersColor = self.defReversedHeadAndShouldersColor
 
-    def setReversedHeadShouldersLwidth(self, reversedHeadShouldersLwidth):
-        self.reversedHeadShouldersLwidth = reversedHeadShouldersLwidth
+    def setReversedHeadAndShouldersLwidth(self, reversedHeadAndShouldersLwidth):
+        self.reversedHeadAndShouldersLwidth = reversedHeadAndShouldersLwidth
 
-    def resetReversedHeadShouldersLwidth(self):
-        self.reversedHeadShouldersLwidth = self.defReversedHeadShouldersLwidth
+    def resetReversedHeadAndShouldersLwidth(self):
+        self.reversedHeadAndShouldersLwidth = self.defReversedHeadAndShouldersLwidth
 
-    def setReversedHeadShouldersLstyle(self, reversedHeadShouldersLstyle):
-        self.reversedHeadShouldersLstyle = reversedHeadShouldersLstyle
+    def setReversedHeadAndShouldersLstyle(self, reversedHeadAndShouldersLstyle):
+        self.reversedHeadAndShouldersLstyle = reversedHeadAndShouldersLstyle
 
-    def resetReversedHeadShouldersLstyle(self):
-        self.reversedHeadShouldersLstyle = self.defReversedHeadShouldersLstyle
+    def resetReversedHeadAndShouldersLstyle(self):
+        self.reversedHeadAndShouldersLstyle = self.defReversedHeadAndShouldersLstyle
 
 
     def setTripleBottomColor(self, tripleBottomColor):
@@ -622,11 +622,11 @@ class FormationDrawer:
     def resetFlagPennantLwidth(self):
         self.flagPennantLwidth = self.defFlagPennantLwidth
 
-    def setFlagPennantLStyle(self, flagPennantLStyle):
-        self.flagPennantLStyle = flagPennantLStyle
+    def setFlagPennantLstyle(self, flagPennantLstyle):
+        self.flagPennantLstyle = flagPennantLstyle
 
-    def resetFlagPennantLStyle(self):
-        self.flagPennantLStyle = self.defFlagPennantLStyle
+    def resetFlagPennantLstyle(self):
+        self.flagPennantLstyle = self.defFlagPennantLstyle
 
     
     def setFormations(self, s):
@@ -638,7 +638,7 @@ class FormationDrawer:
         if abs(s.trendVal)>0:
             self.configuration['trend']=(self.trendColor,self.trendLwidth,self.trendLstyle)
         if abs(s.headAndShouldersVal)>0:
-            self.configuration['head_shoulders']=(self.headShouldersColor,self.headShouldersLwidth,self.headShouldersLstyle)
+            self.configuration['head_shoulders']=(self.headAndShouldersColor,self.headAndShouldersLwidth,self.headAndShouldersLstyle)
         if abs(s.tripleTopVal)>0:
             self.configuration['triple_top']=(self.tripleTopColor,self.tripleTopLwidth,self.tripleTopLstyle)        
         if abs(s.risingWedgeVal)>0:
@@ -646,7 +646,7 @@ class FormationDrawer:
         if abs(s.fallingTriangleVal)>0:
             self.configuration['falling_triangle']=(self.fallingTriangleColor,self.fallingTriangleLwidth,self.fallingTriangleLstyle)        
         if abs(s.reversedHeadAndShouldersVal)>0:
-            self.configuration['reversed_head_shoulders']=(self.reversedHeadShouldersColor,self.reversedHeadShouldersLwidth,self.reversedHeadShouldersLstyle)        
+            self.configuration['reversed_head_shoulders']=(self.reversedHeadAndShouldersColor,self.reversedHeadAndShouldersLwidth,self.reversedHeadAndShouldersLstyle)        
         if abs(s.tripleBottomVal)>0:
             self.configuration['triple_bottom']=(self.tripleBottomColor,self.tripleBottomLwidth,self.tripleBottomLstyle)        
         if abs(s.fallingWedgeVal)>0:
@@ -680,7 +680,7 @@ class FormationDrawer:
         if abs(s.piercingVal)>0:
             self.configuration['piercing']=(self.piercingColor,self.piercingLwidth,self.piercingLstyle) 
         if abs(s.flagPennantVal)>0:
-            self.configutation['FlagOrPennant']=(self.flagPennantColor, self.flagPennantLwidth, self.flagPennantLStyle)
+            self.configutation['FlagOrPennant']=(self.flagPennantColor, self.flagPennantLwidth, self.flagPennantLstyle)
                 
 
     def drawFormations(self):
