@@ -79,6 +79,9 @@ class Chart(FigureCanvas):
         if(self.mainPlot!=None):
             self.updatePlot()
     
+    def getData(self):
+        return self.data
+        
     def setGrid(self, grid):
         """Włącza (True) lub wyłącza (False) rysowanie grida"""
         self.grid=grid
