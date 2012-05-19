@@ -700,6 +700,7 @@ class FormationDrawer:
         computedCandle = False
         computedGeo = False
         computedGaps = False
+        computedFandp = False
         for name, values in self.configuration.iteritems():            
             if name in geoForm:
                 if not computedGeo:
@@ -725,44 +726,44 @@ class FormationDrawer:
                             self.drawGap(gap,values[0],values[1],values[2])
             elif name in fandp:
                 if not computedFandp:
-                    foundFandp = flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
+                    foundFandp = flags = trend.findFlagsAndPennants(self.chart.data.close,self.chart.data.volume, self.chart.data.high, self.chart.data.low)
                     computedFandp = True
                 if name == 'FlagOrPennant':
-                    self.drawFlagAndPennant(foundFanp,values[0],values[1],values[2])                 
+                    self.drawFlagAndPennant(foundFandp,values[0],values[1],values[2])                 
             elif name == 'trend':
                 self.drawTrend(values[0],values[1],values[2])
             elif name == 'rate_lines':
                 self.drawRateLines(values[0],values[1],values[2])        
             elif name == 'head_shoulders':
-                neckline = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
+                neckline = trend.lookForHeadAndShoulders(self.chart.data.close, self.chart.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
             elif name == 'reversed_head_shoulders':   
-                neckline = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
+                neckline = trend.lookForReversedHeadAndShoulders(self.chart.data.close, self.chart.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
             elif name == 'triple_top':
-                neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
+                neckline = trend.lookForTripleTop(self.chart.data.close, self.chart.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
             elif name == 'triple_bottom':
-                neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
+                neckline = trend.lookForTripleBottom(self.chart.data.close, self.chart.data.volume)
                 self.drawHST(neckline, values[0],values[1],values[2])
             # ...
     
-    def drawGeometricFormation(self,form,color = 'r',lstyle = '--',lwidth = 1.0):        
+    def drawGeometricFormation(self,form,color = 'r',lwidth = 1.0,lstyle = '--'):        
         self.chart.drawLine(form[1][0], form[1][1], form[1][2], form[1][3], 
                             color, lwidth, lstyle)
         self.chart.drawLine(form[2][0], form[2][1], form[2][2], form[2][3], 
                             color, lwidth, lstyle)
 
-    def drawCandleFormation(self,formation,color,lstyle,lwidth):                                
+    def drawCandleFormation(self,formation,color,lwidth,lstyle):                                
         x = formation[1]-0.5
-        y = 0.97*min(self.data.low[formation[1]],self.data.low[formation[2]])
+        y = 0.97*min(self.chart.data.low[formation[1]],self.chart.data.low[formation[2]])
         width = formation[2]-formation[1]+1
-        height = 1.06*(max((self.data.high[formation[1]],self.data.high[formation[2]]))
-                    -min((self.data.low[formation[1]],self.data.low[formation[2]])))           
+        height = 1.06*(max((self.chart.data.high[formation[1]],self.chart.data.high[formation[2]]))
+                    -min((self.chart.data.low[formation[1]],self.chart.data.low[formation[2]])))           
         self.chart.drawRectangle(x,y,width,height,color,lwidth,lstyle)     
         
     
-    def drawGap(self,gap,color,lstyle,lwidth):        
+    def drawGap(self,gap,color,lwidth,lstyle):        
         x = gap[1]
         width = 1
         data = self.chart.getData()
@@ -775,29 +776,30 @@ class FormationDrawer:
         self.chart.drawRectangle(x,y,width,height,color,lwidth,lstyle)
     
     #head and shoulders /reversed hs, triple top/botom
-    def drawHST(self,neckline,color,lstyle,lwidth): 
+    def drawHST(self,neckLine,color,lwidth,lstyle): 
         if (neckLine[0] != neckLine[2]):
-            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], color, lwidth, lstyle)
+            self.chart.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], color, lwidth, lstyle)
     
-    def drawFlagAndPennant(self,formation,color,lstyle,lwidth):
+    def drawFlagAndPennant(self,formation,color,lwidth,lstyle):
         if formation != None:
-		self.drawLine(formation[2][0], formation[2][1], formation[2][2], formation[2][3], color, lwidth, lstyle)
-		self.drawLine(formation[2][0], formation[2][1], formation[2][3], formation[2][4], color, lwidth, lstyle)
+		self.chart.drawLine(formation[2][0], formation[2][1], formation[2][2], formation[2][3], color, lwidth, lstyle)
+		self.chart.drawLine(formation[2][0], formation[2][1], formation[2][3], formation[2][4], color, lwidth, lstyle)
  
-    def drawTrend(self,color,lstyle,lwidth):
+    def drawTrend(self,color,lwidth,lstyle):
         data = self.chart.getData()
-        sup, res = trend.getChannelLines(data.close)
+        sup, res = trend.getChannelLines(self.chart.data.close)
         self.chart.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', lwidth, lstyle)
         self.chart.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', lwidth, lstyle)
-        if len(self.data.close) > 30:
-            sup, res = trend.getChannelLines(data.close, 1, 2)
-            self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2*lwidth, lstyle)
-            self.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2*lwidth, lstyle)
+        if len(data.close) > 30:
+            sup, res = trend.getChannelLines(self.chart.data.close, 1, 2)
+            self.chart.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2*lwidth, lstyle)
+            self.chart.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r', 2*lwidth, lstyle)
         
     
-    def drawRateLines(self,color,lstyle,lwidth):        
-        values = trend.rateLines(array(self.chart.getData().close),0.38,0.62)
+    def drawRateLines(self,color,lwidth,lstyle):        
+        data = self.chart.getData()
+        values = trend.rateLines(array(data.close),0.38,0.62)
         print values
-        self.drawLine(values[0][0],values[0][1],values[0][2],values[0][3],color,lwidth,lstyle)
-        self.drawLine(values[1][0],values[1][1],values[1][2],values[1][3],color,lwidth,lstyle)
-        self.drawLine(values[2][0],values[2][1],values[2][2],values[2][3],color,lwidth,lstyle)           
+        self.chart.drawLine(values[0][0],values[0][1],values[0][2],values[0][3],color,lwidth,lstyle)
+        self.chart.drawLine(values[1][0],values[1][1],values[1][2],values[1][3],color,lwidth,lstyle)
+        self.chart.drawLine(values[2][0],values[2][1],values[2][2],values[2][3],color,lwidth,lstyle)           
