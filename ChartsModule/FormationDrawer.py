@@ -799,7 +799,7 @@ class FormationDrawer:
     def drawRateLines(self,color,lwidth,lstyle):        
         data = self.chart.getData()
         values = trend.rateLines(array(data.close),0.38,0.62)
-        print values
+        #print values
         self.chart.drawLine(values[0][0],values[0][1],values[0][2],values[0][3],color,lwidth,lstyle)
         self.chart.drawLine(values[1][0],values[1][1],values[1][2],values[1][3],color,lwidth,lstyle)
         self.chart.drawLine(values[2][0],values[2][1],values[2][2],values[2][3],color,lwidth,lstyle)           

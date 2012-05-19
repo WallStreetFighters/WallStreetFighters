@@ -256,9 +256,9 @@ def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
 	url = "http://finance.yahoo.com/q?s="+abbreviation
 	try:
 		site = urllib2.urlopen(url)
-		print url
+		#print url
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException('Connection Error!')
 	pageSource = site.read()
 	if abbreviation[0] == '^':
@@ -306,7 +306,7 @@ def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException('Connection Error!')
 	pageSource = site.read()
 	pattern = '_c[0-9]>([0-9]*,*[0-9]+\.*[0-9]+)<'
@@ -335,7 +335,7 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
-		print isInHistory(abbreviation)
+		#print isInHistory(abbreviation)
 		finObj = isInHistory(abbreviation)
 		if finObj != None:
 			finObj.updateArchive(timePeriod)
@@ -344,7 +344,7 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 	currentDate = datetime.date.today()
 
 	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail, currentDate)
-	print "Pobieram: " + abbreviation
+	#print "Pobieram: " + abbreviation
 	url = 'http://ichart.finance.yahoo.com/table.csv?s='+abbreviation+'&a='+str(sinceDate.month-1)+'&b='+str(sinceDate.day)	 
         url = url+'&c='+str(sinceDate.year)+'&d='+str(currentDate.month-1)+'&e='
 	url = url+str(currentDate.day)+'&f='+str(currentDate.year)+'&g=d&ignore=.csv'
@@ -355,7 +355,7 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException('Connection Error!')
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
@@ -418,7 +418,7 @@ def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timeP
 		site = opener.open(url2)
 
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException('Connection Error!')
 	csvString = site.read()
 	csvString = cStringIO.StringIO(csvString)
@@ -487,7 +487,7 @@ def updateDatabase():
 		try:
 			site = urllib2.urlopen(url)
 		except urllib2.URLError, ex:
-			print "Something wrong happend! Check your internet connection!"
+			#print "Something wrong happend! Check your internet connection!"
 			raise DataAPIException('Connection Error!')
 		pageSource = site.read()
 		pattern = '(?s)Prev(.*)Prev'
@@ -498,7 +498,7 @@ def updateDatabase():
 		pattern = '>([0-9][0-9]*-[A-Z][a-z][a-z]-[0-9][0-9])</td><td>(.*)</td><td.*>([A-Z][A-Z][A-Z]*)<.*>M<'
 		for m in re.finditer(pattern,pageSource):
 			if isInStock(m.group(3)) == None:
-				print m.group(3)+m.group(2)+m.group(1)
+				#print m.group(3)+m.group(2)+m.group(1)
 				csvFile.write(m.group(3)+','+m.group(2)+',Yahoo,NYSE\n')
 		DATABASE_LAST_UPDATE = DATABASE_LAST_UPDATE + dmonth
 			
@@ -574,11 +574,11 @@ def getAdvDec(date):
 		site = urllib2.urlopen(url)
 	except urllib2.HTTPError, ex:
 		if ex.code == 404:
-			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
+			#print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
 			raise DataAPIException('Connection Error!')
 		return
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException('Connection Error!')
 	pageSource = site.read()
 	pageSource = pageSource.replace(' ','')
@@ -646,9 +646,9 @@ def isInStock(abbreviation):
 def saveHistory(file):
 	"""Funkcja zapisująca bierzącą historie w pliku"""
 	global HISTORY_LIST
-	print "zapisalem"
-	for x in HISTORY_LIST:
-		print x.abbreviation
+	#print "zapisalem"
+	#for x in HISTORY_LIST:
+		#print x.abbreviation
 	cPickle.dump(HISTORY_LIST, file)
 
 class loadHistory(threading.Thread):
@@ -669,7 +669,7 @@ def top5Volume():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	#pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
@@ -693,7 +693,7 @@ def top5Gainers():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
@@ -712,7 +712,7 @@ def top5Losers():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
@@ -732,7 +732,7 @@ def getMostPopular():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()	
 	
@@ -744,7 +744,7 @@ def getMostPopular():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 
@@ -781,7 +781,7 @@ def getMostPopularCurrencies():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	
@@ -799,7 +799,7 @@ def getMostPopularCommodities():
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
+		#print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException("Connection ERROR!")
 	pageSource = site.read()
 	

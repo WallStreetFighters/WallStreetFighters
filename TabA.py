@@ -510,7 +510,7 @@ class TabA(QtGui.QWidget):
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
     def updateDate(self):
-        print 'jestem w update date'
+        #print 'jestem w update date'
         dateStart = self.startDateEdit.date()
         self.settings["start"] = datetime.datetime(dateStart.year(),dateStart.month(),dateStart.day())
         dateEnd = self.endDateEdit.date()
@@ -575,7 +575,7 @@ class TabA(QtGui.QWidget):
             m.resize(m.width() , m.height()+20)
             
     def compareChanged(self,state):
-        print 'xos tam'
+        #print 'xos tam'
         if state == 0:
             self.compareLineEdit.setEnabled(False)
             self.compareButton.setEnabled(False)
@@ -722,11 +722,11 @@ class TabA(QtGui.QWidget):
 
     def paintCompareChart(self):
         self.finObj = []
-        print self.qModelIndex
+        #print self.qModelIndex
         k = 0
         for x in self.listName:
-            print self.qModelIndex[k]
-            print x 
+            #print self.qModelIndex[k]
+            #print x 
             if x == "index":
                 index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.INDEX_LIST[index][2] == 'Yahoo':
@@ -857,7 +857,7 @@ class TabA(QtGui.QWidget):
     def showChartsWithAllIndicators(self,x):
        
         if len(self.settings["indicator"]) >= 3:
-            print 'opening popup'
+            #print 'opening popup'
             start = self.settings["start"]
             end = self.settings["end"]
             oscilator = self.settings["oscilator"]

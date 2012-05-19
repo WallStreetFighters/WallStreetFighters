@@ -37,8 +37,8 @@ def findCandleFormations(O,H,L,C):
         C=C[-CANDLE_MAX_LEN::1]        
     else:
         offset=0       
-    #print "trend= ",trend
-    #print "offset= ", offset
+    ##print "trend= ",trend
+    ##print "offset= ", offset
     if trend==1:
         result.append(findBull3(O,H,L,C))
         result.append(findEveningStar(O,C))
@@ -250,7 +250,7 @@ def findGapsOnFragment(H,L,C,a,b):
     gaps=[]
     amplitude=max(C)-min(C)    
     base=min(C)
-    print "straight trend"
+    #print "straight trend"
     if(trend>0):
         #najpierw szukamy wszystkich luk na wykresie
         for i in range (len(H)-1):
@@ -290,7 +290,7 @@ def findGapsOnFragment(H,L,C,a,b):
     elif(trend<0):                
         for i in range (len(H)-1):
             if(H[i+1]<L[i]):
-                print i, H[i+1], L[i]
+                #print i, H[i+1], L[i]
                 gaps.append( (i+offset,L[i+1]+(H[i]-L[i+1])/2.) )                
         for gap in gaps:
             #luka startowa: możliwie blisko wartości najmniejszej i nie później niż ucieczki lub wyczerpania

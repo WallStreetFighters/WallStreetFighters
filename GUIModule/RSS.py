@@ -32,9 +32,8 @@ class RSSReader:
 		xmldoc = None
 		if (urlInfo):
 			xmldoc = minidom.parse(urlInfo)
-		else:
-			print "Error Getting URL"
-		
+		#else:
+			#print "Error Getting URL"
 		return xmldoc
 	
 	def GetItemText(self,xmlNode):
@@ -48,7 +47,7 @@ class RSSReader:
 	def GetChildText(self, xmlNode, childName):
 		"""Get a child node from the xml node"""
 		if (not xmlNode):
-			print "Error GetChildNode: No xml_node"
+			#print "Error GetChildNode: No xml_node"
 			return ""
 		for itemNode in xmlNode.childNodes:
 			if (itemNode.nodeName==childName):
@@ -68,7 +67,7 @@ class RSSReader:
 	
 	def GetItems(self):
 		"""Generator to get items"""
-		print("ddd")
+		#print("ddd")
                 if not self.xmldoc == None:
                         for itemNode in self.xmldoc.documentElement.childNodes:
                                 for itemNode in itemNode.childNodes:

@@ -299,7 +299,8 @@ class GuiMainWindow(object):
                     qModelIndex.append(self.resourceModel.index(t[1],0))
                     listName.append('resource')
         if not qModelIndex :
-            print "pusta list do porównania"
+            #print "pusta list do porównania"
+            1
         else:
             self.newCompareTab(qModelIndex,"comparison",listName)
             
@@ -540,7 +541,7 @@ class GuiMainWindow(object):
 
         reg= self.stockModel.filterRegExp()
         pattern = text + QtCore.QString(".*"+self.stockModelNestedPattern)
-        print pattern
+        #print pattern
         reg.setPattern(pattern)
             
             
@@ -592,7 +593,7 @@ class GuiMainWindow(object):
         reg.setPattern(self.tabA.filterLineEdit.text()+".*WIG20")
         self.stockModel.setFilterRegExp(reg)
         self.stockModelNestedPattern = "WIG20"
-        print self.tabA.filterLineEdit.text()+".*WIG20"
+        #print self.tabA.filterLineEdit.text()+".*WIG20"
     def allFiltre(self):
         reg= self.stockModel.filterRegExp()
         self.stockModel.setFilterRole(34)

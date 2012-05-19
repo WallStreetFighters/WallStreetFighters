@@ -147,7 +147,7 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         self.fixTimeLabels()
         if(self.grid):
             for tick in ax.xaxis.get_major_ticks():
-                # print tick.get_loc()
+                # #print tick.get_loc()
                 tick.gridOn=True
     
     def addVolumeBars(self):
@@ -210,7 +210,7 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
             width=0.7
             x=i-width/2
             y=min(open[i],close[i])
-            print x,y,width,height
+            #print x,y,width,height
             if open[i]<=close[i]:
                 rectsList.append(Rectangle((x,y),width,height,facecolor='w',edgecolor='k',linewidth=0.5))
             else:

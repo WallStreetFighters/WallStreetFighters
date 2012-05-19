@@ -83,13 +83,13 @@ def optimizedTrend(values):
     
 # x = [1] + [1 for i in range(90)]
 # x = x + [2 for i in range()]
-# print "x = ", x
-# print "\n", optimizedTrend(x)
-# print "\n"
+# #print "x = ", x
+# #print "\n", optimizedTrend(x)
+# #print "\n"
 # x = [1 + randint(1, 10) / 100.0 for i in range(365)]
 # x = x + [1.1]
-# print x
-# print optimizedTrend(x)
+# #print x
+# #print optimizedTrend(x)
 
 
 def linearFun(x1, y1, x2, y2):
@@ -203,9 +203,9 @@ def getChannelLines(array, a=3, b=4):
         return findMaxMin(q[a * size / b:])
 
 #a = [random.randint(0, 100) for i in range(160)]
-# print a
+# #print a
 #a = arange(40)
-# print getChannelLines(a)
+# #print getChannelLines(a)
 
 
 def convertValuesToHeadAndShoulders(values, volumine, maxVal, maxVol):
@@ -277,7 +277,7 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
     #sprawdzamy czy linia szyi zostala przelamana przy wyzszym wolumenie
     rightArmValMin = min(rightArmVal[rightArmPeek:])
     rightArmMaxVol = max(rightArmVol[0:rightArmPeek])
-    # print 'E'
+    # #print 'E'
     if rightArmValMin > minRightArmVal:
         return 0, [0, 0, 0, 0]
     diff = len(leftArmVal) + len(headVal)
@@ -287,7 +287,7 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
     if (trend(a) == 1):
         return 0, [0, 0, 0, 0]
         
-    # print "Czy przelamano linie szyi?"
+    # #print "Czy przelamano linie szyi?"
     
     if (rightArmValMin >= evaluateFun(a, b, diff + rightArmVal.index(rightArmValMin)) and rightArmMaxVol < maxRightArmVol):
         return 0, [0, 0, 0, 0]
@@ -301,7 +301,7 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
 
 def smartLookForHeadAndShoulders(values, volumine):
     """Szukamy formacji glowy i ramion w sposob brutalny, szukajac wszystkich 3 elementowych podzrbiorow - nieuzywac"""
-    # print "Szukamy formacji glowy i ramion"
+    # #print "Szukamy formacji glowy i ramion"
     values = asarray(values)
     volumine = asarray(volumine)
     maxVal = max(values)
@@ -310,16 +310,16 @@ def smartLookForHeadAndShoulders(values, volumine):
         val = asarray(list(combinations(divideArray(values, i), 3)))
         vol = asarray(list(combinations(divideArray(volumine, i), 3)))
         z = map(lambda x, y: convertValuesToHeadAndShoulders(x, y, maxVal, maxVol), val, vol)
-        # print "z = ", z
+        # #print "z = ", z
         if max(z) > 0:
             return val[z.index(max(z))], vol[z.index(max(z))]
-    # print "nie znaleziono"
+    # #print "nie znaleziono"
     return [0], [0]
 
 
 def lookForHeadAndShoulders(values, volumine, analyze=0):
     """Szukamy formacji glowy i ramion"""
-    # print "Szukamy formacji glowy i ramion"
+    # #print "Szukamy formacji glowy i ramion"
     if (len(values) < 15):
         if analyze == 0:
             return [0, 0, 0, 0]
@@ -364,7 +364,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
                                                     maxHeadVal, maxHeadVol, maxRightArmVal, maxRightArmVol, maxVal, maxVol, prev)
     
             if max(z) > 0:
-                # print "znaleziono glowe i ramiona", z
+                # #print "znaleziono glowe i ramiona", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -374,7 +374,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
                 else:
                     return [z[index], neckLine[index]]
                 
-    # print "nie znaleziono"
+    # #print "nie znaleziono"
     if analyze == 0:
         return [0, 0, 0, 0]
     else:
@@ -434,7 +434,7 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
     #sprawdzamy czy linia szyi zostala przelamana przy wyzszym wolumenie
     rightArmValMax = max(rightArmVal[rightArmPeek:])
     rightArmMaxVol = max(rightArmVol[0:rightArmPeek])
-    # print 'E'
+    # #print 'E'
     if  maxRightArmVal > rightArmValMax:
         return 0, [0, 0, 0, 0]
     
@@ -444,7 +444,7 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
     if (trend(a) == -1):
         return 0, [0, 0, 0, 0]
     
-    # print "Czy przelamano linie szyi?"
+    # #print "Czy przelamano linie szyi?"
     if (rightArmValMax <= evaluateFun(a, b, rightArmVal.index(rightArmValMax) + diff) and rightArmMaxVol < maxRightArmVol):
         return 0, [0, 0, 0, 0]
         
@@ -456,7 +456,7 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
 
 def smartLookForReversedHeadAndShoulders(values, volumine):
     """Szukamy odwroconej formacji glowy i ramion wyszukujac wszystkie 3 elementowe podzbiory - nieuzywac"""
-    # print "Szukamy odwroconej formacji glowy i ramion"
+    # #print "Szukamy odwroconej formacji glowy i ramion"
     values = asarray(values)
     volumine = asarray(volumine)
     minVal = min(values)
@@ -465,16 +465,16 @@ def smartLookForReversedHeadAndShoulders(values, volumine):
         val = asarray(list(combinations(divideArray(values, i), 3)))
         vol = asarray(list(combinations(divideArray(volumine, i), 3)))
         z = map(lambda x, y: reversedHeadAndShoulders(x, y, minVal, maxVol), val, vol)
-        # print "z = ", z
+        # #print "z = ", z
         if max(z) > 0:
           return val[z.index(max(z))], vol[z.index(max(z))]
-    # print "nie znaleziono"
+    # #print "nie znaleziono"
     return [0], [0]
 
 
 def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
     """Szukamy odwroconej formacji glowy i ramion"""
-    # print "Szukamy odwroconej formacji glowy i ramion"
+    # #print "Szukamy odwroconej formacji glowy i ramion"
     if (len(values) < 15):
         if analyze == 0:
             return [0, 0, 0, 0]
@@ -498,7 +498,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
             vol = list(divideArray(volumine[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
-            # print "\nsprawdzamy ", j
+            # #print "\nsprawdzamy ", j
             for i in range(len(val) - 3):
                 leftArmVal = val[i]
                 leftArmVol = vol[i]
@@ -520,9 +520,9 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
                                                             minLeftArmVal, maxLeftArmVol, minHeadVal,
                                                             maxHeadVol, minRightArmVal, maxRightArmVol,
                                                             minVal, maxVol, prev)
-            ##print j, k, shift, size
+            ###print j, k, shift, size
             if max(z) > 0:
-                ##print "znaleziono odwrocona glowe i ramiona", z
+                ###print "znaleziono odwrocona glowe i ramiona", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -532,7 +532,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
                 else:
                     return [z[index], neckLine[index]]
 
-    # print "nie znaleziono", z
+    # #print "nie znaleziono", z
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
@@ -585,7 +585,7 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
     #sprawdzamy czy linia szyi zostala przelamana przy wyzszym wolumenie
     lastArmValMin = min(lastArmVal[lastArmPeek:])
     lastArmMaxVol = max(lastArmVol[0:lastArmPeek])
-    # print 'E'
+    # #print 'E'
     if lastArmValMin > minLastArmVal:
         return 0, [0, 0, 0, 0]
     diff = len(firstArmVal) + len(middleVal)
@@ -595,7 +595,7 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
     if (trend(a) == 1):
         return 0, [0, 0, 0, 0]
 
-    # print "Czy przelamano linie szyi?"
+    # #print "Czy przelamano linie szyi?"
     if (lastArmValMin >= evaluateFun(a, b, diff + lastArmVal.index(lastArmValMin)) and lastArmMaxVol < maxLastArmVol):
         return 0, [0, 0, 0, 0]
 
@@ -632,7 +632,7 @@ def lookForTripleTop(values, volumine, analyze=0):
             vol = list(divideArray(volumine[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
-            # print "\nsprawdzamy ", j
+            # #print "\nsprawdzamy ", j
             for i in range(len(val) - 3):
                 firstArmVal = val[i]
                 firstArmVol = vol[i]
@@ -654,9 +654,9 @@ def lookForTripleTop(values, volumine, analyze=0):
                                                             minFirstArmVal, maxFirstArmVol, minMiddleVal,
                                                             maxMiddleVol, minLastArmVal, maxLastArmVol,
                                                             minVal, maxVol, prev)
-            ##print j, k, shift, size
+            ###print j, k, shift, size
             if max(z) > 0:
-                ##print "znaleziono potrojny szczyt", z
+                ###print "znaleziono potrojny szczyt", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -667,7 +667,7 @@ def lookForTripleTop(values, volumine, analyze=0):
                     return [z[index], neckLine[index]]
                 
 
-    # print "nie znaleziono", z
+    # #print "nie znaleziono", z
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
@@ -723,7 +723,7 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
     #sprawdzamy czy linia szyi zostala przelamana przy wyzszym wolumenie
     lastArmValMax = max(lastArmVal[lastArmPeek:])
     lastArmMaxVol = max(lastArmVol[0:lastArmPeek])
-    # print 'E'
+    # #print 'E'
     if  maxLastArmVal > lastArmValMax:
         return 0, [0, 0, 0, 0]
 
@@ -733,7 +733,7 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
     if (trend(a) == - 1):
         return 0, [0, 0, 0, 0]
 
-    # print "Czy przelamano linie szyi?"
+    # #print "Czy przelamano linie szyi?"
     if (lastArmValMax <= evaluateFun(a, b, lastArmVal.index(lastArmValMax) + diff) and lastArmMaxVol < maxLastArmVol):
         return 0, [0, 0, 0, 0]
 
@@ -769,7 +769,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
             vol = list(divideArray(volumine[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
-            # print "\nsprawdzamy ", j
+            # #print "\nsprawdzamy ", j
             for i in range(len(val) - 3):
                 firstArmVal = val[i]
                 firstArmVol = vol[i]
@@ -791,9 +791,9 @@ def lookForTripleBottom(values, volumine, analyze=0):
                                                             minFirstArmVal, maxFirstArmVol, minMiddleVal,
                                                             maxMiddleVol, minLastArmVal, maxLastArmVol,
                                                             minVal, maxVol, prev)
-            #print j, k, shift, size
+            ##print j, k, shift, size
             if max(z) > 0:
-                ##print "znaleziono potrojne dno", z
+                ###print "znaleziono potrojne dno", z
                 index = z.index(max(z))
                 diff = sum(map(lambda x: len(x), val[0:index]))
                 neckLine[index][0] += diff + shift
@@ -804,7 +804,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
                     return [z[index], neckLine[index]]
                 
 
-    # print "nie znaleziono", z
+    # #print "nie znaleziono", z
     if analyze ==0:
         return [0, 0, 0, 0]
     else:
@@ -918,7 +918,7 @@ def findGeometricFormationOnFragment(values, a, b):
     scaledResLine=lineFrom2Points(factorX * resx0, factorY * (resy0 - minY),factorX * resx1, factorY * (resy1 - minY))
     supAngle = arctan(scaledSupLine[0]) * (180.0 / pi)
     resAngle = arctan(scaledResLine[0]) * (180.0 / pi)
-    #print "supAngle: ", supAngle, "resAngle: ", resAngle
+    ##print "supAngle: ", supAngle, "resAngle: ", resAngle
     #prostokąt
     if resAngle < formVul and resAngle > - formVul and supAngle < formVul and supAngle > - formVul:        
         #return ['rect',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1), 1] 
@@ -942,7 +942,7 @@ def findGeometricFormationOnFragment(values, a, b):
         return ['falling_wedge',(resx0, resy0, resx1, resy1),(supx0, supy0, supx1, supy1),1]        
     return None    
    
-# print findMaxMin(arange(1000))
+# #print findMaxMin(arange(1000))
 #lookForHeadAndShoulders(arange(100), arange(100))
 #lookForReversedHeadAndShoulders(arange(100), arange(100)) 
 
@@ -1015,27 +1015,27 @@ def findRectFormation(array):
     resMin, indMin = findMinLine(array)
     resMax, indMax = findMaxLine(array)
     if (resMin[0] == - 1 or indMin[0] == - 1) or (resMax[0] == - 1 or indMax[0] == - 1):
-        # print "Nie odnalazlem formacji prostokata"
+        # #print "Nie odnalazlem formacji prostokata"
         return 0
     if indMin.min() > indMax.min():
         # Wtedy sprawdzamy czy kontynuacja trendu spadkowego
         globalMin = indMax.min()
         globalMax = indMin.max()
         if array[globalMin - 1] > array[globalMin] and array[globalMax] > array[globalMax + 1]:
-            # print "Wykrylem formacje prostokatna trendu spadkowego na indeksach ktore zwracam :"
+            # #print "Wykrylem formacje prostokatna trendu spadkowego na indeksach ktore zwracam :"
             return globalMin, globalMax
         else:
-            # print "Formacja prostokata nie wskazuje na kontynuacje trendu spadkowego"
+            # #print "Formacja prostokata nie wskazuje na kontynuacje trendu spadkowego"
             return 0
     else:
         # Sprawdzamy czy kontynuacja trendu wzrostowego
         globalMin = indMin.min()
         globalMax = indMax.max()
         if array[globalMin] > array[globalMin - 1] and array[globalMax + 1] > array[globalMax]:
-            # print "Wykrylem formacje prostokatna trendu wzrostowego na indeksach ktore zwracam :"
+            # #print "Wykrylem formacje prostokatna trendu wzrostowego na indeksach ktore zwracam :"
             return globalMin, globalMax
         else:
-            # print "Formacja prostokata nie wskazuje na kontynuacje trendu wzrostowego"
+            # #print "Formacja prostokata nie wskazuje na kontynuacje trendu wzrostowego"
             return 0
 
 
@@ -1140,7 +1140,7 @@ def checkValuesForFlagsAndPennants(period, values):
 		i += 1
 	raiseproposals = list(map((lambda x: x+period), raiseproposals))
 	fallproposals = list(map((lambda x: x+period), fallproposals))
-	print [raiseproposals,fallproposals]	
+	#print [raiseproposals,fallproposals]	
 	return [raiseproposals,fallproposals]
 
 def checkVolumeForFlagsAndPennants(proposals,volume,values):
@@ -1206,7 +1206,7 @@ def scoreFlags(rising,falling,volume):
 	except TypeError: 
 		pass
 	if maxR > maxL:
-		print len(volume)
+		#print len(volume)
 		scale =  ((float) (maxR))/len(volume)	
 		scale = round(scale,2)
 		return ['risingTrendFlagOrPennant', scale, rising[-1]]
