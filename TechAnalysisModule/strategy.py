@@ -530,39 +530,40 @@ class Strategy:
                   resultText = resultText + "(+) rising-trend flag/pennant"
 
 
-          gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)
+          gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)          
           for formation in gaps:
               if formation != None:
-                  if formation[0][0] == 'rising_breakaway_gap':
-                      overallScore += self.risingBreakawayGapVal * formation[1]
-                      if self.risingBreakawayGapVal * formation[1] != 0:
-#                          print "   (+) rising breakaway gap\n"
-                           resultText = resultText + "   (+) rising breakaway gap\n"
-                  elif formation[0][0] == 'rising_continuation_gap':
-                      overallScore += self.risingContinuationGapVal * formation[1]
-                      if self.risingContinuationGapVal * formation[1] != 0:
-#                          print "   (+) rising continuation gap\n"
-                           resultText = resultText + "   (+) rising continuation gap\n"
-                  elif formation[0][0] == 'rising_exhaustion_gap':
-                      overallScore += self.risingExhaustionGapVal * formation[1]
-                      if self.risingExhaustionGapVal * formation[1] != 0:
-#                          print "   (-) rising exhaustion gap\n"
-                           resultText = resultText + "   (-) rising exhaustion gap\n"
-                  elif formation[0][0] == 'falling_breakaway_gap':
-                      overallScore += self.fallingBreakawayGapVal * formation[1]
-                      if self.fallingBreakawayGapVal * formation[1] != 0:
-#                          print "   (-) falling breakaway gap\n"
-                           resultText = resultText + "   (-) falling breakaway gap\n"
-                  elif formation[0][0] == 'falling_continuation_gap':
-                      overallScore += self.fallingContinuationGapVal * formation[1]
-                      if self.fallingContinuationGapVal * formation[1] != 0:
-#                          print "   (-) falling continuation gap\n"
-                           resultText = resultText + "   (-) falling continuation gap\n"
-                  elif formation[0][0] == 'falling_exhaustion_gap':
-                      overallScore += self.fallingExhaustionGapVal * formation[1]
-                      if self.fallingExhaustionGapVal * formation[1] != 0:
-#                          print "   (+) falling exhaustion gap\n"
-                           resultText = resultText + "   (+) falling exhaustion gap\n"
+                  for gap in formation[0]:                      
+                      if gap[0] == 'rising_breakaway_gap':
+                          overallScore += self.risingBreakawayGapVal * formation[1]
+                          if self.risingBreakawayGapVal * formation[1] != 0:
+    #                          print "   (+) rising breakaway gap\n"
+                               resultText = resultText + "   (+) rising breakaway gap\n"
+                      elif gap[0] == 'rising_continuation_gap':
+                          overallScore += self.risingContinuationGapVal * formation[1]
+                          if self.risingContinuationGapVal * formation[1] != 0:
+    #                          print "   (+) rising continuation gap\n"
+                               resultText = resultText + "   (+) rising continuation gap\n"
+                      elif gap[0] == 'rising_exhaustion_gap':
+                          overallScore += self.risingExhaustionGapVal * formation[1]
+                          if self.risingExhaustionGapVal * formation[1] != 0:
+    #                          print "   (-) rising exhaustion gap\n"
+                               resultText = resultText + "   (-) rising exhaustion gap\n"
+                      elif gap[0] == 'falling_breakaway_gap':
+                          overallScore += self.fallingBreakawayGapVal * formation[1]
+                          if self.fallingBreakawayGapVal * formation[1] != 0:
+    #                          print "   (-) falling breakaway gap\n"
+                               resultText = resultText + "   (-) falling breakaway gap\n"
+                      elif gap[0] == 'falling_continuation_gap':
+                          overallScore += self.fallingContinuationGapVal * formation[1]
+                          if self.fallingContinuationGapVal * formation[1] != 0:
+    #                          print "   (-) falling continuation gap\n"
+                               resultText = resultText + "   (-) falling continuation gap\n"
+                      elif gap[0] == 'falling_exhaustion_gap':
+                          overallScore += self.fallingExhaustionGapVal * formation[1]
+                          if self.fallingExhaustionGapVal * formation[1] != 0:
+    #                          print "   (+) falling exhaustion gap\n"
+                               resultText = resultText + "   (+) falling exhaustion gap\n"
 
           candleFormations = candles.findCandleFormations(self.data.open, self.data.high, self.data.low, self.data.close)
           for formation in candleFormations:

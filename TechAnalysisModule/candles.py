@@ -206,7 +206,7 @@ def isStraightTrend(array):
     Robimy to wyliczając regresję i sprawdzając czy wszystkie punkty w tablicy 
     są w pasie regresja +/- jakieś sensitivity. Oczywiście sprawdzamy też czy sam trend
     jest odpowiednio silny poprzez badanie współczynnika kierunkowego prostej."""    
-    a, b = trendA.regression(array)
+    a, b = trendA.regression(array)    
     if abs(a) < STRONG_TREND:
         return 0
     for i in range(len(array)):
