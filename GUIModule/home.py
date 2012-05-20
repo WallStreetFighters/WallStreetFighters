@@ -128,10 +128,10 @@ class Home (QtGui.QWidget):
             dates=d['date']
             values=d['close']
             #values=indicators.adLine(d['adv'], d['dec'])
-            #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
-            #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
-            zajebistyWykres = LightweightChart(self,dates,values,'A/D line')                        
-            self.topLayout.addWidget(zajebistyWykres,k/3,(2*k+1)%6)#zajebiste Dane1
+            #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
+            #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
+            zafajnistyWykres = LightweightChart(self,dates,values,'A/D line')                        
+            self.topLayout.addWidget(zafajnistyWykres,k/3,(2*k+1)%6)#zafajniste Dane1
 
             
         
