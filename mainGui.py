@@ -376,6 +376,9 @@ class GuiMainWindow(object):
         painting = self.tabA.paintCheckBox.isChecked()
         #draw trend
         drawTrend = self.tabA.drawTrendCheckBox.isChecked()
+        #line width
+        lineWidth = 2.0
+        
         
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
@@ -468,7 +471,6 @@ class GuiMainWindow(object):
 
         reg= self.stockModel.filterRegExp()
         pattern = text + QtCore.QString(".*"+self.stockModelNestedPattern)
-        print pattern
         reg.setPattern(pattern)
             
             
