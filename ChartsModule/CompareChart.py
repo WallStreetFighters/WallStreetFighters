@@ -50,19 +50,28 @@ class CompareChart(FigureCanvas):
     
     def setData(self, data, start=None, end=None, step='monthly'):
         """Ustawiamy model danych, który ma reprezentować wykres. (przekazujemy
-            tablicę FinancialObjectów). Następnie konieczne jest jego ponowne odrysowanie."""
+            tablicę FinancialObjectów). Następnie konieczne jest jego ponowne odrysowanie."""        
         self.data=[]
+        lengths=[]
         for finObj in data:
             #sprawdzmy czy wszystkie dane są poprawne i tej samej długości
-            newData=ChartData(finObj, start, end, step,compare = True)
-            if(self.data==[]):
-                length=len(newData.date)
-            newlength=len(newData.date)
-            if newData.corrupted or length!=newlength:
+            newData=ChartData(finObj, start, end, step,compare = True)                        
+            newLength=len(newData.date)
+            lengths.append(newLength)            
+            if newData.corrupted:
                 self.data=[]
                 break;
             else:
-                self.data.append(newData)
+                self.data.append(newData)        
+        minLen=min(lengths)
+        if minLen==0:
+            self.data=[]
+        else:
+            for dataItem in self.data:
+                if len(dataItem.date)>minLen:
+                    dataItem.date=dataItem.date[-minLen:]
+                    dataItem.percentChng=dataItem.percentChng[-minLen:]
+                    
             
         if(self.mainPlot!=None):
             self.updatePlot()
