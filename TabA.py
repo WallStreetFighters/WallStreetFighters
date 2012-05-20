@@ -13,6 +13,11 @@ from TechAnalysisModule.strategy import Strategy
 from GUIModule.analyze import Analyze
 
 class TabA(QtGui.QWidget):
+    """Obiekt klasy widget odpowiedzialny za wyświetlanie zakładki do wyszukiwania
+       obiektów finansowych oraz ustawiania podstawowych opcji wyświetlania wykresu.
+       W przypadku przekazania do konstruktora modelu obiektu finansowego widget jest
+       w trybie wyswietlania wykresu, jeżeli przekazana jest lista modelów , wtedy wyświetlamy
+       porównywanie kilkur obiektów na jednym wykresie"""
     def __init__(self,finObjType = None, indexModel=None,stockModel=None,forexModel=None,bondModel= None,
                  resourceModel = None,futuresModel = None, qModelIndex = None,settings = None,listName=None,showLists = True):
         self.finObjType = finObjType
@@ -35,13 +40,11 @@ class TabA(QtGui.QWidget):
         self.chart =None
         QtGui.QWidget.__init__(self)
         self.initUi()
+        
     def initUi(self):
-        
-        
 	#wywołujemy metodę z modułu GUIModule.Tab
         #która tworzy podstawowe elementy GUI
         tabUi(self,self.showLists)
-        
 	self.hasChart = False #sprawdzenie czy istnieje 
 	self.currentChart = ""
 	self.chart = None
@@ -106,32 +109,7 @@ class TabA(QtGui.QWidget):
             self.williamsCheckBox = QtGui.QRadioButton("williams",
                                                          self.optionsFrame)
             self.buttonsLayout.addWidget(self.williamsCheckBox,2,4,1,1)
-            self.oscilatorCheckBoxList.append(self.williamsCheckBox)
-
-            """#horizontal line
-            self.line = QtGui.QFrame(self.buttonsFrame)
-            self.line.setFrameShape(QtGui.QFrame.HLine)
-            self.line.setFrameShadow(QtGui.QFrame.Sunken)
-            self.buttonsLayout.addWidget(self.line, 4, 2, 1, 3)
-
-
-            #check box dla drawTrend
-            self.drawTrendCheckBox = QtGui.QCheckBox("show Trend",self.optionsFrame)
-            self.buttonsLayout.addWidget(self.drawTrendCheckBox,5,2,1,1)
-            #label dla grubosci lini
-            self.lineWidthLabel = QtGui.QLabel("line Width",self)
-            self.buttonsLayout.addWidget(self.lineWidthLabel,5,3,1,1)
-            #spin box dla grubosci lini
-            self.lineWidthSpinBox = QtGui.QDoubleSpinBox(self.optionsFrame)
-            self.lineWidthSpinBox.setFrame(True)
-            self.lineWidthSpinBox.setReadOnly(False)
-            self.lineWidthSpinBox.setButtonSymbols(QtGui.QAbstractSpinBox.PlusMinus)
-            self.lineWidthSpinBox.setDecimals(1)
-            self.lineWidthSpinBox.setMinimum(0.5)
-            self.lineWidthSpinBox.setMaximum(5.0)
-            self.lineWidthSpinBox.setSingleStep(0.5)
-            self.lineWidthSpinBox.setProperty("value", 1.0)
-            self.buttonsLayout.addWidget(self.lineWidthSpinBox,5,4,1,1)"""           
+            self.oscilatorCheckBoxList.append(self.williamsCheckBox)       
 
             self.scrollArea.setWidget(self.buttonsFrame)
             if self.showLists != True:
@@ -177,11 +155,14 @@ class TabA(QtGui.QWidget):
             self.bondListView.clicked.connect(self.addSymbolToCompareLine)
             self.resourceListView.clicked.connect(self.addSymbolToCompareLine)
             self.futuresListView.clicked.connect(self.addSymbolToCompareLine)
-            
     def clearDrawnFormations(self):
+        """czyścimy narysowane formacje, trendy , wskaźniki etc"""
         self.chart.clearRectangles()
         self.chart.clearLines()
+        
     def newAnalyzeTab(self):
+        """Tworzymy i otwieramy nowa zakładkę  wyświetlającą opis analizy techniecznej
+           w polu tekstowym"""
         strategy = Strategy(self.chart.data)
         text = strategy.analyze()
         self.analyzeTab = Analyze()
@@ -189,7 +170,9 @@ class TabA(QtGui.QWidget):
         nameTab = "Analyze " + nameTab
         self.parent().parent().parent().parent().gui.tabs.setCurrentIndex(self.parent().parent().parent().parent().gui.tabs.addTab(self.analyzeTab,nameTab))
         self.analyzeTab.textBrowser.setText(text)
+        
     def showChartPatterns(self):
+        """Rysuje wybrane przez użytkownika formacje , wskazniki"""
         settings = self.parent().parent().parent().parent().gui.settingsTab.getVal()
 
         lineStyle = []
@@ -469,6 +452,7 @@ class TabA(QtGui.QWidget):
         self.formationDrawer.drawFormations()
         
         
+    """ Metody do uaktualniania wykresu"""
     
     def updateScale(self):
         if self.logRadioButton.isChecked():
@@ -649,6 +633,8 @@ class TabA(QtGui.QWidget):
             m.resize(m.width() , m.height()-20)
             m.resize(m.width() , m.height()+20)
 
+    """ Koniec metod do uaktualniania"""
+
     def checkDrawTrend(self):
         drawTrend =self.drawTrendCheckBox.isChecked()
         if self.chart !=None and drawTrend:
@@ -663,6 +649,7 @@ class TabA(QtGui.QWidget):
             self.compareLineEdit.setText(self.compareLineEdit.text() +a.data(QtCore.Qt.WhatsThisRole).toStringList()[0]+ ' vs ')
 
     def paint2Chart(self):
+        """metoda rysuje wykres z odpowiednimi ustawiniami  """
         index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
 
         if self.listName == "index":
@@ -726,8 +713,8 @@ class TabA(QtGui.QWidget):
         self.setOptions()
 
     def paintCompareChart(self):
+        """metoda do rysowania wykresu w trybie Compare"""
         self.finObj = []
-        print self.qModelIndex
         k = 0
         for x in self.listName:
             if x == "index":
@@ -738,15 +725,6 @@ class TabA(QtGui.QWidget):
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
             if x == "stock":
-                print k
-                print "--------------------------------11111"
-                print self.qModelIndex[k]
-                print "--22222222------------------------------11111"
-                print self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)
-                print "----3333333333---------------------------11111"
-                print (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList())
-                for x in (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()):
-                    print x
                 index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.STOCK_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
@@ -867,6 +845,7 @@ class TabA(QtGui.QWidget):
             self.paintCheckBox.setCheckState(2)
 
     def showChartsWithAllIndicators(self,x):
+        """ Tworzymy nowe okno Popup i wyświetlamy wykresy obok siebie z wybranymi wyskaźnikami"""
        
         if len(self.settings["indicator"]) >= 3:
             print 'opening popup'
@@ -966,6 +945,7 @@ class TabA(QtGui.QWidget):
 
     
     class MyPopup(QtGui.QWidget):
+        """klasa odpowiedzialna za utworzenie nowego okna do porównywania wykresów"""
         def __init__(self,parent):
             self.parent=parent
             QtGui.QWidget.__init__(self)

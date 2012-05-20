@@ -8,6 +8,7 @@ class Analyze (QtGui.QWidget):
                 QtGui.QWidget.__init__(self)
                 self.initUi()
         def initUi(self):
+                self.setObjectName('AnalyzeTab')
 		self.layout = QtGui.QHBoxLayout(self)
 		self.textBrowser = QtGui.QTextBrowser(self)
 		self.layout.addWidget(self.textBrowser)

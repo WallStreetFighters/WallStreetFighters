@@ -22,8 +22,8 @@ class MainWindow(QtGui.QMainWindow):
         ran = range(self.gui.tabs.count())
         tabHistoryList = []
         for i in ran:
-            if i >2:
-                t=  self.gui.tabs.widget(i).getSettings()
+            if i >2 and self.gui.tabs.widget(i).objectName()!= 'WebTab' and self.gui.tabs.widget(i).objectName()!= 'AnalyzeTab':
+                t=  self.gui.tabs.widget(i).getSettings()                
                 tabHistoryList.append(t)
         cPickle.dump(tabHistoryList, open('tabHistory.wsf','w'))
         settingsList = []
