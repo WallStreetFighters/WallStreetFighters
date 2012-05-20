@@ -876,9 +876,6 @@ class TabA(QtGui.QWidget):
                 k+=1
                 #self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
                 self.w.show()
-    def settingsTest(self):
-        dateStart = self.startDateEdit.date()
-        return dateStart
     def getSettings(self):
         #funkcja pobiera aktualnie zaznaczone opcje z tab
         dateStart = self.startDateEdit.date()  # początek daty

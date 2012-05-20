@@ -6,6 +6,7 @@ import re
 
 
 class RSSItem:
+        """Obiekt RSS przechowujący strukutrę artykułów"""
 	def __init__(self,title="",description="", link="",pubDate = ""):
                 self.title = title
 		self.description = description
@@ -13,6 +14,8 @@ class RSSItem:
 		self.pubDate = pubDate
 
 class RSSReader:
+        """Klasa odpowiedzialan za parsowanie dokumentu html i stworzenie struktury
+        artykułu RSS zawirający tytuł datę powstania , opis i hiperłącze"""
 	
 	name = ""
 	def __init__(self,RSSUrl):

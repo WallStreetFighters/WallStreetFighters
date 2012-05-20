@@ -376,8 +376,6 @@ class GuiMainWindow(object):
         painting = self.tabA.paintCheckBox.isChecked()
         #draw trend
         drawTrend = self.tabA.drawTrendCheckBox.isChecked()
-        #line width
-        lineWidth = 2.0
         
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
@@ -392,14 +390,11 @@ class GuiMainWindow(object):
         k = 0
         for  x in dataParser.INDEX_LIST:
             if name in x:
-                print "znalazlem w indx"
                 return ("index",k)
             k= k+1
         k = 0
         for  x in dataParser.STOCK_LIST:
             if name in x:
-               print k
-               print "znalazlem w stc"
                return ("stock",k)
             k= k+1
         k = 0

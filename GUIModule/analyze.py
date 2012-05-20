@@ -4,6 +4,7 @@ import DataParserModule.dataParser as dataParser
 import time
 
 class Analyze (QtGui.QWidget):
+        """lasa wyświetlająca w przeglądarce tekstowej wynik analizy obiektu finanowego"""
         def __init__(self):
                 QtGui.QWidget.__init__(self)
                 self.initUi()
