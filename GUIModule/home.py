@@ -90,6 +90,8 @@ class Home (QtGui.QWidget):
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
+       
+
     def addTopObject(self,objList,k):
         self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)

@@ -5,6 +5,7 @@ from Calendar import Calendar
 
 def tabUi(self,showLists=True):
         self.horizontalLayout = QtGui.QHBoxLayout(self)
+        self.horizontalLayout.setContentsMargins(0,0,0,0)
         """Każdą zakładkę dzielimy jak na razie na 3 obszary: opcje,
         listy , wykresy """
         
@@ -27,6 +28,7 @@ def tabUi(self,showLists=True):
 
                 #ustawiamy zarządce rozkładu vertical
                 self.listsLayout = QtGui.QVBoxLayout(self.listsFrame)
+                self.listsLayout.setContentsMargins(0,0,0,0)
                 # textline
                 self.filterLineEdit = QtGui.QLineEdit(self.listsFrame)
                 self.listsLayout.addWidget(self.filterLineEdit)
@@ -162,9 +164,11 @@ def tabUi(self,showLists=True):
         self.optionsAndChartsFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.optionsAndChartsFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.verticalLayout = QtGui.QVBoxLayout(self.optionsAndChartsFrame)
+        self.verticalLayout.setContentsMargins(0,0,0,0)
 
         """Ramka przechowujaca wykresy"""
         self.chartsFrame = QtGui.QFrame(self)
+        self.chartsFrame.setContentsMargins(0,0,0,0)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
@@ -175,6 +179,7 @@ def tabUi(self,showLists=True):
         self.chartsFrame.setLineWidth(3)
         #ustawiamy zarządce rozkładu vertical
         self.chartsLayout = QtGui.QVBoxLayout(self.chartsFrame)
+        self.chartsLayout.setContentsMargins(0,0,0,0)
         self.verticalLayout.addWidget(self.chartsFrame)
 
         """Ramka przechowujaca opcje"""
@@ -222,45 +227,51 @@ def addChartButton(self):
         self.gridLayout.setSpacing(6)
 
         # Step combo box
-        self.stepLabel = QtGui.QLabel('Step',self.optionsFrame)#label Step
+        self.stepLabel = QtGui.QLabel('Step:',self.optionsFrame)#label Step
+        self.stepLabel.setMaximumWidth(40)
         self.gridLayout.addWidget(self.stepLabel,0,0,1,1)
         self.stepComboBox = QtGui.QComboBox(self.optionsFrame)
         self.stepComboBox.addItem('daily')
         self.stepComboBox.addItem('weekly')
         self.stepComboBox.addItem('monthly')
-        self.gridLayout.addWidget(self.stepComboBox,1,0,1,1)
+        self.gridLayout.addWidget(self.stepComboBox,0,1,1,1)
         # show chart Patterns
         self.showChartPatternsButton = QtGui.QPushButton('Show chart patterns',self.optionsFrame)
-        self.gridLayout.addWidget(self.showChartPatternsButton,2,0,1,1)
+        self.gridLayout.addWidget(self.showChartPatternsButton,1,0,1,2)
         #draw Trend
         self.drawTrendCheckBox = QtGui.QPushButton('Draw Trend',self.optionsFrame)
-        self.gridLayout.addWidget(self.drawTrendCheckBox,2,1,1,1)
+        self.gridLayout.addWidget(self.drawTrendCheckBox,2,0,1,2)
         # chartType comboBox
         self.chartTypeLabel = QtGui.QLabel('Chart Type',self.optionsFrame)#label Chart Type
-        self.gridLayout.addWidget(self.chartTypeLabel,0,1,1,1)
+        self.chartTypeLabel.setAlignment(QtCore.Qt.AlignCenter)                
+        self.gridLayout.addWidget(self.chartTypeLabel,0,2,1,1)
         self.chartTypeComboBox = QtGui.QComboBox(self.optionsFrame)
         self.chartTypeComboBox.addItem('line')
         self.chartTypeComboBox.addItem('point')
         self.chartTypeComboBox.addItem('candlestick')
         self.chartTypeComboBox.addItem('bar')
-        self.gridLayout.addWidget(self.chartTypeComboBox,1,1,1,1)
+        self.gridLayout.addWidget(self.chartTypeComboBox,1,2,1,1)
         # Scale Type
         self.scaleTypeLabel = QtGui.QLabel('Scale',self.optionsFrame)
-        self.gridLayout.addWidget(self.scaleTypeLabel,0,2,1,1)
+        self.gridLayout.addWidget(self.scaleTypeLabel,0,3,1,1)
         self.linearRadioButton = QtGui.QRadioButton('linear',self.optionsFrame)
-        self.gridLayout.addWidget(self.linearRadioButton,1,2,1,1)
+        self.gridLayout.addWidget(self.linearRadioButton,1,3,1,1)
         self.linearRadioButton.setChecked(True)
         self.logRadioButton = QtGui.QRadioButton('log',self.optionsFrame)
-        self.gridLayout.addWidget(self.logRadioButton,2,2,1,1)
+        self.gridLayout.addWidget(self.logRadioButton,2,3,1,1)
         #wyłaczenie voluminu
         self.volumenCheckBox = QtGui.QCheckBox('Hide Volume',self.optionsFrame)
-        self.gridLayout.addWidget(self.volumenCheckBox,0,3,1,1)
+        self.gridLayout.addWidget(self.volumenCheckBox,0,4,1,1)
         #wlacznie możliwości rysowania na wykeresie
         self.paintCheckBox = QtGui.QCheckBox('Enable drawing',self.optionsFrame)
-        self.gridLayout.addWidget(self.paintCheckBox,1,3,1,1)
+        self.gridLayout.addWidget(self.paintCheckBox,1,4,1,1)
         #przycisk do analizy
         self.analyzeButton = QtGui.QPushButton('Analyze',self.optionsFrame)
-        self.gridLayout.addWidget(self.analyzeButton,2,3,1,1)
+        self.gridLayout.addWidget(self.analyzeButton,2,2,1,1)
+        #przycisk do czyszczenia
+        self.clearButton = QtGui.QPushButton('Clear',self.optionsFrame)
+        self.clearButton.setToolTip("Click to clear all drawn formations")
+        self.gridLayout.addWidget(self.clearButton,2,4,1,1)
 	#Spacer
         #self.spacer = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, 		QtGui.QSizePolicy.Expanding)
         #self.gridLayout.addItem(self.spacer,0,5,1,3)

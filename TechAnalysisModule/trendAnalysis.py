@@ -1108,85 +1108,113 @@ def rateLines(array, scaler1, scaler2):
 
 # FLAGI I CHORAGIEWKI
 
+def findFlagsAndPennants(values, volume, maxval, minval):
+	proposals = checkValuesForFlagsAndPennants(3,values)
+	proposals = checkVolumeForFlagsAndPennants(proposals,volume,values)
+	raising,falling = checkRegressionForFlagsAndPennants(proposals,maxval,minval)
+	print scoreFlags(raising,falling,volume)
 
-def findFlagsAndPennants(values,volume):
-    proposals = checkValuesForFlagsAndPennants(3,values)
-    return checkVolumeForFlagsAndPennants(proposals,volume,values)
 
 def checkValuesForFlagsAndPennants(period, values):
-    i = 0
-    maxs = max(values)
-    mins = min(values)
-    diff = maxs - mins
-    raiseproposals = []
-    fallproposals = []
-    while i < len(values) - period:
-        if values[i] + 0.25*diff < values[i+period]:
-            if raiseproposals == []:
-                raiseproposals.append(i)
-            elif raiseproposals[-1] == i-1:
-                raiseproposals[-1] = i
-            else:
-                raiseproposals.append(i)
-        elif values[i] - 0.25*diff > values[i+period]:
-            if fallproposals == []:
-                fallproposals.append(i)
-            elif fallproposals[-1] == i-1:
-                fallproposals[-1] = i
-            else:
-                fallproposals.append(i)
-        i += 1
-    raiseproposals = list(map((lambda x: x+period), raiseproposals))
-    fallproposals = list(map((lambda x: x+period), fallproposals))
-    return [raiseproposals,fallproposals]
+	i = 0
+	maxs = max(values)
+	mins = min(values)
+	diff = maxs - mins
+	raiseproposals = [] 
+	fallproposals = []
+	while i < len(values) - period:
+		if values[i] + 0.25*diff < values[i+period]:
+			if raiseproposals == []:
+				raiseproposals.append(i)
+			elif raiseproposals[-1] == i-1:
+				raiseproposals[-1] = i
+			else:
+				raiseproposals.append(i)
+		elif values[i] - 0.25*diff > values[i+period]:
+			if fallproposals == []:
+				fallproposals.append(i)
+			elif fallproposals[-1] == i-1:
+				fallproposals[-1] = i
+			else:
+				fallproposals.append(i)
+		i += 1
+	raiseproposals = list(map((lambda x: x+period), raiseproposals))
+	fallproposals = list(map((lambda x: x+period), fallproposals))
+	print [raiseproposals,fallproposals]	
+	return [raiseproposals,fallproposals]
 
 def checkVolumeForFlagsAndPennants(proposals,volume,values):
-    ups = []
-    downs = []
-    for x in proposals[0]:
-        i = x
-        while (i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
-            i = i+1
-        diff = i - x
-        if diff > 2 and diff < 28 and values[i+1] > values[i]:
-            temp = volume[x:i:1]
-            average = float(sum(temp)) / len(temp)
-            if average < volume[x]:
-                ups.append([x,i])
+	ups = []
+	downs = []
+	for x in proposals[0]:
+		i = x
+		while (i+2 < len(volume) and volume[i+1] < 1.6*volume[i]):
+			i = i+1
+		diff = i - x
+		if (i+1 < len(volume)):
+			if diff > 2 and diff < 28 and values[i+1] > values[i]:
+				temp = volume[x:i:1]
+				average = float(sum(temp)) / len(temp)
+				if average < volume[x]:
+					ups.append([x,i])
 
-    for x in proposals[1]:
-        i = x
-        while ( i+2 < len(volume) and volume[i+1] < 2.5*volume[i]):
-            i = i+1
-        diff = i - x
-        if  values[i+1] < values[i] and diff > 2 and diff < 28:
-            temp = volume[x:i:1]
-            average = float(sum(temp)) / len(temp)
-            if average < volume[x]:
-                downs.append([x,i])
-    maxR = 0
-    maxL = 0    
-    try:
-        tmp = reduce(lambda x,y: x+y,ups)
-        maxR = max(tmp)
-        tmp = reduce(lambda x,y: x+y,downs)
-        maxL = max(tmp)
-    except TypeError: 
-        pass
-    if maxR > maxL:
-        scale = maxR/len(volume)
-        return ['risingTrendFlagOrPennant', scale]
-    elif maxR < maxL:
-        scale = -1*(maxL/len(volume))
-        return ['fallingTrendFlagOrPennant', scale]
-    else:
-        return None
-    proposals = checkValuesForFlagsAndPennants(3,values)
-    return checkVolumeForFlagsAndPennants(proposals,volume,values)
+	for x in proposals[1]:
+		i = x
+		while ( i+2 < len(volume) and volume[i+1] < 1.6*volume[i]):
+			i = i+1
+		diff = i - x
+		if (i+1 < len(volume)):
+			if  values[i+1] < values[i] and diff > 2 and diff < 28:
+				temp = volume[x:i:1]
+				average = float(sum(temp)) / len(temp)
+				if average < volume[x]:
+					downs.append([x,i])
+	return [ups,downs]
 
-"""
-def checkChannelForFlagsAndPennants(proposals,values):      
-"""
+def checkRegressionForFlagsAndPennants(proposals,maxval,minval):
+	fallingFlags = []
+	risingFlags = []
+	for x in proposals[0]:
+		maxtemp = maxval[x[0]:x[1]:1]
+		a1,b1 = regression(maxtemp)
+		mintemp = minval[x[0]:x[1]:1]
+		a2,b2 = regression(mintemp)
+		if a1 < 0 and a2-0.05 >= a1:
+			risingFlags.append([x[0],x[1],a1 *x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
+		elif a1 > 0 and a2 > 0 and x[1] < (b2-b1)/(a1-a2):
+			risingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
+
+	for x in proposals[1]:
+		maxtemp = maxval[x[0]:x[1]:1]
+		a1,b1 = regression(maxtemp)
+		mintemp = minval[x[0]:x[1]:1]
+		a2,b2 = regression(mintemp)
+		if a1 < 0 and a2-0.05 >= a1:
+			fallingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
+		elif a1 > 0 and a2 > 0 and x[1] < (b2-b1)/(a1-a2):
+			fallingFlags.append([x[0],x[1],a1*x[0]+b1, a1*x[1]+b1, a2*x[0]+b2, a2*x[1]+b2])
+	return risingFlags, fallingFlags
+
+def scoreFlags(rising,falling,volume):
+	maxR = 0
+	maxL = 0	
+	try:
+		if rising != []:
+			maxR = rising[-1][1]
+		if falling != []:		
+			maxL = falling[-1][1]
+	except TypeError: 
+		pass
+	if maxR > maxL:
+		print len(volume)
+		scale =  ((float) (maxR))/len(volume)	
+		scale = round(scale,2)
+		return ['risingTrendFlagOrPennant', scale, rising[-1]]
+	elif maxR < maxL:
+		scale = -1*(maxL/len(volume))
+		return ['fallingTrendFlagOrPennant', scale, falling [-1]]
+	else:
+		return None
 
     
 #values = [[1, 2, 10], [1, 2, 20], [1, 2, 12]]

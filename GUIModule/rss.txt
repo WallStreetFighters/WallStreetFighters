@@ -1,1 +1,2 @@
-http://feeds.reuters.com/reuters/bondsNews
+http://feeds.reuters.com/reuters/businessNews
+http://articlefeeds.nasdaq.com/nasdaq/categories?category=Bonds

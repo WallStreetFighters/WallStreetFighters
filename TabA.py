@@ -165,6 +165,7 @@ class TabA(QtGui.QWidget):
                 self.bollingerCheckBox.stateChanged.connect(self.bollingerChanged)
                 self.analyzeButton.pressed.connect(self.newAnalyzeTab)
                 self.showChartPatternsButton.pressed.connect(self.showChartPatterns)
+                self.clearButton.pressed.connect(self.clearDrawnFormations)
             self.startDateEdit.dateChanged.connect(self.checkDate)
             self.endDateEdit.dateChanged.connect(self.checkDate)
         else:
@@ -177,7 +178,9 @@ class TabA(QtGui.QWidget):
             self.resourceListView.clicked.connect(self.addSymbolToCompareLine)
             self.futuresListView.clicked.connect(self.addSymbolToCompareLine)
             
-
+    def clearDrawnFormations(self):
+        self.chart.clearRectangles()
+        self.chart.clearLines()
     def newAnalyzeTab(self):
         strategy = Strategy(self.chart.data)
         text = strategy.analyze()
@@ -220,6 +223,7 @@ class TabA(QtGui.QWidget):
                 color.append('r')
         values = settings[0]
         enables = settings[3]
+        lineWidth = settings[4]
                 
         strategy = Strategy(self.chart.data)
         strategy.setPositiveSignal(values[0])
@@ -392,74 +396,74 @@ class TabA(QtGui.QWidget):
         self.formationDrawer.setTrendColor(color[2])
         self.formationDrawer.setTrendLstyle(lineStyle[2])
         self.formationDrawer.setTrendLwidth(2.0)
-        self.formationDrawer.setHeadShouldersColor(color[3])
-        self.formationDrawer.setHeadShouldersLstyle(lineStyle[3])
-        self.formationDrawer.setHeadShouldersLwidth(2.0)
+        self.formationDrawer.setHeadAndShouldersColor(color[3])
+        self.formationDrawer.setHeadAndShouldersLstyle(lineStyle[3])
+        self.formationDrawer.setHeadAndShouldersLwidth(lineWidth[0])
         self.formationDrawer.setTripleTopColor(color[4])
         self.formationDrawer.setTripleTopLstyle(lineStyle[4])
-        self.formationDrawer.setTripleTopLwidth(2.0)
+        self.formationDrawer.setTripleTopLwidth(lineWidth[0])
         self.formationDrawer.setRisingWedgeColor(color[5])
         self.formationDrawer.setRisingWedgeLstyle(lineStyle[5])
-        self.formationDrawer.setRisingWedgeLwidth(2.0)
+        self.formationDrawer.setRisingWedgeLwidth(lineWidth[0])
         self.formationDrawer.setFallingTriangleColor(color[6])
         self.formationDrawer.setFallingTriangleLstyle(lineStyle[6])
-        self.formationDrawer.setFallingTriangleLwidth(2.0)
-        self.formationDrawer.setReversedHeadShouldersColor(color[7])
-        self.formationDrawer.setReversedHeadShouldersLstyle(lineStyle[7])
-        self.formationDrawer.setReversedHeadShouldersLwidth(2.0)
+        self.formationDrawer.setFallingTriangleLwidth(lineWidth[0])
+        self.formationDrawer.setReversedHeadAndShouldersColor(color[7])
+        self.formationDrawer.setReversedHeadAndShouldersLstyle(lineStyle[7])
+        self.formationDrawer.setReversedHeadAndShouldersLwidth(lineWidth[1])
         self.formationDrawer.setTripleBottomColor(color[8])
         self.formationDrawer.setTripleBottomLstyle(lineStyle[8])
-        self.formationDrawer.setTripleBottomLwidth(2.0)
+        self.formationDrawer.setTripleBottomLwidth(lineWidth[1])
         self.formationDrawer.setFallingWedgeColor(color[9])
         self.formationDrawer.setFallingWedgeLstyle(lineStyle[9])
-        self.formationDrawer.setFallingWedgeLwidth(2.0)
+        self.formationDrawer.setFallingWedgeLwidth(lineWidth[1])
         self.formationDrawer.setRisingTriangleColor(color[10])
         self.formationDrawer.setRisingTriangleLstyle(lineStyle[10])
-        self.formationDrawer.setRisingTriangleLwidth(2.0)
+        self.formationDrawer.setRisingTriangleLwidth(lineWidth[1])
         self.formationDrawer.setSymetricTriangleColor(color[11])
         self.formationDrawer.setSymetricTriangleLstyle(lineStyle[11])
-        self.formationDrawer.setSymetricTriangleLwidth(2.0)
+        self.formationDrawer.setSymetricTriangleLwidth(lineWidth[2])
         #przerwa
         self.formationDrawer.setFlagPennantColor(color[13])
-        self.formationDrawer.setFlagPennantLStyle(lineStyle[13])
-        self.formationDrawer.setFlagPennantLwidth(2.0)
+        self.formationDrawer.setFlagPennantLstyle(lineStyle[13])
+        self.formationDrawer.setFlagPennantLwidth(lineWidth[2])
         #przerwa
         self.formationDrawer.setRisingBreakawayGapColor(color[22])
         self.formationDrawer.setRisingBreakawayGapLstyle(lineStyle[22])
-        self.formationDrawer.setRisingBreakawayGapLwidth(2.0)
+        self.formationDrawer.setRisingBreakawayGapLwidth(lineWidth[3])
         self.formationDrawer.setRisingContinuationGapColor(color[23])
         self.formationDrawer.setRisingContinuationGapLstyle(lineStyle[23])
-        self.formationDrawer.setRisingContinuationGapLwidth(2.0)
+        self.formationDrawer.setRisingContinuationGapLwidth(lineWidth[3])
         self.formationDrawer.setFallingExhaustionGapColor(color[24])
         self.formationDrawer.setFallingExhaustionGapLstyle(lineStyle[24])
-        self.formationDrawer.setFallingExhaustionGapLwidth(2.0)
+        self.formationDrawer.setFallingExhaustionGapLwidth(lineWidth[3])
         self.formationDrawer.setFallingBreakawayGapColor(color[25])
         self.formationDrawer.setFallingBreakawayGapLstyle(lineStyle[25])
-        self.formationDrawer.setFallingBreakawayGapLwidth(2.0)
+        self.formationDrawer.setFallingBreakawayGapLwidth(lineWidth[4])
         self.formationDrawer.setRisingExhaustionGapColor(color[26])
         self.formationDrawer.setRisingExhaustionGapLstyle(lineStyle[26])
-        self.formationDrawer.setRisingExhaustionGapLwidth(2.0)
+        self.formationDrawer.setRisingExhaustionGapLwidth(lineWidth[4])
         self.formationDrawer.setFallingContinuationGapColor(color[27])
         self.formationDrawer.setFallingContinuationGapLstyle(lineStyle[27])
-        self.formationDrawer.setFallingContinuationGapLwidth(2.0)
+        self.formationDrawer.setFallingContinuationGapLwidth(lineWidth[4])
         self.formationDrawer.setBull3Color(color[28])
         self.formationDrawer.setBull3Lstyle(lineStyle[28])
-        self.formationDrawer.setBull3Lwidth(2.0)
+        self.formationDrawer.setBull3Lwidth(lineWidth[5])
         self.formationDrawer.setMornigStarColor(color[29])
         self.formationDrawer.setMornigStarLstyle(lineStyle[29])
-        self.formationDrawer.setMornigStarLwidth(2.0)
+        self.formationDrawer.setMornigStarLwidth(lineWidth[5])
         self.formationDrawer.setPiercingColor(color[30])
         self.formationDrawer.setPiercingLstyle(lineStyle[30])
-        self.formationDrawer.setPiercingLwidth(2.0)
+        self.formationDrawer.setPiercingLwidth(lineWidth[5])
         self.formationDrawer.setBear3Color(color[31])
         self.formationDrawer.setBear3Lstyle(lineStyle[31])
-        self.formationDrawer.setBear3Lwidth(2.0)
+        self.formationDrawer.setBear3Lwidth(lineWidth[6])
         self.formationDrawer.setEveningStarColor(color[32])
         self.formationDrawer.setEveningStarLstyle(lineStyle[32])
-        self.formationDrawer.setEveningStarLwidth(2.0)
+        self.formationDrawer.setEveningStarLwidth(lineWidth[6])
         self.formationDrawer.setDarkCloudColor(color[33])
         self.formationDrawer.setDarkCloudLstyle(lineStyle[33])
-        self.formationDrawer.setDarkCloudLwidth(2.0)
+        self.formationDrawer.setDarkCloudLwidth(lineWidth[6])
         
         self.formationDrawer.setFormations(strategy)
         self.formationDrawer.drawFormations()
@@ -723,6 +727,7 @@ class TabA(QtGui.QWidget):
 
     def paintCompareChart(self):
         self.finObj = []
+        print self.qModelIndex
         k = 0
         for x in self.listName:
             if x == "index":
@@ -733,6 +738,15 @@ class TabA(QtGui.QWidget):
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
             if x == "stock":
+                print k
+                print "--------------------------------11111"
+                print self.qModelIndex[k]
+                print "--22222222------------------------------11111"
+                print self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)
+                print "----3333333333---------------------------11111"
+                print (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList())
+                for x in (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()):
+                    print x
                 index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
                 if dataParser.STOCK_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])

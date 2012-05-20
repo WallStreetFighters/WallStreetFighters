@@ -504,16 +504,16 @@ class Strategy:
                   if hasFound:
                       resultText = resultText + self.data.date[int(formation[1][0])].strftime("%Y-%m-%d") + " - " + self.data.date[int(formation[1][2])].strftime("%Y-%m-%d") + "\n"   
                       
-           
-          flags = trend.findFlagsAndPennants(self.data.close, self.data.volume)
-          if flags != None:
-              overallScore += self.defFlagPennantVal * flags[1]
-              if flags[1] < 0:
-                  print "(-) falling-trend flag/pennant"
-                  resultText = resultText + "(-) falling-trend flag/pennant"
-              else:
-                  print "(+) rising-trend flag/pennant"
-                  resultText = resultText + "(+) rising-trend flag/pennant"
+	  flags = trend.findFlagsAndPennants(self.data.close,self.data.volume, self.data.high, self.data.low)
+	  if flags != None:
+		overallScore += defFlagPennantVal * flags[1]
+		if flags[1] < 0:
+			print "(-) falling-trend flag/pennant"
+			resultText = resultText + "(-) falling-trend flag/pennant"
+		else:
+			print "(+) rising-trend flag/pennant"
+			resultText = resultText + "(+) rising-trend flag/pennant"
+
 
           gaps = candles.findGaps(self.data.high,self.data.low,self.data.close)
           for formation in gaps:

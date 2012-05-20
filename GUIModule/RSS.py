@@ -2,6 +2,7 @@
 
 import urllib2
 from xml.dom import minidom, Node
+import re
 
 
 class RSSItem:
@@ -62,6 +63,8 @@ class RSSReader:
 		title = '# '
 		title += self.GetChildText(itemNode,"title")
 		description = self.GetChildText(itemNode,"description")
+		description = re.sub('<.+>','',description,flags = re.DOTALL)
+		
 		link = self.GetChildText(itemNode, "link")
 		pubDate = self.GetChildText(itemNode, "pubDate")
 		return RSSItem(title,description,link,pubDate)
