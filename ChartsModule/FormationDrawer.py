@@ -719,9 +719,9 @@ class FormationDrawer:
             elif name in gaps:
                 if not computedGaps:
                     foundGaps = candles.findGaps(data.high, data.low, data.close)
-                    computedGaps = True
+                    computedGaps = True                
                 for gapsList in foundGaps:
-                    for gap in gapsList:
+                    for gap in gapsList[0]:
                         if name == gap[0]:
                             self.drawGap(gap,values[0],values[1],values[2])
             elif name in fandp:

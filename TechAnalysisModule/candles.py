@@ -226,7 +226,7 @@ def findGaps(H,L,C):
         gaps=findGapsOnFragment(H,L,C,a,b)
         if(gaps!=[]):
             gapsList.append((gaps,value))            
-        value*=0.75
+        value*=0.75    
     return gapsList
 
 def findGapsOnFragment(H,L,C,a,b):
@@ -284,7 +284,7 @@ def findGapsOnFragment(H,L,C,a,b):
             gaps.append(continuation_gap)
         if exhaustion_gap!=None:
             exhaustion_gap=('rising_exhaustion_gap',exhaustion_gap[0],exhaustion_gap[1])
-            gaps.append(exhaustion_gap)
+            gaps.append(exhaustion_gap)        
         return gaps
     #dla trendu malejącego analogicznie, tylko odejmowania i nierówności w drugą stronę
     elif(trend<0):                
