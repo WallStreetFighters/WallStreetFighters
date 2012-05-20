@@ -173,8 +173,10 @@ class FinancialObject(object):
 			
 	def getIndex(self, begin, end, time = 'daily'):
 		"""Funkcja zwracająca indeksy tablicy dla danego przedziału czasu"""
-		if begin > end:
+		if begin >= end:
 			return
+		if len(self.valuesDaily) ==  1:
+			return [0,0]	
 		if time == 'daily':
 			if end < self.valuesDaily[0][0]:
 				raise DataAPIException('Stock was not noted yet ')
@@ -659,6 +661,7 @@ class loadHistory(threading.Thread):
 
 	def run(self):
 		global HISTORY_LIST
+		updateDatabase()
 		HISTORY_LIST = cPickle.load(self.file)
 		self.file.close()
 
