@@ -483,8 +483,6 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         
     def drawTrend(self):
         self.clearLines()
-        strategy = Strategy(self.data)
-        strategy.analyze()
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)
         #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
