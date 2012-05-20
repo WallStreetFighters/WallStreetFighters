@@ -97,41 +97,41 @@ class GuiMainWindow(object):
 	self.rssWidget.ourWebsite.clicked.connect(self.ourWebsiteTab)
 	QtCore.QObject.connect(self.home,QtCore.SIGNAL("tabFromHome"),self.tabHome)
 
-        """#zajebiste Dane
+        """#zafajniste Dane
 	nowDate = datetime.datetime.now()
 	nowDate = datetime.date(nowDate.year,nowDate.month,nowDate.day)
 	d = datetime.timedelta(-367)
 	pastDate = nowDate + d
 	d = datetime.timedelta(-322)
 	nowDate = nowDate +d
-	#zajebiste Dane1
-        zajebisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
-        dates=zajebisteDane['date']
-        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
-        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
-        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
-        zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
-        self.home.topLayout.addWidget(zajebistyWykres,0,1)#zajebiste Dane1
+	#zafajniste Dane1
+        zafajnisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
+        dates=zafajnisteDane['date']
+        values=indicators.adLine(zafajnisteDane['adv'], zafajnisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
+        #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
+        zafajnistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
+        self.home.topLayout.addWidget(zafajnistyWykres,0,1)#zafajniste Dane1
 
-        #zajebiste Dane2
-        zajebisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2004,7,10),datetime.date(2005,2,2),'NASDAQ')
-        dates=zajebisteDane['date']
-        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
-        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
-        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
-        zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
-        self.home.topLayout.addWidget(zajebistyWykres,0,3)
-        zajebistyWykres.close()
-        #zajebiste Dane3
-        zajebisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2005,7,10),datetime.date(2006,2,2),'AMEX')
-        dates=zajebisteDane['date']
-        values=indicators.adLine(zajebisteDane['adv'], zajebisteDane['dec'])
-        #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
-        #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
-        zajebistyWykres = LightweightChart(self.home,dates,values,'A/D line')
+        #zafajniste Dane2
+        zafajnisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2004,7,10),datetime.date(2005,2,2),'NASDAQ')
+        dates=zafajnisteDane['date']
+        values=indicators.adLine(zafajnisteDane['adv'], zafajnisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
+        #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
+        zafajnistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
+        self.home.topLayout.addWidget(zafajnistyWykres,0,3)
+        zafajnistyWykres.close()
+        #zafajniste Dane3
+        zafajnisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2005,7,10),datetime.date(2006,2,2),'AMEX')
+        dates=zafajnisteDane['date']
+        values=indicators.adLine(zafajnisteDane['adv'], zafajnisteDane['dec'])
+        #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
+        #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
+        zafajnistyWykres = LightweightChart(self.home,dates,values,'A/D line')
         
-        self.home.topLayout.addWidget(zajebistyWykres,0,5)#zajebiste Dane1
-        zajebistyWykres.close()"""
+        self.home.topLayout.addWidget(zafajnistyWykres,0,5)#zafajniste Dane1
+        zafajnistyWykres.close()"""
         """Search"""
 	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
         self.tabs.addTab(self.tabA,"Search")
