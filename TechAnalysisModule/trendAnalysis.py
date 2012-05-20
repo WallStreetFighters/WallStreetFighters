@@ -208,16 +208,16 @@ def getChannelLines(array, a=3, b=4):
 # #print getChannelLines(a)
 
 
-def convertValuesToHeadAndShoulders(values, volumine, maxVal, maxVol):
+def convertValuesToHeadAndShoulders(values, volume, maxVal, maxVol):
     """Wylicza wartosci niezbedne do znalezienia formacji glowy i ramion"""
-    if len(values) != 3 or len(volumine) != 3:
+    if len(values) != 3 or len(volume) != 3:
         return 0
     leftArmVal = list(values[0])
     headVal = list(values[1])
     rightArmVal = list(values[2])
-    leftArmVol = list(volumine[0])
-    headVol = list(volumine[1])
-    rightArmVol = list(volumine[2])
+    leftArmVol = list(volume[0])
+    headVol = list(volume[1])
+    rightArmVol = list(volume[2])
     maxLeftArmVal = max(leftArmVal)
     maxLeftArmVol = max(leftArmVol)
     maxHeadVal = max(headVal)
@@ -299,16 +299,16 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
                     len(rightArmVal) + diff, evaluateFun(a, b, len(rightArmVal) + diff)]    
 
 
-def smartLookForHeadAndShoulders(values, volumine):
+def smartLookForHeadAndShoulders(values, volume):
     """Szukamy formacji glowy i ramion w sposob brutalny, szukajac wszystkich 3 elementowych podzrbiorow - nieuzywac"""
     # #print "Szukamy formacji glowy i ramion"
     values = asarray(values)
-    volumine = asarray(volumine)
+    volume = asarray(volume)
     maxVal = max(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
     for i in reversed(range(5, div + 1)):
         val = asarray(list(combinations(divideArray(values, i), 3)))
-        vol = asarray(list(combinations(divideArray(volumine, i), 3)))
+        vol = asarray(list(combinations(divideArray(volume, i), 3)))
         z = map(lambda x, y: convertValuesToHeadAndShoulders(x, y, maxVal, maxVol), val, vol)
         # #print "z = ", z
         if max(z) > 0:
@@ -317,7 +317,7 @@ def smartLookForHeadAndShoulders(values, volumine):
     return [0], [0]
 
 
-def lookForHeadAndShoulders(values, volumine, analyze=0):
+def lookForHeadAndShoulders(values, volume, analyze=0):
     """Szukamy formacji glowy i ramion"""
     # #print "Szukamy formacji glowy i ramion"
     if (len(values) < 15):
@@ -326,13 +326,13 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
         else:
             return [0]
     values = asarray(values)
-    volumine = asarray(volumine)
+    volume = asarray(volume)
     maxVal = max(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
     
     for j in reversed(range(hsDiv - 4, min(2 * hsDiv, len(values)))):
         val = list(divideArray(values, j))
-        vol = list(divideArray(volumine, j))
+        vol = list(divideArray(volume, j))
         size = len(val[0])
         for k in range(1, 6):
             if k == 1:
@@ -340,7 +340,7 @@ def lookForHeadAndShoulders(values, volumine, analyze=0):
             else:
                 shift = size / k
             val = list(divideArray(values[shift:], j))
-            vol = list(divideArray(volumine[shift:], j))
+            vol = list(divideArray(volume[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
             for i in range(len(val) - 3):
@@ -454,16 +454,16 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
                     len(rightArmVal) + diff, evaluateFun(a, b, len(rightArmVal) + diff)] 
   
 
-def smartLookForReversedHeadAndShoulders(values, volumine):
+def smartLookForReversedHeadAndShoulders(values, volume):
     """Szukamy odwroconej formacji glowy i ramion wyszukujac wszystkie 3 elementowe podzbiory - nieuzywac"""
     # #print "Szukamy odwroconej formacji glowy i ramion"
     values = asarray(values)
-    volumine = asarray(volumine)
+    volume = asarray(volume)
     minVal = min(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
     for i in reversed(range(4, div + 1)):
         val = asarray(list(combinations(divideArray(values, i), 3)))
-        vol = asarray(list(combinations(divideArray(volumine, i), 3)))
+        vol = asarray(list(combinations(divideArray(volume, i), 3)))
         z = map(lambda x, y: reversedHeadAndShoulders(x, y, minVal, maxVol), val, vol)
         # #print "z = ", z
         if max(z) > 0:
@@ -472,7 +472,7 @@ def smartLookForReversedHeadAndShoulders(values, volumine):
     return [0], [0]
 
 
-def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
+def lookForReversedHeadAndShoulders(values, volume, analyze=0):
     """Szukamy odwroconej formacji glowy i ramion"""
     # #print "Szukamy odwroconej formacji glowy i ramion"
     if (len(values) < 15):
@@ -481,13 +481,13 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
         else:
             return [0]
     values = asarray(values)
-    volumine = asarray(volumine)
+    volume = asarray(volume)
     minVal = min(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
 
     for j in reversed(range(hsDiv - 4, min(2 * hsDiv, len(values)))):
         val = list(divideArray(values, j))
-        vol = list(divideArray(volumine, j))
+        vol = list(divideArray(volume, j))
         size = len(val[0])
         for k in range(1, 6):
             if k == 1:
@@ -495,7 +495,7 @@ def lookForReversedHeadAndShoulders(values, volumine, analyze=0):
             else:
                 shift = size / k
             val = list(divideArray(values[shift:], j))
-            vol = list(divideArray(volumine[shift:], j))
+            vol = list(divideArray(volume[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
             # #print "\nsprawdzamy ", j
@@ -607,7 +607,7 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
                     len(lastArmVal) + diff, evaluateFun(a, b, len(lastArmVal) + diff)]
 
 
-def lookForTripleTop(values, volumine, analyze=0):
+def lookForTripleTop(values, volume, analyze=0):
     """Szukamy formacji potrojnego szczytu"""
     if (len(values) < 15):
         if analyze == 0:
@@ -615,13 +615,13 @@ def lookForTripleTop(values, volumine, analyze=0):
         else:
             return [0]
     values = asarray(values)
-    volumine = asarray(volumine)
+    volume = asarray(volume)
     minVal = min(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
 
     for j in reversed(range(tripleDiv - 4, min(2 * tripleDiv, len(values)))):
         val = list(divideArray(values, j))
-        vol = list(divideArray(volumine, j))
+        vol = list(divideArray(volume, j))
         size = len(val[0])
         for k in range(1, 6):
             if k == 1:
@@ -629,7 +629,7 @@ def lookForTripleTop(values, volumine, analyze=0):
             else:
                 shift = size / k
             val = list(divideArray(values[shift:], j))
-            vol = list(divideArray(volumine[shift:], j))
+            vol = list(divideArray(volume[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
             # #print "\nsprawdzamy ", j
@@ -744,7 +744,7 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
                     len(lastArmVal) + diff, evaluateFun(a, b, len(lastArmVal) + diff)] 
 
 
-def lookForTripleBottom(values, volumine, analyze=0):
+def lookForTripleBottom(values, volume, analyze=0):
     """Szukamy formacji potrojnego dna"""
     if (len(values) < 15):
         if analyze == 0:
@@ -752,13 +752,13 @@ def lookForTripleBottom(values, volumine, analyze=0):
         else:
             return [0]
     values = asarray(values)
-    volumine = asarray(volumine)
+    volume = asarray(volume)
     minVal = min(values)
-    maxVol = max(volumine)
+    maxVol = max(volume)
 
     for j in reversed(range(tripleDiv - 4, min(2 * tripleDiv, len(values)))):
         val = list(divideArray(values, j))
-        vol = list(divideArray(volumine, j))
+        vol = list(divideArray(volume, j))
         size = len(val[0])
         for k in range(1, 6):
             if k == 1:
@@ -766,7 +766,7 @@ def lookForTripleBottom(values, volumine, analyze=0):
             else:
                 shift = size / k
             val = list(divideArray(values[shift:], j))
-            vol = list(divideArray(volumine[shift:], j))
+            vol = list(divideArray(volume[shift:], j))
             z = [0 for i in (range(len(val) - 1))]
             neckLine = [[0, 0, 0, 0] for i in (range(len(val) - 1))]
             # #print "\nsprawdzamy ", j
