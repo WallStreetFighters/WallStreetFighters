@@ -489,7 +489,7 @@ class TabA(QtGui.QWidget):
         self.settings["ChartType"] = self.chartTypeComboBox.currentText()
         if self.chart !=None:
             self.chart.setMainType(self.settings["ChartType"])
-            self.updateDrawTrend()
+            #self.updateDrawTrend()
             self.chart.repaint()
             self.chart.update()
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
@@ -558,7 +558,7 @@ class TabA(QtGui.QWidget):
             self.chartsLayout.addWidget(self.chart)
             self.chart.repaint()
             self.chart.update()
-            self.checkDrawTrend()
+            #self.checkDrawTrend()
             #self.chart.emit(QtCore.SIGNAL("movido"))
             m= self.parentWidget().parentWidget().parentWidget().parentWidget()
             m.resize(m.width() , m.height()-20)
