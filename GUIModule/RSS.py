@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import urllib2
 from xml.dom import minidom, Node
@@ -6,7 +6,7 @@ import re
 
 
 class RSSItem:
-        """Obiekt RSS przechowujący strukutrę artykułów"""
+        """Obiekt RSS przechowującyą strukutrę artykułów"""
 	def __init__(self,title="",description="", link="",pubDate = ""):
                 self.title = title
 		self.description = description
