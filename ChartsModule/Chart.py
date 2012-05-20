@@ -491,27 +491,6 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         sup, res = trend.getChannelLines(self.data.close)
         self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g')
         self.drawLine(res[0][1], res[0][0], res[len(res)-1][1], res[len(res)-1][0], 'r')
-        neckLine = trend.lookForHeadAndShoulders(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'm', 2.0, '-')
-        
-        trend.hornBottoms(self.data.close, self.data.volume)
-        trend.hornTops(self.data.close, self.data.volume)
-        neckline = trend.lookForTripleTop(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'y', 2.0, '-')
-        neckline = trend.lookForTripleBottom(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'b', 2.0, '-')
-        neckLine = trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
-        if (neckLine[0] != neckLine[2]):
-            self.drawLine(neckLine[0], neckLine[1], neckLine[2], neckLine[3], 'c', 2.0, '-')
-       # trend.lookForReversedHeadAndShoulders(self.data.close, self.data.volume)
-        
-     #   min, mindex = trend.findMinLine(asarray(self.data.close))
-     #   self.drawLine(mindex[0], min[0], mindex[len(min)-1], min[len(sup)-1], 'b', 1.0)
-     #   max, mindex = trend.findMaxLine(asarray(self.data.close))
-     #   self.drawLine(mindex[0], max[0], mindex[len(min)-1], max[len(sup)-1], 'b', 1.0)
         if len(self.data.close) > 30:
             sup, res = trend.getChannelLines(self.data.close, 1, 2)
             self.drawLine(sup[0][1], sup[0][0], sup[len(sup)-1][1], sup[len(sup)-1][0], 'g', 2.0)
