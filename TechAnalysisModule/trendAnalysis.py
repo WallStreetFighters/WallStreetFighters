@@ -252,6 +252,10 @@ def headAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headVol, righ
     if len(prev):
         if optimizedTrend(prev) == -1:
             return 0, [0, 0, 0, 0]     #trend jest rosnacy, nie bedzie zmiany trendu
+
+    if maxVol == 0:
+        maxVol = 1
+
     #Wartosc lewego ramienia < glowy i wartosc wolumenu lewego ramienia ma byc najwieksza
     if maxLeftArmVal > (1 - hsDiff) * maxHeadVal  or maxRightArmVal > (1 - hsDiff) * maxHeadVal: 
         return 0, [0, 0, 0, 0]
@@ -407,7 +411,8 @@ def reversedHeadAndShoulders(leftArmVal, headVal, rightArmVal, leftArmVol, headV
     if len(prev):
         if optimizedTrend(prev) == 1:
             return 0, [0, 0, 0, 0]
-
+    if maxVol == 0:
+        maxVol = 1
     #Wartosc lewego ramienia > glowy i wartosc wolumenu glowy ma byc najmniejsza
     if minLeftArmVal < (1 + hsDiff) * minHeadVal  or minRightArmVal < (1 + hsDiff) * minHeadVal:
         return 0, [0, 0, 0, 0]
@@ -562,6 +567,10 @@ def tripleTop(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, lastAr
     if len(prev):
         if optimizedTrend(prev) == - 1:
             return 0, [0, 0, 0, 0]     #trend jest rosnacy, nie bedzie zmiany trendu
+
+    if maxVol == 0:
+        maxVol = 1
+
     #Wartosc szczytow lewego ramienia, glowy i prawego ramienia lezy mniej wiecej na tym samym poziomie
     if aInRect(asarray([maxFirstArmVal, maxMiddleVal, maxLastArmVal]), tripleDiff) == 0:
         return 0, [0, 0, 0, 0]
@@ -697,6 +706,9 @@ def tripleBottom(firstArmVal, middleVal, lastArmVal, firstArmVol, middleVol, las
     if len(prev):
         if optimizedTrend(prev) == 1:
             return 0, [0, 0, 0, 0]
+
+    if maxVol == 0:
+        maxVol = 1
 
          #Wartosc szczytow lewego ramienia, glowy i prawego ramienia lezy mniej wiecej na tym samym poziomie
     if (aInRect(asarray([minFirstArmVal, minMiddleVal, minLastArmVal]), tripleDiff) == 0):
