@@ -13,6 +13,7 @@ class RSSSite:
         self.Name = self.rssReader.name
         
 class RSSWidget(QtGui.QWidget):
+    """Widget odpoweidzilany za wyświetlanie i możliwość dodawania kanałów RSS"""
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
        

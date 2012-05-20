@@ -7,6 +7,9 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 
 class Settings (QtGui.QFrame):
+    """ Ramka odpowiedzialna za dostarczenie interfesju do wyboru sposobu wyświetlania formacji
+        wykrytych przez moduł analizy technicznej. Włacznie / wyłącznie danej formacji, wskaźnika etc.
+        wybór koloru , sytlu lini , grubości lini. Klasa zapewnia metody do pobierania aktualnych ustawień"""
     def __init__(self,settingsList = []):
         QtGui.QFrame.__init__(self)
         self.initUi()
@@ -18,6 +21,7 @@ class Settings (QtGui.QFrame):
             self.loadVal(settingsList)
             #self.defaultValues)
     def getVal(self):
+        "pobieramy aktulane ustawinia i zwracamy w postaci list list"""
         li = []
         li.append(self.positiveSignalSpinBox.value())
         li.append(self.negativeSignalSpinBox.value())
@@ -176,6 +180,7 @@ class Settings (QtGui.QFrame):
         
         
     def loadVal(self,lis = []):
+        """załadowywanie zapisanych ustawień lub wartości domyślnych"""
         if not lis:
             li = self.defaultList
             li2 =[0 for i in range(34)]
@@ -376,6 +381,7 @@ class Settings (QtGui.QFrame):
         self.darkCloudCheckBox.setChecked(li4[33])
 
     def initUi(self):
+        """inicjalizacja interfejsu"""
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Raised)
         self.setLineWidth(3)

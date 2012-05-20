@@ -4,6 +4,7 @@ from PyQt4 import QtGui,QtCore
 from Calendar import Calendar
 
 def tabUi(self,showLists=True):
+        """moduł zapweniające podstawowe atrybuty wspólne dla Search i wyświetlania wykresów"""
         self.horizontalLayout = QtGui.QHBoxLayout(self)
         self.horizontalLayout.setContentsMargins(0,0,0,0)
         """Każdą zakładkę dzielimy jak na razie na 3 obszary: opcje,
