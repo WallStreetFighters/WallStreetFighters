@@ -6,7 +6,7 @@ import operator
 import threading
 import time
 import os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore,QtWebKit
 from TabA import TabA
 import cPickle
 import GUIModule.RSSgui as RSSgui
@@ -28,6 +28,7 @@ class GuiMainWindow(object):
 
         #tabs - przechowywanie zakładek
 	self.verticalLayout = QtGui.QVBoxLayout(self.centralWidget)
+	self.verticalLayout.setContentsMargins(0, 0, 0, -1)
         self.tabs = QtGui.QTabWidget(self.centralWidget)
         self.tabs.setGeometry(QtCore.QRect(10, 10, 980, 640))
         self.tabs.setObjectName("Tabs")
@@ -92,6 +93,8 @@ class GuiMainWindow(object):
         #os.chdir("../../WallStreetFighters/GUIModule")
         self.home.rssLayout.addWidget(self.rssWidget)
 	self.home.startUpdating()
+	self.ourWebTab = None
+	self.rssWidget.ourWebsite.clicked.connect(self.ourWebsiteTab)
 	QtCore.QObject.connect(self.home,QtCore.SIGNAL("tabFromHome"),self.tabHome)
 
         """#zajebiste Dane
@@ -277,6 +280,9 @@ class GuiMainWindow(object):
         chartList = text.split(' VS ')
         qModelIndex = []
         listName = []
+#        for x in chartList:
+#            print x
+#        print "znalazlwm"
         for x in chartList:
             t = self.findIndexModel(x)
             if t:
@@ -448,7 +454,7 @@ class GuiMainWindow(object):
         #draw trend
         drawTrend = self.tabA.drawTrendCheckBox.isChecked()
         #line width
-        lineWidth = self.tabA.lineWidthSpinBox.value()
+        lineWidth = 2.0
         
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
@@ -463,11 +469,14 @@ class GuiMainWindow(object):
         k = 0
         for  x in dataParser.INDEX_LIST:
             if name in x:
+#                print "znalazlem w indx"
                 return ("index",k)
             k= k+1
         k = 0
         for  x in dataParser.STOCK_LIST:
             if name in x:
+#               print k
+#               print "znalazlem w stc"
                return ("stock",k)
             k= k+1
         k = 0
@@ -599,8 +608,19 @@ class GuiMainWindow(object):
         self.stockModel.setFilterRole(34)
         reg.setPattern(self.tabA.filterLineEdit.text()+".*")
         self.stockModel.setFilterRegExp(reg)
-        self.stockModelNestedPattern = ""      
-
+        self.stockModelNestedPattern = ""
+    def ourWebsiteTab(self):
+        if not (self.ourWebTab):
+            self.ourWebTab = QtGui.QWidget()
+            self.horizontalLayout2 = QtGui.QHBoxLayout(self.ourWebTab)
+            self.webView = QtWebKit.QWebView()
+            self.webView.setUrl(QtCore.QUrl("http://wall-street-fighters.herokuapp.com"))
+            self.horizontalLayout2.addWidget(self.webView)
+            self.tabs.addTab(self.ourWebTab,"WSF WebSite")
+            self.tabs.setCurrentWidget(self.ourWebTab)
+        elif self.ourWebTab not in self.tabs.children():
+#            print 'aaa'
+            self.tabs.setCurrentWidget(self.ourWebTab)
             
     """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""    
     class ListModel(QtCore.QAbstractTableModel):
@@ -639,6 +659,7 @@ class GuiMainWindow(object):
             if not index.isValid():
                 return QtCore.QVariant()
             elif role == QtCore.Qt.WhatsThisRole:
+#                print self.list[index.row()]
                 return self.list[index.row()]
             elif role != QtCore.Qt.DisplayRole and role != 32 and role!= 33 and role!=34 :
                 return QtCore.QVariant()
