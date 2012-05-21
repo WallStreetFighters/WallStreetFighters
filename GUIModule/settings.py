@@ -7,6 +7,9 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 
 class Settings (QtGui.QFrame):
+    """ Ramka odpowiedzialna za dostarczenie interfesju do wyboru sposobu wyświetlania formacji
+        wykrytych przez moduł analizy technicznej. Włacznie / wyłącznie danej formacji, wskaźnika etc.
+        wybór koloru , sytlu lini , grubości lini. Klasa zapewnia metody do pobierania aktualnych ustawień"""
     def __init__(self,settingsList = []):
         QtGui.QFrame.__init__(self)
         self.initUi()
@@ -18,6 +21,7 @@ class Settings (QtGui.QFrame):
             self.loadVal(settingsList)
             #self.defaultValues)
     def getVal(self):
+        "pobieramy aktulane ustawinia i zwracamy w postaci list list"""
         li = []
         li.append(self.positiveSignalSpinBox.value())
         li.append(self.negativeSignalSpinBox.value())
@@ -176,6 +180,7 @@ class Settings (QtGui.QFrame):
         
         
     def loadVal(self,lis = []):
+        """załadowywanie zapisanych ustawień lub wartości domyślnych"""
         if not lis:
             li = self.defaultList
             li2 =[0 for i in range(34)]
@@ -376,6 +381,7 @@ class Settings (QtGui.QFrame):
         self.darkCloudCheckBox.setChecked(li4[33])
 
     def initUi(self):
+        """inicjalizacja interfejsu"""
         self.setFrameShape(QtGui.QFrame.StyledPanel)
         self.setFrameShadow(QtGui.QFrame.Raised)
         self.setLineWidth(3)
@@ -464,7 +470,7 @@ class Settings (QtGui.QFrame):
         self.line_5.setFrameShape(QtGui.QFrame.HLine)
         self.line_5.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_5.setObjectName(_fromUtf8("line_5"))
-        self.gridLayout.addWidget(self.line_5, 13, 5, 1, 6)
+        self.gridLayout.addWidget(self.line_5, 13, 6, 1, 5)
         self.risingTriangleSpinBox = QtGui.QSpinBox(self)
         self.risingTriangleSpinBox.setMaximum(100)
         self.risingTriangleSpinBox.setSingleStep(5)
@@ -501,11 +507,11 @@ class Settings (QtGui.QFrame):
         self.oscilatorsCheckBox.setText(_fromUtf8(""))
         self.oscilatorsCheckBox.setObjectName(_fromUtf8("oscilatorsCheckBox"))
         self.gridLayout.addWidget(self.oscilatorsCheckBox, 1, 6, 1, 1)
-        self.line_4 = QtGui.QFrame(self)
+        """self.line_4 = QtGui.QFrame(self)
         self.line_4.setFrameShape(QtGui.QFrame.VLine)
         self.line_4.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_4.setObjectName(_fromUtf8("line_4"))
-        self.gridLayout.addWidget(self.line_4, 0, 11, 24, 1)
+        self.gridLayout.addWidget(self.line_4, 0, 11, 24, 1)"""
         self.label_36 = QtGui.QLabel(self)
         self.label_36.setIndent(15)
         self.label_36.setObjectName(_fromUtf8("label_36"))
@@ -1266,11 +1272,11 @@ class Settings (QtGui.QFrame):
         self.label_37.setIndent(0)
         self.label_37.setObjectName(_fromUtf8("label_37"))
         self.gridLayout.addWidget(self.label_37, 19, 7, 1, 1)
-        self.line = QtGui.QFrame(self)
+        """ self.line = QtGui.QFrame(self)
         self.line.setFrameShape(QtGui.QFrame.VLine)
         self.line.setFrameShadow(QtGui.QFrame.Sunken)
         self.line.setObjectName(_fromUtf8("line"))
-        self.gridLayout.addWidget(self.line, 0, 5, 24, 1)
+        self.gridLayout.addWidget(self.line, 0, 5, 24, 1)"""
         self.label_9 = QtGui.QLabel(self)
         self.label_9.setStyleSheet(_fromUtf8("background-color: rgb(226, 226, 226);"))
         self.label_9.setIndent(0)

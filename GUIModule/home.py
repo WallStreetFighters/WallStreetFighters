@@ -7,6 +7,8 @@ import TechAnalysisModule.oscilators as indicators
 import time
 
 class Home (QtGui.QWidget):
+    """ Klasa dostarczająca widget zakładki wyswietlającej najbardziej popularne i najbardziej aktywne instrumenty finasowe
+        największe spadki i wzrosty. Ponadto wyswietlany jest Widget RSS umozliwiający dodawanie  wyświetlanie kanałów rss"""
     def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None, finObjList = None):
         self.topList = topList
         self.mostList = mostList
@@ -18,32 +20,24 @@ class Home (QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.initUi()
     def initUi(self):
+        """inicjalizacja GUI"""
         self.gridLayout = QtGui.QGridLayout(self)
-        #ramka zawierajaca obiekty z góry yahoo 
+        
+        #ramka zawierajaca najbardziej popularne obiekty
         self.topFrame = QtGui.QFrame(self)
         self.topFrame.setMaximumSize(QtCore.QSize(16777215, 240))
         self.topFrame.setMinimumSize(QtCore.QSize(0, 240))
         self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
         self.topLayout = QtGui.QGridLayout(self.topFrame)
-        #spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        #self.topLayout.addItem(spacerItem)
         k = 0
         if self.topList:
             for objList in self.topList:
                 self.addTopObject(objList,k)
                 k=k+1
-
-
-        
-        #spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        #self.topLayout.addItem(spacerItem1)
+                
         self.gridLayout.addWidget(self.topFrame, 0, 1, 1, 1)
         #koniec top ramki
-        
-        #test update top list
-        #self.updateTopList([['a','a','a','a'],['a','a','a','a']])
-       
 
         #ramka zawierajaca Most Activities, Gainers i Losers
         self.scrollArea = QtGui.QScrollArea(self)
@@ -68,16 +62,11 @@ class Home (QtGui.QWidget):
         self.leftLayout.addWidget(self.label3)
         self.addTable(self.loserList)
         
-        #spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        #self.leftLayout.addItem(spacerItem2)
         self.scrollArea.setWidget(self.leftFrame)
         self.gridLayout.addWidget(self.scrollArea, 0, 0, 2, 1)
+        #koniec ramki 
 
-        #test update Table
-        #self.updateTable([['a','a','a','a'],['a','a','a','a']],[],[])
-
-
-        #rssLayout
+        #dodajemy Widget RSS
         self.rssFrame = QtGui.QFrame(self)
         self.rssFrame.setAutoFillBackground(True)
         self.rssFrame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -90,9 +79,9 @@ class Home (QtGui.QWidget):
         self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
-       
-
     def addTopObject(self,objList,k):
+        """metoda tworzy ramki wyświetlające aktualne wartości najpopularniejszych obiektów finanswoych i
+           wyświetla do nich aktualne wykresiki"""
         self.frame = MyFrame(self)
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtGui.QFrame.Raised)
@@ -128,16 +117,13 @@ class Home (QtGui.QWidget):
             dates=d['date']
             values=d['close']
             #values=indicators.adLine(d['adv'], d['dec'])
-            #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
-            #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
-            zafajnistyWykres = LightweightChart(self,dates,values,'A/D line')                        
-            self.topLayout.addWidget(zafajnistyWykres,k/3,(2*k+1)%6)#zafajniste Dane1
-
-            
-        
-        
+            #values=indicators.mcClellanOscillator(zajebisteDane['adv'], zajebisteDane['dec'])        
+            #values=indicators.TRIN(zajebisteDane['adv'], zajebisteDane['dec'], zajebisteDane['advv'], zajebisteDane['decv'])
+            zajebistyWykres = LightweightChart(self,dates,values,'A/D line')                        
+            self.topLayout.addWidget(zajebistyWykres,k/3,(2*k+1)%6)#zajebiste Dane1
                                   
     def addTable(self,objList2):
+        """metoda tworzy strkuturę tabeli wyświetlajać wartości dla Most actives , gainers, losers"""
         self.tableWidget = QtGui.QTableWidget(self)
         self.tableWidget.setEnabled(True)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
@@ -222,14 +208,16 @@ class Home (QtGui.QWidget):
         self.leftLayout.addWidget(self.tableWidget)
      
     def updateTopList(self):
+        """uaktualnianie danych w górnej ramce"""
        
 	self.topList = self.updateThread.topList
 	self.topList.remove(self.topList[4])
 	self.finObjList = self.updateThread.finObjList
+	
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
         for i in ran:
-            widget = self.topLayout.itemAt(i).widget().close()
+            self.topLayout.itemAt(i).widget().destroy()
             
 
         # tworzymy nowe ramki z nowymi wartościami
@@ -239,7 +227,7 @@ class Home (QtGui.QWidget):
             k = k+1
 
     def updateTable(self):
-	
+	"""uaktualnianie tabelek po lawej stronie nowymi wartościami"""
 	self.mostList = self.updateThread.mostList
 	self.loserList = self.updateThread.loserList
 	self.gainerList = self.updateThread.gainerList
@@ -270,6 +258,8 @@ class Home (QtGui.QWidget):
             self.emit(QtCore.SIGNAL("tabFromHome"),(a.text()))
             
 class MyFrame(QtGui.QFrame):
+    """ przeładowanie obiektu QFrame z którego tworzymy górne obiekty w celu zdefiniowania metod obsługi zdarzeń myszy,
+        po naciśnięciy na górną ramkę otwieramy odpowiedni wykres na nowej zakładace"""
     def __init__(self,parent):
         self.parent = parent
         QtGui.QWidget.__init__(self)
@@ -303,6 +293,7 @@ class MyFrame(QtGui.QFrame):
             self.parent.topLayout.itemAtPosition(0,3).widget().close()
         
 class UpdateThread(QtCore.QThread):
+    """ klasa pobierająca na bieżąco aktualne zmiany wartości obiektów finansowych"""
 
     def __init__(self,finObjList):
         QtCore.QThread.__init__(self)

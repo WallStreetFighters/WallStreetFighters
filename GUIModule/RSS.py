@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import urllib2
 from xml.dom import minidom, Node
@@ -6,6 +6,7 @@ import re
 
 
 class RSSItem:
+        """Obiekt RSS przechowującyą strukutrę artykułów"""
 	def __init__(self,title="",description="", link="",pubDate = ""):
                 self.title = title
 		self.description = description
@@ -13,6 +14,8 @@ class RSSItem:
 		self.pubDate = pubDate
 
 class RSSReader:
+        """Klasa odpowiedzialan za parsowanie dokumentu html i stworzenie struktury
+        artykułu RSS zawirający tytuł datę powstania , opis i hiperłącze"""
 	
 	name = ""
 	def __init__(self,RSSUrl):
@@ -33,8 +36,9 @@ class RSSReader:
 		xmldoc = None
 		if (urlInfo):
 			xmldoc = minidom.parse(urlInfo)
-		#else:
-			#print "Error Getting URL"
+		else:
+			print "Error Getting URL"
+		
 		return xmldoc
 	
 	def GetItemText(self,xmlNode):
@@ -48,7 +52,7 @@ class RSSReader:
 	def GetChildText(self, xmlNode, childName):
 		"""Get a child node from the xml node"""
 		if (not xmlNode):
-			#print "Error GetChildNode: No xml_node"
+			print "Error GetChildNode: No xml_node"
 			return ""
 		for itemNode in xmlNode.childNodes:
 			if (itemNode.nodeName==childName):
@@ -70,7 +74,7 @@ class RSSReader:
 	
 	def GetItems(self):
 		"""Generator to get items"""
-		#print("ddd")
+		print("ddd")
                 if not self.xmldoc == None:
                         for itemNode in self.xmldoc.documentElement.childNodes:
                                 for itemNode in itemNode.childNodes:
