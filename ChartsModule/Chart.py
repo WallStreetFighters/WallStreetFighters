@@ -229,7 +229,7 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
             lines2list.append(((i-0.3,self.data.open[i]),(i,self.data.open[i])))
             lines2list.append(((i,self.data.close[i]),(i+0.3,self.data.close[i])))   
         lines2=LineCollection(lines2list)
-        lines2.color('k')
+        lines2.set_color('k')
         ax.add_collection(lines2)
     
     def setMainIndicator(self, type):
@@ -483,8 +483,6 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         
     def drawTrend(self):
         self.clearLines()
-        strategy = Strategy(self.data)
-        strategy.analyze()
         a, b = trend.regression(self.data.close)
         trend.optimizedTrend(self.data.close)
         #self.drawTrendLine(0, b, len(self.data.close)-1, a*(len(self.data.close)-1) + b, 'y', 2.0)
