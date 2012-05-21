@@ -19,6 +19,8 @@ class MainWindow(QtGui.QMainWindow):
         FILE.close()
         valueList = [self.gui.home.topList,self.gui.home.mostList,self.gui.home.loserList,self.gui.home.gainerList, self.gui.home.finObjList]
         cPickle.dump(valueList, open('save.wsf','w'))
+        self.gui.allFiltre()
+        self.gui.bigFiltre('')
         ran = range(self.gui.tabs.count())
         tabHistoryList = []
         for i in ran:
