@@ -81,7 +81,7 @@ class GuiMainWindow(object):
         self.futuresModel.setFilterCaseSensitivity(0)
         self.futuresModel.setDynamicSortFilter(True)
         
-        """home """
+        # dodajemy zakłądkę home
 	try:
 		File = open("../GUIModule/save.wsf",'r')
 		valueList = cPickle.load(File)
@@ -97,42 +97,7 @@ class GuiMainWindow(object):
 	self.rssWidget.ourWebsite.clicked.connect(self.ourWebsiteTab)
 	QtCore.QObject.connect(self.home,QtCore.SIGNAL("tabFromHome"),self.tabHome)
 
-        """#zafajniste Dane
-	nowDate = datetime.datetime.now()
-	nowDate = datetime.date(nowDate.year,nowDate.month,nowDate.day)
-	d = datetime.timedelta(-367)
-	pastDate = nowDate + d
-	d = datetime.timedelta(-322)
-	nowDate = nowDate +d
-	#zafajniste Dane1
-        zafajnisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2003,7,10),datetime.date(2004,2,2),'NYSE')
-        dates=zafajnisteDane['date']
-        values=indicators.adLine(zafajnisteDane['adv'], zafajnisteDane['dec'])
-        #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
-        #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
-        zafajnistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
-        self.home.topLayout.addWidget(zafajnistyWykres,0,1)#zafajniste Dane1
-
-        #zafajniste Dane2
-        zafajnisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2004,7,10),datetime.date(2005,2,2),'NASDAQ')
-        dates=zafajnisteDane['date']
-        values=indicators.adLine(zafajnisteDane['adv'], zafajnisteDane['dec'])
-        #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
-        #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
-        zafajnistyWykres = LightweightChart(self.home,dates,values,'A/D line')                        
-        self.home.topLayout.addWidget(zafajnistyWykres,0,3)
-        zafajnistyWykres.close()
-        #zafajniste Dane3
-        zafajnisteDane=dataParser.getAdvDecInPeriodOfTime(datetime.date(2005,7,10),datetime.date(2006,2,2),'AMEX')
-        dates=zafajnisteDane['date']
-        values=indicators.adLine(zafajnisteDane['adv'], zafajnisteDane['dec'])
-        #values=indicators.mcClellanOscillator(zafajnisteDane['adv'], zafajnisteDane['dec'])        
-        #values=indicators.TRIN(zafajnisteDane['adv'], zafajnisteDane['dec'], zafajnisteDane['advv'], zafajnisteDane['decv'])
-        zafajnistyWykres = LightweightChart(self.home,dates,values,'A/D line')
-        
-        self.home.topLayout.addWidget(zafajnistyWykres,0,5)#zafajniste Dane1
-        zafajnistyWykres.close()"""
-        """Search"""
+        #dodajemy zakładke Search
 	self.tabA = TabA(None,self.indexModel,self.stockModel,self.forexModel,self.bondModel,self.resourceModel,self.futuresModel)
         self.tabs.addTab(self.tabA,"Search")
         
@@ -151,7 +116,7 @@ class GuiMainWindow(object):
         self.tabA.allButton.pressed.connect(self.allFiltre)
         
 
-        """Setings"""
+        #dodajemy zakładę Settings oraz wczytyjemy zapisane ustawienia
         settingsFile = open('settingsList.wsf','rb')
         try:
             settingsList = cPickle.load(settingsFile)
@@ -159,13 +124,10 @@ class GuiMainWindow(object):
             settingsList = []
         self.settingsTab = Settings(settingsList)
         self.tabs.addTab(self.settingsTab,"Settings")
-        
-        
-
         self.tabA.filterLineEdit.textChanged.connect(self.bigFiltre)
 
         
-        """ teraz otwieramy zakładki z historii"""
+        #otwieramy zakładki z historii
         tabHistoryFile = open('tabHistory.wsf','rb')
         try:
             tabHistoryList = cPickle.load(tabHistoryFile)
@@ -236,53 +198,23 @@ class GuiMainWindow(object):
                     nameTab = "Futures' comparison"
                     self.newFuturesTab(qModelIndex ,nameTab,tabSettings,"futures")
 
-        
-        """koniec tab A """
-        
-        """ tab B
-        self.tabB = AbstractTab()
-        self.tabB.setObjectName("tabB")
-
-        #przycisk wyswietlanie wykresu (przyciski dodajemy na sam koniec okna)
-        self.tabB.optionsLayout.addWidget(self.tabB.addChartButton(),0,4,3,4)
-        self.tabs.addTab(self.tabB,"tabB")
-        koniec tab B"""
-
-        """ tabC
-        self.tabC = AbstractTab()
-        self.tabC.setObjectName("tabC")
-        self.tabs.addTab(self.tabC,"tabC")
-        self.tabC.optionsLayout.addWidget(self.tabC.addChartButton(),0,7,3,4)
-        self.tabs.addTab(self.tabC,"tabC")
-        
-        Koniec tabC"""
-
 	""" koniec ustawiania Zakładek"""
 
 	self.tabs.tabCloseRequested.connect(self.closeTab)
-	
         self.verticalLayout.addWidget(self.tabs)
         MainWindow.setCentralWidget(self.centralWidget)
-
-				
-        self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 640, 25))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-
         
     
     def compare(self):
+        """ metoda tworzy wykres w trybie porónania kilku obiektów na jednym wykresie"""
         text = self.tabA.compareLineEdit.text().toUpper()
         chartList = text.split(' VS ')
         qModelIndex = []
         listName = []
-#        for x in chartList:
-#            print x
-#        print "znalazlwm"
+        
+        
+        self.allFiltre()
+        self.bigFiltre('')
         for x in chartList:
             t = self.findIndexModel(x)
             if t:
@@ -305,15 +237,10 @@ class GuiMainWindow(object):
                     qModelIndex.append(self.resourceModel.index(t[1],0))
                     listName.append('resource')
         if not qModelIndex :
-            #print "pusta list do porównania"
-            1
+            pass
         else:
             self.newCompareTab(qModelIndex,"comparison",listName)
             
-            
-            
-
-      
         """pageIndex = self.tabA.listsToolBox.currentIndex()
         if pageIndex == 0:
             qModelIndex = self.tabA.indexListView.selectedIndexes()
@@ -456,27 +383,25 @@ class GuiMainWindow(object):
         #line width
         lineWidth = 2.0
         
+        
         t = {"start":start,"end":end,"indicator":indicator,"step":step,
              "chartType":chartType,"hideVolumen":hideVolumen,
              "painting":painting,"scale":scale,"oscilator":oscilator,"drawTrend":drawTrend,'lineWidth':lineWidth}
         return t
+    
     def closeTab(self,i):
         if i != 0 and i!=1 and i !=2:
-
             self.tabs.removeTab(i)
             
     def findIndexModel(self,name):
         k = 0
         for  x in dataParser.INDEX_LIST:
             if name in x:
-#                print "znalazlem w indx"
                 return ("index",k)
             k= k+1
         k = 0
         for  x in dataParser.STOCK_LIST:
             if name in x:
-#               print k
-#               print "znalazlem w stc"
                return ("stock",k)
             k= k+1
         k = 0
@@ -546,11 +471,10 @@ class GuiMainWindow(object):
             k= k+1
 
     def bigFiltre(self,text):
-
+        """metoda odpowiedzialna za filtrowanie list w Search"""
 
         reg= self.stockModel.filterRegExp()
         pattern = text + QtCore.QString(".*"+self.stockModelNestedPattern)
-        #print pattern
         reg.setPattern(pattern)
             
             
@@ -602,7 +526,7 @@ class GuiMainWindow(object):
         reg.setPattern(self.tabA.filterLineEdit.text()+".*WIG20")
         self.stockModel.setFilterRegExp(reg)
         self.stockModelNestedPattern = "WIG20"
-        #print self.tabA.filterLineEdit.text()+".*WIG20"
+        print self.tabA.filterLineEdit.text()+".*WIG20"
     def allFiltre(self):
         reg= self.stockModel.filterRegExp()
         self.stockModel.setFilterRole(34)
@@ -611,7 +535,9 @@ class GuiMainWindow(object):
         self.stockModelNestedPattern = ""
     def ourWebsiteTab(self):
         if not (self.ourWebTab):
+            
             self.ourWebTab = QtGui.QWidget()
+            self.ourWebTab.setObjectName("WebTab")
             self.horizontalLayout2 = QtGui.QHBoxLayout(self.ourWebTab)
             self.webView = QtWebKit.QWebView()
             self.webView.setUrl(QtCore.QUrl("http://wall-street-fighters.herokuapp.com"))
@@ -619,11 +545,12 @@ class GuiMainWindow(object):
             self.tabs.addTab(self.ourWebTab,"WSF WebSite")
             self.tabs.setCurrentWidget(self.ourWebTab)
         elif self.ourWebTab not in self.tabs.children():
-#            print 'aaa'
+            print 'aaa'
             self.tabs.setCurrentWidget(self.ourWebTab)
             
-    """ Modele przechowywania listy dla poszczególnych instrumentów finansowych"""    
+       
     class ListModel(QtCore.QAbstractTableModel):
+        """ Modele przechowywania listy dla poszczególnych instrumentów finansowych""" 
         def __init__(self,list, parent = None):
             QtCore.QAbstractTableModel.__init__(self, parent)
             self.list = list
@@ -659,7 +586,6 @@ class GuiMainWindow(object):
             if not index.isValid():
                 return QtCore.QVariant()
             elif role == QtCore.Qt.WhatsThisRole:
-#                print self.list[index.row()]
                 return self.list[index.row()]
             elif role != QtCore.Qt.DisplayRole and role != 32 and role!= 33 and role!=34 :
                 return QtCore.QVariant()
